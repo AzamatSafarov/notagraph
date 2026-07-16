@@ -1,33 +1,46 @@
 # Topologies of Ideas Universal
 
-A standalone browser app that turns an Obsidian vault into a 3D idea graph — now with split provider support for **embeddings** and **annotation/chat**.
+A standalone browser app that turns an Obsidian vault into a 3D idea graph.
 
 ## What changed
 
-The original build was tied to Gemini. This version lets you mix providers:
+The original build was locked to Gemini. This version keeps the extra provider support, but now the UI is simpler:
 
-- one provider for **embeddings**
-- another provider for **cluster naming / center nomination / edge labels**
+- **Simple mode by default**: one provider block for everything
+- one API key field
+- one base URL field
+- one chat model field
+- one embedding model field that you can usually leave as-is
+- **advanced annotation override** only if you really want a different provider for cluster naming and edge labels
 
-That means you can do things like:
-- OpenAI embeddings + Anthropic annotations
-- Azure OpenAI embeddings + Groq annotations
-- Ollama Cloud embeddings + OpenRouter annotations
-- Gemini embeddings + xAI annotations
+## Good defaults if you only have Ollama Cloud or Azure
 
-## Included provider presets
+### Ollama Cloud
+- Provider: `Ollama Cloud`
+- Base URL: `https://ollama.com/v1`
+- Chat model: leave the default or pick your preferred Ollama Cloud chat model
+- Embedding model: leave the default unless you know you want another embedding model
 
-### Embedding side
-- Gemini
-- OpenAI
-- OpenRouter
-- Azure OpenAI
+### Azure OpenAI
+- Provider: `Azure OpenAI`
+- Base URL: your Azure resource root, for example `https://YOUR-RESOURCE.openai.azure.com`
+- API version: usually `2024-02-01`
+- Chat model: your Azure chat deployment name
+- Embedding model: your Azure embedding deployment name
+
+## Included providers
+
+### Simple mode (one provider for everything)
 - Ollama Cloud
+- Azure OpenAI
+- OpenRouter
+- OpenAI
+- Gemini
 - Ollama Local
 - Mistral
 - Custom OpenAI-compatible endpoint
 
-### Chat / annotation side
+### Advanced annotation-only override
 - Gemini
 - OpenAI
 - OpenRouter
@@ -45,22 +58,14 @@ That means you can do things like:
 - Perplexity
 - Custom OpenAI-compatible endpoint
 
-## Important notes
+## Browser compatibility
 
-- **Azure OpenAI** uses `api-key` auth and requires an API version. In this app, set the base URL to your Azure resource root (for example `https://YOUR-RESOURCE.openai.azure.com`) and the model field to your deployment name.
-- **Anthropic** is supported for the chat/annotation pipeline only. Use another embedding provider for vectors.
-- **Ollama Cloud** uses the OpenAI-compatible endpoint at `https://ollama.com/v1`.
-- **Ollama Local** uses `http://localhost:11434/v1`.
-- Any provider that exposes OpenAI-style `/embeddings` and `/chat/completions` can be used through the custom preset.
+The app now tries `window.showDirectoryPicker()` first, but if your browser does not expose that API it falls back to a hidden folder input (`webkitdirectory`). That makes browsers like Zen much more likely to work.
 
 ## Quick start
 
-1. Open `app.html` in Chrome or another Chromium browser.
-2. Fill the **embedding pipeline** section.
-3. Fill the **annotation pipeline** section.
-4. Select your notes folder.
-5. Wait for the graph to embed, cluster, annotate, and render.
-
-## Browser requirement
-
-This app uses the File System Access API for folder selection, so it needs Chrome / Edge / another Chromium-based browser.
+1. Open `app.html` in a Chromium-based browser.
+2. Fill the **Main AI Provider** block.
+3. Leave the embedding model alone if you do not know what it is.
+4. Click **Select Notes Folder**.
+5. Only turn on the advanced annotation override if you truly want a different provider for cluster naming.
