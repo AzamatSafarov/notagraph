@@ -164,6 +164,24 @@
       opacity: 0.65;
     }
 
+    .setup-provider-hint {
+      margin-top: 4px;
+      padding: 11px 12px;
+      border: 1px dashed rgba(120, 180, 255, 0.35);
+      background: rgba(120, 180, 255, 0.06);
+      font-family: var(--mono);
+      font-size: 10px;
+      line-height: 1.65;
+      letter-spacing: 0.03em;
+      color: var(--text-dim);
+      text-transform: none;
+    }
+
+    .setup-provider-hint strong {
+      color: var(--text-bright);
+      font-weight: 600;
+    }
+
     .setup-field-input,
     .setup-field-select {
       background: transparent;
@@ -850,7 +868,7 @@
   <div id="setup">
     <div id="setup-title">TOPOLOGIES OF IDEAS</div>
     <div id="setup-subtitle">SCOPE // UNIVERSAL</div>
-    <div id="setup-note">IF YOU ARE NOT SURE WHAT EMBEDDINGS ARE, DO NOT WORRY. IN SIMPLE MODE YOU JUST PASTE ONE KEY, PICK A PROVIDER, AND THE APP USES IT FOR BOTH NOTE INDEXING AND CLUSTER ANNOTATION.</div>
+    <div id="setup-note">QUICK SETUP: CHOOSE A PROVIDER, PASTE A KEY, AND KEEP THE DEFAULT MODELS UNLESS YOUR PROVIDER USES CUSTOM DEPLOYMENT NAMES.</div>
 
     <div class="setup-grid simple-mode">
       <section class="setup-section setup-section-primary">
@@ -882,6 +900,7 @@
           <label for="primary-embedding-model-input" class="setup-field-label">EMBEDDING MODEL <span class="setup-inline-help">(TECHNICAL — LEAVE DEFAULT IF UNSURE)</span></label>
           <input type="text" id="primary-embedding-model-input" class="setup-field-input" placeholder="EMBEDDING MODEL" spellcheck="false" autocomplete="off">
         </div>
+        <div id="primary-provider-hint" class="setup-provider-hint"></div>
       </section>
 
       <section class="setup-section setup-section-advanced">
@@ -914,6 +933,7 @@
               <input type="text" id="chat-model-input" class="setup-field-input" placeholder="CHAT MODEL" spellcheck="false" autocomplete="off">
             </div>
           </div>
+          <div id="chat-provider-hint" class="setup-provider-hint"></div>
         </div>
       </section>
     </div>
@@ -1119,6 +1139,7 @@
     const primaryEmbeddingModelInput = document.getElementById('primary-embedding-model-input');
     const primaryChatModelInput = document.getElementById('primary-chat-model-input');
     const primaryApiKeyLabel = document.getElementById('primary-api-key-label');
+    const primaryProviderHint = document.getElementById('primary-provider-hint');
 
     const useSeparateChatToggle = document.getElementById('use-separate-chat-toggle');
     const advancedChatSection = document.getElementById('advanced-chat-section');
@@ -1128,6 +1149,37 @@
     const chatApiVersionInput = document.getElementById('chat-api-version-input');
     const chatModelInput = document.getElementById('chat-model-input');
     const chatApiKeyLabel = document.getElementById('chat-api-key-label');
+    const chatProviderHint = document.getElementById('chat-provider-hint');
+
+    function getPrimaryProviderHint(provider) {
+      switch (provider) {
+        case 'ollama-cloud':
+          return '<strong>Ollama Cloud:</strong> usually you can paste your key and keep the prefilled Base URL and models.';
+        case 'azure':
+          return '<strong>Azure OpenAI:</strong> Base URL should be your resource root. Both model fields must be your deployment names.';
+        case 'gemini':
+          return '<strong>Gemini:</strong> use a Gemini API key. Base URL is prefilled and API Version can stay empty.';
+        case 'ollama-local':
+          return '<strong>Ollama Local:</strong> make sure your local Ollama server is running before you pick a folder.';
+        case 'custom-openai':
+          return '<strong>Custom OpenAI-compatible:</strong> point Base URL at the provider root that exposes /embeddings and /chat/completions.';
+        default:
+          return '<strong>Tip:</strong> if your provider gives you both chat and embeddings, the default values here are usually enough to get started.';
+      }
+    }
+
+    function getChatOverrideHint(provider) {
+      switch (provider) {
+        case 'anthropic':
+          return '<strong>Anthropic override:</strong> this only names clusters and labels edges. Embeddings still come from the main provider.';
+        case 'azure':
+          return '<strong>Azure override:</strong> use your Azure resource root and put the annotation deployment name into the chat model field.';
+        case 'custom-openai':
+          return '<strong>Custom override:</strong> the annotation provider only needs a chat-compatible endpoint.';
+        default:
+          return '<strong>Advanced mode:</strong> this override changes annotation only. It does not affect note embeddings or graph layout vectors.';
+      }
+    }
 
     function getProviderPreset(provider = 'ollama-cloud') {
       return PROVIDER_PRESETS[provider] || PROVIDER_PRESETS['custom-openai'];
@@ -1309,6 +1361,7 @@
       primaryApiVersionInput.placeholder = apiStyle === 'azure' ? AZURE_API_VERSION : 'OPTIONAL';
       primaryEmbeddingModelInput.placeholder = apiStyle === 'azure' ? 'EMBEDDING DEPLOYMENT' : 'EMBEDDING MODEL';
       primaryChatModelInput.placeholder = apiStyle === 'azure' ? 'CHAT DEPLOYMENT' : 'CHAT MODEL';
+      primaryProviderHint.innerHTML = getPrimaryProviderHint(normalized.provider);
     }
 
     function applyChatOverrideToInputs(config) {
@@ -1334,6 +1387,7 @@
           ? ANTHROPIC_VERSION
           : 'OPTIONAL';
       chatModelInput.placeholder = apiStyle === 'azure' ? 'CHAT DEPLOYMENT' : 'CHAT MODEL';
+      chatProviderHint.innerHTML = getChatOverrideHint(normalized.provider);
     }
 
     function updateAdvancedChatVisibility() {

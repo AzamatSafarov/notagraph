@@ -64,6 +64,7 @@ const elements = {
   'primary-embedding-model-input': makeElement(''),
   'primary-chat-model-input': makeElement(''),
   'primary-api-key-label': makeElement(''),
+  'primary-provider-hint': makeElement(''),
   'use-separate-chat-toggle': makeElement(''),
   'advanced-chat-section': makeElement(''),
   'chat-provider-select': makeElement('anthropic'),
@@ -72,6 +73,7 @@ const elements = {
   'chat-api-version-input': makeElement(''),
   'chat-model-input': makeElement(''),
   'chat-api-key-label': makeElement(''),
+  'chat-provider-hint': makeElement(''),
   'folder-input': makeElement(''),
 };
 
@@ -161,6 +163,7 @@ return {
   primaryApiVersionInput,
   primaryEmbeddingModelInput,
   primaryChatModelInput,
+  primaryProviderHint,
   useSeparateChatToggle,
   advancedChatSection,
   chatProviderSelect,
@@ -168,6 +171,7 @@ return {
   chatBaseUrlInput,
   chatApiVersionInput,
   chatModelInput,
+  chatProviderHint,
   folderInput,
 };
 `)();
@@ -181,6 +185,7 @@ return {
   assert.equal(exported.primaryChatModelInput.value, 'deepseek-v4-pro');
   assert.equal(exported.useSeparateChatToggle.checked, false);
   assert.equal(exported.advancedChatSection.classList.contains('hidden'), true);
+  assert.match(exported.primaryProviderHint.innerHTML, /Ollama Cloud/i);
   results.simple_defaults = 'ok';
 
   exported.primaryApiKeyInput.value = 'primary-key';
@@ -191,6 +196,7 @@ return {
   assert.equal(exported.primaryApiVersionInput.value, exported.AZURE_API_VERSION);
   assert.equal(exported.primaryEmbeddingModelInput.value, 'text-embedding-3-small');
   assert.equal(exported.primaryChatModelInput.value, 'gpt-4o-mini');
+  assert.match(exported.primaryProviderHint.innerHTML, /deployment names/i);
   results.azure_defaults = 'ok';
 
   exported.primaryBaseUrlInput.value = 'https://demo.openai.azure.com';
@@ -212,6 +218,8 @@ return {
   runtime = exported.buildRuntimeConfig(exported.getConfigFromInputs());
   assert.equal(runtime.chat.provider, 'anthropic');
   assert.equal(runtime.chat.model, 'claude-3-5-sonnet-latest');
+  exported.applyConfigToInputs(exported.getConfigFromInputs());
+  assert.match(exported.chatProviderHint.innerHTML, /Embeddings still come from the main provider/i);
   results.advanced_runtime = 'ok';
 
   fetchCalls = [];

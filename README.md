@@ -1,36 +1,57 @@
 # Topologies of Ideas Universal
 
-A standalone browser app that turns an Obsidian vault into a 3D idea graph.
+Topologies of Ideas Universal is a standalone browser app that turns an Obsidian vault into a 3D graph of notes, clusters, and connections.
 
-## What changed
+No build step. No backend. Open `app.html` and run it locally in the browser.
 
-The original build was locked to Gemini. This version keeps the extra provider support, but now the UI is simpler:
+## What this version fixes
 
-- **Simple mode by default**: one provider block for everything
-- one API key field
-- one base URL field
-- one chat model field
-- one embedding model field that you can usually leave as-is
-- **advanced annotation override** only if you really want a different provider for cluster naming and edge labels
+The original build was effectively tied to Gemini. This version removes that limitation.
 
-## Good defaults if you only have Ollama Cloud or Azure
+You can now:
+
+- use a normal **single-provider setup** for most cases
+- paste **any supported API key**, not just Gemini
+- keep one provider for both embeddings and annotation by default
+- optionally enable a separate **annotation-only provider** for cluster names and edge labels
+- pick a notes folder even in browsers that do not expose `showDirectoryPicker()` by falling back to `webkitdirectory`
+
+## Quick start
+
+1. Open `app.html` in a Chromium-based browser.
+2. In **Main AI Provider**, choose your provider.
+3. Paste your API key.
+4. Leave the prefilled model values alone unless your provider uses custom deployment names.
+5. Click **Select Notes Folder**.
+6. Enable the advanced annotation override only if you really want a second provider just for naming/labeling.
+
+## Best default choices
 
 ### Ollama Cloud
+
+Use this if you want the easiest setup.
+
 - Provider: `Ollama Cloud`
-- Base URL: `https://ollama.com/v1`
-- Chat model: leave the default or pick your preferred Ollama Cloud chat model
-- Embedding model: leave the default unless you know you want another embedding model
+- Base URL: leave `https://ollama.com/v1`
+- Chat model: keep the default or replace it with your preferred Ollama Cloud chat model
+- Embedding model: usually keep the default
 
 ### Azure OpenAI
+
+Use this if your models are deployed in Azure.
+
 - Provider: `Azure OpenAI`
 - Base URL: your Azure resource root, for example `https://YOUR-RESOURCE.openai.azure.com`
 - API version: usually `2024-02-01`
-- Chat model: your Azure chat deployment name
-- Embedding model: your Azure embedding deployment name
+- Chat model: your chat deployment name
+- Embedding model: your embedding deployment name
 
-## Included providers
+## Supported providers
 
-### Simple mode (one provider for everything)
+### Main provider mode
+
+These providers can drive the whole pipeline in the simple one-provider setup:
+
 - Ollama Cloud
 - Azure OpenAI
 - OpenRouter
@@ -41,6 +62,9 @@ The original build was locked to Gemini. This version keeps the extra provider s
 - Custom OpenAI-compatible endpoint
 
 ### Advanced annotation-only override
+
+These providers can be used only for cluster naming and edge labeling when the advanced override is enabled:
+
 - Gemini
 - OpenAI
 - OpenRouter
@@ -58,14 +82,36 @@ The original build was locked to Gemini. This version keeps the extra provider s
 - Perplexity
 - Custom OpenAI-compatible endpoint
 
+## Provider notes
+
+- **Azure OpenAI:** use the Azure resource root as Base URL. Model fields should contain deployment names.
+- **Anthropic:** available in the annotation override path, not as the main embedding provider in this UI.
+- **Ollama Local:** expects a local Ollama server, usually at `http://localhost:11434/v1`.
+- **Custom OpenAI-compatible:** should expose compatible `/embeddings` and `/chat/completions` endpoints.
+
 ## Browser compatibility
 
-The app now tries `window.showDirectoryPicker()` first, but if your browser does not expose that API it falls back to a hidden folder input (`webkitdirectory`). That makes browsers like Zen much more likely to work.
+The app tries `window.showDirectoryPicker()` first.
 
-## Quick start
+If the browser does not expose that API, it falls back to a hidden folder input using `webkitdirectory`. This improves compatibility with Chromium-derived browsers that block or omit the File System Access API.
 
-1. Open `app.html` in a Chromium-based browser.
-2. Fill the **Main AI Provider** block.
-3. Leave the embedding model alone if you do not know what it is.
-4. Click **Select Notes Folder**.
-5. Only turn on the advanced annotation override if you truly want a different provider for cluster naming.
+## Files
+
+- `app.html` — the standalone application
+- `verify-provider-support.js` — local verification script for provider config behavior and folder-picker fallback
+
+## Local verification
+
+Run:
+
+```bash
+node verify-provider-support.js
+```
+
+This checks:
+
+- simple-mode provider defaults
+- Azure default field mapping
+- advanced annotation override wiring
+- provider-specific request construction
+- folder-picker fallback behavior
