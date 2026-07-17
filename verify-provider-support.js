@@ -17,7 +17,7 @@ function sliceBetween(startMarker, endMarker) {
 }
 
 const configSection = sliceBetween('// Provider Config Persistence', '// IndexedDB Cache');
-const pickerSection = sliceBetween('const folderInput = document.getElementById(\'folder-input\');', '// ═══════════════════════════════════════════════\n    // Button Wiring & Screen Transition');
+const pickerSection = sliceBetween("const folderInput = document.getElementById('folder-input');", '// ═══════════════════════════════════════════════\n    // Button Wiring & Screen Transition');
 const apiSection = sliceBetween('// Provider API — Embeddings & Generation', '// Math Pipeline');
 
 function makeElement(initial = '') {
@@ -27,6 +27,8 @@ function makeElement(initial = '') {
     textContent: '',
     innerHTML: '',
     checked: false,
+    disabled: false,
+    dataset: {},
     files: [],
     listeners: {},
     classList: {
@@ -65,6 +67,10 @@ const elements = {
   'primary-chat-model-input': makeElement(''),
   'primary-api-key-label': makeElement(''),
   'primary-provider-hint': makeElement(''),
+  'primary-load-models-btn': makeElement(''),
+  'primary-models-status': makeElement(''),
+  'primary-chat-model-select': makeElement(''),
+  'primary-embedding-model-select': makeElement(''),
   'use-separate-chat-toggle': makeElement(''),
   'advanced-chat-section': makeElement(''),
   'chat-provider-select': makeElement('anthropic'),
@@ -74,6 +80,9 @@ const elements = {
   'chat-model-input': makeElement(''),
   'chat-api-key-label': makeElement(''),
   'chat-provider-hint': makeElement(''),
+  'chat-load-models-btn': makeElement(''),
+  'chat-models-status': makeElement(''),
+  'chat-model-select': makeElement(''),
   'folder-input': makeElement(''),
 };
 
@@ -106,6 +115,7 @@ global.window = {
 };
 
 global.setTimeout = (fn) => { fn(); return 1; };
+global.clearTimeout = () => {};
 
 let fetchCalls = [];
 global.fetch = async (url, options = {}) => {
@@ -114,6 +124,18 @@ global.fetch = async (url, options = {}) => {
     ok: true,
     headers: { get: () => 'application/json' },
     async json() {
+      if (url.endsWith('/models') && url.includes('ollama.com')) {
+        return {
+          data: [
+            { id: 'deepseek-v4-pro' },
+            { id: 'llama3.1:8b' },
+            { id: 'nomic-embed-text' },
+          ],
+        };
+      }
+      if (url.endsWith('/models') && url.includes('api.openai.com')) {
+        return { data: [{ id: 'gpt-4o-mini' }, { id: 'text-embedding-3-small' }] };
+      }
       if (url.includes(':batchEmbedContents')) {
         const body = JSON.parse(options.body);
         return { embeddings: body.requests.map((_, index) => ({ values: [index + 1, index + 2] })) };
@@ -153,6 +175,9 @@ return {
   syncPrimaryProvider,
   syncChatOverrideProvider,
   buildRuntimeConfig,
+  loadModelChoices,
+  splitModelsByCapability,
+  providerSupportsModelDiscovery,
   pickFolder,
   readNotesFromSelection,
   embedTexts,
@@ -164,6 +189,9 @@ return {
   primaryEmbeddingModelInput,
   primaryChatModelInput,
   primaryProviderHint,
+  primaryModelsStatus,
+  primaryChatModelSelect,
+  primaryEmbeddingModelSelect,
   useSeparateChatToggle,
   advancedChatSection,
   chatProviderSelect,
@@ -172,6 +200,8 @@ return {
   chatApiVersionInput,
   chatModelInput,
   chatProviderHint,
+  chatModelsStatus,
+  chatModelSelect,
   folderInput,
 };
 `)();
@@ -197,16 +227,28 @@ return {
   assert.equal(exported.primaryEmbeddingModelInput.value, 'text-embedding-3-small');
   assert.equal(exported.primaryChatModelInput.value, 'gpt-4o-mini');
   assert.match(exported.primaryProviderHint.innerHTML, /deployment names/i);
+  assert.equal(exported.primaryModelsStatus.dataset.state, 'error');
   results.azure_defaults = 'ok';
+
+  exported.syncPrimaryProvider('ollama-cloud');
+  exported.primaryApiKeyInput.value = 'ollama-key';
+  fetchCalls = [];
+  await exported.loadModelChoices('primary');
+  assert.equal(fetchCalls[0].url, 'https://ollama.com/v1/models');
+  assert.equal(fetchCalls[0].options.headers.Authorization, 'Bearer ollama-key');
+  assert.match(exported.primaryModelsStatus.textContent, /3 models loaded/i);
+  assert.equal(exported.primaryModelsStatus.dataset.state, 'success');
+  assert.match(exported.primaryChatModelSelect.innerHTML, /deepseek-v4-pro/);
+  assert.match(exported.primaryEmbeddingModelSelect.innerHTML, /nomic-embed-text/);
+  results.model_loader = 'ok';
 
   exported.primaryBaseUrlInput.value = 'https://demo.openai.azure.com';
   exported.primaryEmbeddingModelInput.value = 'embed-deploy';
   exported.primaryChatModelInput.value = 'chat-deploy';
   let runtime = exported.buildRuntimeConfig(exported.getConfigFromInputs());
-  assert.equal(runtime.embedding.provider, 'azure');
+  assert.equal(runtime.embedding.provider, 'ollama-cloud');
   assert.equal(runtime.embedding.model, 'embed-deploy');
   assert.equal(runtime.chat.model, 'chat-deploy');
-  assert.equal(runtime.chat.provider, 'azure');
   results.simple_runtime = 'ok';
 
   exported.useSeparateChatToggle.checked = true;

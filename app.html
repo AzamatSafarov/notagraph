@@ -64,79 +64,204 @@
        ═══════════════════════════════════════════════ */
     #setup {
       width: 100vw;
-      height: 100vh;
+      min-height: 100vh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
-      gap: 14px;
-      padding: 32px 0 48px;
+      padding: 40px 20px 56px;
       overflow-y: auto;
+      background:
+        radial-gradient(circle at top left, rgba(109, 140, 255, 0.22), transparent 28%),
+        radial-gradient(circle at top right, rgba(255, 157, 86, 0.18), transparent 30%),
+        radial-gradient(circle at 50% 100%, rgba(133, 94, 255, 0.18), transparent 34%),
+        linear-gradient(180deg, #0b1120 0%, #11162a 48%, #1b1631 100%);
+    }
+
+    #setup-shell {
+      width: min(1080px, 100%);
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      padding: 24px;
+      border-radius: 32px;
+      background: rgba(246, 240, 232, 0.96);
+      border: 1px solid rgba(255, 255, 255, 0.55);
+      box-shadow:
+        0 28px 80px rgba(5, 10, 20, 0.36),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+      color: #1b2234;
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+    }
+
+    .setup-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      align-self: flex-start;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(66, 94, 198, 0.10);
+      color: #5162b8;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .setup-kicker::before {
+      content: '';
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #6d8cff 0%, #ff9d56 100%);
+      box-shadow: 0 0 18px rgba(109, 140, 255, 0.45);
+    }
+
+    .setup-hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.5fr) minmax(300px, 0.9fr);
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .setup-hero-main,
+    .setup-hero-side {
+      border-radius: 28px;
+      padding: 26px 28px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .setup-hero-main {
+      background:
+        radial-gradient(circle at top right, rgba(109, 140, 255, 0.17), transparent 34%),
+        linear-gradient(180deg, rgba(255,255,255,0.84), rgba(238,231,223,0.92));
+      border: 1px solid rgba(80, 96, 145, 0.16);
+    }
+
+    .setup-hero-side {
+      background: linear-gradient(160deg, #202845 0%, #2f3565 58%, #8f4f44 100%);
+      color: #f6efe7;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08);
     }
 
     #setup-title {
-      font-family: var(--mono);
-      font-size: 20px;
+      font-family: 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+      font-size: clamp(34px, 5vw, 62px);
+      line-height: 0.96;
       font-weight: 600;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--text-dim);
+      letter-spacing: -0.04em;
+      color: #171f34;
+      max-width: 10ch;
+      text-wrap: balance;
     }
 
     #setup-subtitle {
+      margin-top: 14px;
       font-family: var(--mono);
-      font-size: 11px;
-      letter-spacing: 0.10em;
+      font-size: 12px;
+      letter-spacing: 0.12em;
       text-transform: uppercase;
-      color: var(--text-dim);
-      margin-top: -10px;
-      margin-bottom: 4px;
+      color: #647198;
     }
 
     #setup-note {
-      width: min(760px, calc(100vw - 32px));
+      margin-top: 18px;
+      max-width: 62ch;
+      font-family: var(--sans);
+      font-size: 16px;
+      line-height: 1.62;
+      color: #48526e;
+      text-align: left;
+      text-transform: none;
+      letter-spacing: 0;
+      text-wrap: pretty;
+    }
+
+    .setup-hero-side-title {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      opacity: 0.72;
+    }
+
+    .setup-hero-side-list {
+      margin-top: 16px;
+      display: grid;
+      gap: 12px;
+    }
+
+    .setup-hero-side-item {
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .setup-hero-side-label {
+      display: block;
       font-family: var(--mono);
       font-size: 10px;
-      line-height: 1.55;
-      letter-spacing: 0.05em;
-      color: var(--text-dim);
-      text-align: center;
+      letter-spacing: 0.1em;
       text-transform: uppercase;
+      opacity: 0.66;
+      margin-bottom: 6px;
+    }
+
+    .setup-hero-side-value {
+      display: block;
+      font-family: var(--sans);
+      font-size: 15px;
+      line-height: 1.45;
+      color: #f7f3ee;
     }
 
     .setup-grid {
-      width: min(760px, calc(100vw - 32px));
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
+      width: 100%;
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.85fr);
+      gap: 18px;
     }
 
     .setup-section {
-      border: 1px solid var(--border);
-      background: var(--bg-panel);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      padding: 14px;
+      border-radius: 28px;
+      background: rgba(255, 255, 255, 0.66);
+      border: 1px solid rgba(82, 97, 145, 0.16);
+      padding: 22px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 14px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.8);
+    }
+
+    .setup-section-primary {
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.82), rgba(243,236,226,0.96));
+    }
+
+    .setup-section-advanced {
+      background:
+        linear-gradient(180deg, rgba(244,247,255,0.86), rgba(233,238,250,0.96));
     }
 
     .setup-section-title {
-      font-family: var(--mono);
-      font-size: 11px;
-      letter-spacing: 0.12em;
-      color: var(--text-bright);
-      text-transform: uppercase;
+      font-family: 'Iowan Old Style', 'Palatino Linotype', Georgia, serif;
+      font-size: 26px;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      color: #1e2741;
     }
 
     .setup-section-caption {
-      font-family: var(--mono);
-      font-size: 10px;
-      line-height: 1.5;
-      letter-spacing: 0.05em;
-      color: var(--text-dim);
-      text-transform: uppercase;
+      font-family: var(--sans);
+      font-size: 14px;
+      line-height: 1.58;
+      color: #5f6883;
+      text-transform: none;
+      letter-spacing: 0;
     }
 
     .setup-field,
@@ -152,74 +277,194 @@
 
     .setup-field-label {
       font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 0.12em;
-      color: var(--text-dim);
-      margin-bottom: 6px;
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      color: #6d7691;
+      margin-bottom: 7px;
       display: block;
       text-transform: uppercase;
     }
 
     .setup-inline-help {
-      opacity: 0.65;
+      opacity: 0.72;
+      font-size: 9px;
     }
 
-    .setup-provider-hint {
-      margin-top: 4px;
-      padding: 11px 12px;
-      border: 1px dashed rgba(120, 180, 255, 0.35);
-      background: rgba(120, 180, 255, 0.06);
-      font-family: var(--mono);
-      font-size: 10px;
-      line-height: 1.65;
-      letter-spacing: 0.03em;
-      color: var(--text-dim);
+    .setup-provider-hint,
+    .setup-status-card {
+      margin-top: 2px;
+      padding: 13px 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(87, 110, 184, 0.18);
+      background: rgba(113, 139, 214, 0.08);
+      font-family: var(--sans);
+      font-size: 14px;
+      line-height: 1.55;
+      color: #4b5674;
       text-transform: none;
+      letter-spacing: 0;
     }
 
-    .setup-provider-hint strong {
-      color: var(--text-bright);
-      font-weight: 600;
+    .setup-provider-hint strong,
+    .setup-status-card strong {
+      color: #223153;
+      font-weight: 700;
     }
 
     .setup-field-input,
-    .setup-field-select {
-      background: transparent;
-      border: 1px solid var(--border);
-      border-radius: 0;
-      color: var(--text);
-      font-family: var(--mono);
-      font-size: 13px;
-      padding: 10px 14px;
+    .setup-field-select,
+    .setup-model-select {
+      appearance: none;
+      background: rgba(255,255,255,0.82);
+      border: 1px solid rgba(90, 106, 150, 0.22);
+      border-radius: 18px;
+      color: #1d2740;
+      font-family: var(--sans);
+      font-size: 15px;
+      padding: 14px 16px;
       width: 100%;
       box-sizing: border-box;
-      letter-spacing: 0.04em;
-      transition: border-color 200ms ease;
+      transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.9);
     }
 
     .setup-field-input::placeholder {
-      color: var(--text-dim);
+      color: #8d95ae;
     }
 
     .setup-field-input:focus,
-    .setup-field-select:focus {
-      border-color: var(--blue);
+    .setup-field-select:focus,
+    .setup-model-select:focus {
+      outline: none;
+      border-color: rgba(84, 111, 213, 0.52);
+      box-shadow: 0 0 0 4px rgba(87, 116, 224, 0.12);
+      transform: translateY(-1px);
+    }
+
+    .setup-model-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding: 14px 16px;
+      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(28,40,77,0.96), rgba(32,48,92,0.93));
+      color: #eef3ff;
+    }
+
+    .setup-model-bar-copy {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .setup-model-bar-title {
+      display: block;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      opacity: 0.68;
+      margin-bottom: 4px;
+    }
+
+    .setup-model-bar-text {
+      display: block;
+      font-family: var(--sans);
+      font-size: 14px;
+      line-height: 1.45;
+      color: #edf2ff;
+    }
+
+    .setup-secondary-btn {
+      appearance: none;
+      border: none;
+      border-radius: 999px;
+      padding: 11px 16px;
+      background: linear-gradient(135deg, #6f8cff 0%, #7d69ff 100%);
+      color: #f8fbff;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 0 12px 24px rgba(71, 92, 176, 0.24);
+      transition: transform 150ms ease, box-shadow 150ms ease, filter 150ms ease;
+    }
+
+    .setup-secondary-btn:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.03);
+      box-shadow: 0 16px 32px rgba(71, 92, 176, 0.28);
+    }
+
+    .setup-secondary-btn:disabled {
+      opacity: 0.5;
+      cursor: wait;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .setup-model-pickers {
+      display: grid;
+      gap: 12px;
+    }
+
+    .setup-model-picker-card {
+      padding: 14px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.62);
+      border: 1px solid rgba(87, 106, 150, 0.15);
+    }
+
+    .setup-model-picker-label {
+      display: block;
+      margin-bottom: 8px;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #67718d;
+    }
+
+    .setup-model-select {
+      min-height: 48px;
+    }
+
+    .setup-model-status {
+      font-family: var(--sans);
+      font-size: 13px;
+      line-height: 1.45;
+      color: rgba(238, 243, 255, 0.78);
+    }
+
+    .setup-model-status[data-state="success"] {
+      color: #d7ffe8;
+    }
+
+    .setup-model-status[data-state="error"] {
+      color: #ffd2cb;
     }
 
     .setup-toggle-row {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       font-family: var(--mono);
       font-size: 11px;
       letter-spacing: 0.08em;
-      color: var(--text-bright);
+      color: #243255;
       text-transform: uppercase;
       cursor: pointer;
+      padding: 14px 16px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.6);
+      border: 1px solid rgba(87, 106, 150, 0.15);
     }
 
     .setup-toggle-row input {
-      accent-color: var(--blue);
+      accent-color: #5f76df;
+      transform: scale(1.12);
     }
 
     #advanced-chat-section.hidden {
@@ -227,73 +472,89 @@
     }
 
     .setup-actions {
-      width: min(760px, calc(100vw - 32px));
+      width: 100%;
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 12px;
+      grid-template-columns: 1.35fr 0.9fr;
+      gap: 14px;
     }
 
     #pick-folder-btn,
     #load-cache-btn {
       width: 100%;
+      min-height: 58px;
+      border-radius: 20px;
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease, background 150ms ease;
     }
 
-    @media (max-width: 760px) {
-      .setup-field-row,
+    #pick-folder-btn {
+      background: linear-gradient(135deg, #223153 0%, #435bc1 100%);
+      border: 1px solid rgba(43, 63, 121, 0.35);
+      color: #f4f8ff;
+      box-shadow: 0 18px 36px rgba(53, 72, 143, 0.24);
+    }
+
+    #pick-folder-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 24px 42px rgba(53, 72, 143, 0.28);
+    }
+
+    #load-cache-btn {
+      background: rgba(255,255,255,0.75);
+      border: 1px solid rgba(82, 99, 142, 0.18);
+      color: #324161;
+    }
+
+    #load-cache-btn:hover {
+      transform: translateY(-1px);
+      background: rgba(255,255,255,0.92);
+    }
+
+    #setup-status {
+      min-height: 1.4em;
+      padding: 2px 4px 0;
+      font-family: var(--sans);
+      font-size: 14px;
+      line-height: 1.5;
+      color: #56617d;
+    }
+
+    @media (max-width: 960px) {
+      .setup-hero,
+      .setup-grid,
       .setup-actions {
         grid-template-columns: 1fr;
       }
     }
 
-    #pick-folder-btn {
-      background: transparent;
-      border: 1px solid var(--border);
-      border-radius: 0;
-      color: var(--text);
-      font-family: var(--mono);
-      font-size: 12px;
-      letter-spacing: 0.10em;
-      text-transform: uppercase;
-      padding: 10px 24px;
-      width: 320px;
-      box-sizing: border-box;
-      cursor: pointer;
-      transition: border-color 200ms ease, color 200ms ease;
-    }
+    @media (max-width: 760px) {
+      #setup {
+        padding-inline: 12px;
+      }
 
-    #pick-folder-btn:hover {
-      border-color: var(--blue);
-      color: var(--text-bright);
-    }
+      #setup-shell {
+        padding: 16px;
+        border-radius: 24px;
+      }
 
-    #load-cache-btn {
-      background: transparent;
-      border: 1px solid var(--blue);
-      border-radius: 0;
-      color: var(--blue);
-      font-family: var(--mono);
-      font-size: 12px;
-      letter-spacing: 0.10em;
-      text-transform: uppercase;
-      padding: 10px 24px;
-      width: 320px;
-      box-sizing: border-box;
-      cursor: pointer;
-      transition: background 200ms ease, color 200ms ease;
-    }
+      .setup-hero-main,
+      .setup-hero-side,
+      .setup-section {
+        padding: 18px;
+        border-radius: 22px;
+      }
 
-    #load-cache-btn:hover {
-      background: var(--blue);
-      color: var(--text-bright);
-    }
+      .setup-field-row {
+        grid-template-columns: 1fr;
+      }
 
-    #setup-status {
-      font-family: var(--mono);
-      font-size: 11px;
-      color: var(--text-dim);
-      letter-spacing: 0.06em;
-      min-height: 1.4em;
-      margin-top: 8px;
+      #setup-title {
+        font-size: 32px;
+      }
     }
 
     /* ═══════════════════════════════════════════════
@@ -866,84 +1127,163 @@
        Setup Screen
        ═══════════════════════════════════════════════ -->
   <div id="setup">
-    <div id="setup-title">TOPOLOGIES OF IDEAS</div>
-    <div id="setup-subtitle">SCOPE // UNIVERSAL</div>
-    <div id="setup-note">QUICK SETUP: CHOOSE A PROVIDER, PASTE A KEY, AND KEEP THE DEFAULT MODELS UNLESS YOUR PROVIDER USES CUSTOM DEPLOYMENT NAMES.</div>
+    <div id="setup-shell">
+      <div class="setup-kicker">Local vault → semantic map</div>
 
-    <div class="setup-grid simple-mode">
-      <section class="setup-section setup-section-primary">
-        <div class="setup-section-title">MAIN AI PROVIDER</div>
-        <div class="setup-section-caption">USE ONE PROVIDER FOR EVERYTHING. THIS IS THE SIMPLE MODE YOU PROBABLY WANT.</div>
-        <div class="setup-field">
-          <label for="primary-provider-select" class="setup-field-label">PROVIDER</label>
-          <select id="primary-provider-select" class="setup-field-select"></select>
+      <div class="setup-hero">
+        <div class="setup-hero-main">
+          <div id="setup-title">Topologies of Ideas</div>
+          <div id="setup-subtitle">Universal provider console</div>
+          <div id="setup-note">Paste one key, keep the defaults, and load models directly from the provider when possible. The panel stays simple by default, but still keeps the advanced split-provider path if you ever need it.</div>
         </div>
-        <div class="setup-field">
-          <label for="primary-api-key-input" id="primary-api-key-label" class="setup-field-label">API KEY</label>
-          <input type="password" id="primary-api-key-input" class="setup-field-input" placeholder="PASTE KEY HERE" spellcheck="false" autocomplete="off">
-        </div>
-        <div class="setup-field">
-          <label for="primary-base-url-input" class="setup-field-label">BASE URL</label>
-          <input type="text" id="primary-base-url-input" class="setup-field-input" placeholder="BASE URL" spellcheck="false" autocomplete="off">
-        </div>
-        <div class="setup-field-row">
-          <div class="setup-field">
-            <label for="primary-api-version-input" class="setup-field-label">API VERSION / EXTRA</label>
-            <input type="text" id="primary-api-version-input" class="setup-field-input" placeholder="OPTIONAL" spellcheck="false" autocomplete="off">
-          </div>
-          <div class="setup-field">
-            <label for="primary-chat-model-input" class="setup-field-label">CHAT MODEL</label>
-            <input type="text" id="primary-chat-model-input" class="setup-field-input" placeholder="CHAT MODEL" spellcheck="false" autocomplete="off">
+        <div class="setup-hero-side">
+          <div class="setup-hero-side-title">What this panel does</div>
+          <div class="setup-hero-side-list">
+            <div class="setup-hero-side-item">
+              <span class="setup-hero-side-label">Default path</span>
+              <span class="setup-hero-side-value">One provider handles everything, so you do not need to think about embeddings unless you want to.</span>
+            </div>
+            <div class="setup-hero-side-item">
+              <span class="setup-hero-side-label">Model helpers</span>
+              <span class="setup-hero-side-value">After you paste a key, the panel can pull a model list and let you choose instead of typing IDs by hand.</span>
+            </div>
+            <div class="setup-hero-side-item">
+              <span class="setup-hero-side-label">Best quick start</span>
+              <span class="setup-hero-side-value">For your current setup, keep <strong>Ollama Cloud</strong> selected and just load the folder.</span>
+            </div>
           </div>
         </div>
-        <div class="setup-field">
-          <label for="primary-embedding-model-input" class="setup-field-label">EMBEDDING MODEL <span class="setup-inline-help">(TECHNICAL — LEAVE DEFAULT IF UNSURE)</span></label>
-          <input type="text" id="primary-embedding-model-input" class="setup-field-input" placeholder="EMBEDDING MODEL" spellcheck="false" autocomplete="off">
-        </div>
-        <div id="primary-provider-hint" class="setup-provider-hint"></div>
-      </section>
+      </div>
 
-      <section class="setup-section setup-section-advanced">
-        <label class="setup-toggle-row" for="use-separate-chat-toggle">
-          <input type="checkbox" id="use-separate-chat-toggle">
-          <span>USE A SEPARATE PROVIDER ONLY FOR ANNOTATION (ADVANCED)</span>
-        </label>
-        <div class="setup-section-caption">TURN THIS ON ONLY IF YOU REALLY WANT ONE PROVIDER FOR EMBEDDINGS AND ANOTHER FOR CLUSTER NAMES / EDGE LABELS.</div>
+      <div class="setup-grid simple-mode">
+        <section class="setup-section setup-section-primary">
+          <div class="setup-section-title">Main AI provider</div>
+          <div class="setup-section-caption">This card runs the normal flow. If one provider can do both chat and embeddings, you stay here and ignore the advanced section.</div>
 
-        <div id="advanced-chat-section" class="hidden">
           <div class="setup-field">
-            <label for="chat-provider-select" class="setup-field-label">ANNOTATION PROVIDER</label>
-            <select id="chat-provider-select" class="setup-field-select"></select>
+            <label for="primary-provider-select" class="setup-field-label">Provider</label>
+            <select id="primary-provider-select" class="setup-field-select"></select>
           </div>
-          <div class="setup-field">
-            <label for="chat-api-key-input" id="chat-api-key-label" class="setup-field-label">ANNOTATION API KEY</label>
-            <input type="password" id="chat-api-key-input" class="setup-field-input" placeholder="PASTE KEY HERE" spellcheck="false" autocomplete="off">
-          </div>
-          <div class="setup-field">
-            <label for="chat-base-url-input" class="setup-field-label">ANNOTATION BASE URL</label>
-            <input type="text" id="chat-base-url-input" class="setup-field-input" placeholder="BASE URL" spellcheck="false" autocomplete="off">
-          </div>
+
           <div class="setup-field-row">
             <div class="setup-field">
-              <label for="chat-api-version-input" class="setup-field-label">API VERSION / EXTRA</label>
-              <input type="text" id="chat-api-version-input" class="setup-field-input" placeholder="OPTIONAL" spellcheck="false" autocomplete="off">
+              <label for="primary-api-key-input" id="primary-api-key-label" class="setup-field-label">API key</label>
+              <input type="password" id="primary-api-key-input" class="setup-field-input" placeholder="Paste API key here" spellcheck="false" autocomplete="off">
             </div>
             <div class="setup-field">
-              <label for="chat-model-input" class="setup-field-label">ANNOTATION CHAT MODEL</label>
-              <input type="text" id="chat-model-input" class="setup-field-input" placeholder="CHAT MODEL" spellcheck="false" autocomplete="off">
+              <label for="primary-base-url-input" class="setup-field-label">Base URL</label>
+              <input type="text" id="primary-base-url-input" class="setup-field-input" placeholder="Base URL" spellcheck="false" autocomplete="off">
             </div>
           </div>
-          <div id="chat-provider-hint" class="setup-provider-hint"></div>
-        </div>
-      </section>
-    </div>
 
-    <div class="setup-actions">
-      <button id="pick-folder-btn">SELECT NOTES FOLDER</button>
-      <button id="load-cache-btn" class="hidden">RESUME PREVIOUS SESSION</button>
+          <div class="setup-field-row">
+            <div class="setup-field">
+              <label for="primary-api-version-input" class="setup-field-label">API version / extra</label>
+              <input type="text" id="primary-api-version-input" class="setup-field-input" placeholder="Optional" spellcheck="false" autocomplete="off">
+            </div>
+            <div class="setup-field">
+              <label for="primary-chat-model-input" class="setup-field-label">Chat model</label>
+              <input type="text" id="primary-chat-model-input" class="setup-field-input" placeholder="Chat model" spellcheck="false" autocomplete="off">
+            </div>
+          </div>
+
+          <div class="setup-field">
+            <label for="primary-embedding-model-input" class="setup-field-label">Embedding model <span class="setup-inline-help">(technical — leave default if unsure)</span></label>
+            <input type="text" id="primary-embedding-model-input" class="setup-field-input" placeholder="Embedding model" spellcheck="false" autocomplete="off">
+          </div>
+
+          <div class="setup-model-bar">
+            <div class="setup-model-bar-copy">
+              <span class="setup-model-bar-title">Model assistant</span>
+              <span class="setup-model-bar-text">Load the provider catalog and pick chat / embedding models from a real list instead of typing raw IDs.</span>
+            </div>
+            <button type="button" id="primary-load-models-btn" class="setup-secondary-btn">Load model list</button>
+          </div>
+
+          <div class="setup-model-pickers">
+            <div class="setup-model-picker-card">
+              <label for="primary-chat-model-select" class="setup-model-picker-label">Chat models from provider</label>
+              <select id="primary-chat-model-select" class="setup-model-select">
+                <option value="">Load models first or keep manual value</option>
+              </select>
+            </div>
+            <div class="setup-model-picker-card">
+              <label for="primary-embedding-model-select" class="setup-model-picker-label">Embedding models from provider</label>
+              <select id="primary-embedding-model-select" class="setup-model-select">
+                <option value="">Load models first or keep manual value</option>
+              </select>
+            </div>
+          </div>
+
+          <div id="primary-models-status" class="setup-model-status" data-state="idle"></div>
+          <div id="primary-provider-hint" class="setup-provider-hint"></div>
+        </section>
+
+        <section class="setup-section setup-section-advanced">
+          <div class="setup-section-title">Optional advanced override</div>
+          <div class="setup-section-caption">Only use this if you want one provider for the graph itself and another provider only for naming clusters and labeling note connections.</div>
+
+          <label class="setup-toggle-row" for="use-separate-chat-toggle">
+            <input type="checkbox" id="use-separate-chat-toggle">
+            <span>Use a separate annotation provider</span>
+          </label>
+
+          <div id="advanced-chat-section" class="hidden">
+            <div class="setup-field">
+              <label for="chat-provider-select" class="setup-field-label">Annotation provider</label>
+              <select id="chat-provider-select" class="setup-field-select"></select>
+            </div>
+
+            <div class="setup-field-row">
+              <div class="setup-field">
+                <label for="chat-api-key-input" id="chat-api-key-label" class="setup-field-label">Annotation API key</label>
+                <input type="password" id="chat-api-key-input" class="setup-field-input" placeholder="Paste API key here" spellcheck="false" autocomplete="off">
+              </div>
+              <div class="setup-field">
+                <label for="chat-base-url-input" class="setup-field-label">Annotation base URL</label>
+                <input type="text" id="chat-base-url-input" class="setup-field-input" placeholder="Base URL" spellcheck="false" autocomplete="off">
+              </div>
+            </div>
+
+            <div class="setup-field-row">
+              <div class="setup-field">
+                <label for="chat-api-version-input" class="setup-field-label">API version / extra</label>
+                <input type="text" id="chat-api-version-input" class="setup-field-input" placeholder="Optional" spellcheck="false" autocomplete="off">
+              </div>
+              <div class="setup-field">
+                <label for="chat-model-input" class="setup-field-label">Annotation chat model</label>
+                <input type="text" id="chat-model-input" class="setup-field-input" placeholder="Chat model" spellcheck="false" autocomplete="off">
+              </div>
+            </div>
+
+            <div class="setup-model-bar">
+              <div class="setup-model-bar-copy">
+                <span class="setup-model-bar-title">Annotation model picker</span>
+                <span class="setup-model-bar-text">If this provider supports model discovery, you can pull the list and choose the annotation model from it.</span>
+              </div>
+              <button type="button" id="chat-load-models-btn" class="setup-secondary-btn">Load list</button>
+            </div>
+
+            <div class="setup-model-picker-card">
+              <label for="chat-model-select" class="setup-model-picker-label">Annotation chat models from provider</label>
+              <select id="chat-model-select" class="setup-model-select">
+                <option value="">Load models first or keep manual value</option>
+              </select>
+            </div>
+
+            <div id="chat-models-status" class="setup-model-status" data-state="idle"></div>
+            <div id="chat-provider-hint" class="setup-provider-hint"></div>
+          </div>
+        </section>
+      </div>
+
+      <div class="setup-actions">
+        <button id="pick-folder-btn">Select notes folder</button>
+        <button id="load-cache-btn" class="hidden">Resume previous session</button>
+      </div>
+      <input id="folder-input" class="hidden" type="file" webkitdirectory directory multiple>
+      <div id="setup-status"></div>
     </div>
-    <input id="folder-input" class="hidden" type="file" webkitdirectory directory multiple>
-    <div id="setup-status"></div>
   </div>
 
   <!-- ═══════════════════════════════════════════════
@@ -1140,6 +1480,10 @@
     const primaryChatModelInput = document.getElementById('primary-chat-model-input');
     const primaryApiKeyLabel = document.getElementById('primary-api-key-label');
     const primaryProviderHint = document.getElementById('primary-provider-hint');
+    const primaryLoadModelsBtn = document.getElementById('primary-load-models-btn');
+    const primaryModelsStatus = document.getElementById('primary-models-status');
+    const primaryChatModelSelect = document.getElementById('primary-chat-model-select');
+    const primaryEmbeddingModelSelect = document.getElementById('primary-embedding-model-select');
 
     const useSeparateChatToggle = document.getElementById('use-separate-chat-toggle');
     const advancedChatSection = document.getElementById('advanced-chat-section');
@@ -1150,13 +1494,18 @@
     const chatModelInput = document.getElementById('chat-model-input');
     const chatApiKeyLabel = document.getElementById('chat-api-key-label');
     const chatProviderHint = document.getElementById('chat-provider-hint');
+    const chatLoadModelsBtn = document.getElementById('chat-load-models-btn');
+    const chatModelsStatus = document.getElementById('chat-models-status');
+    const chatModelSelect = document.getElementById('chat-model-select');
+
+    const modelLoadTimers = { primary: null, chat: null };
 
     function getPrimaryProviderHint(provider) {
       switch (provider) {
         case 'ollama-cloud':
-          return '<strong>Ollama Cloud:</strong> usually you can paste your key and keep the prefilled Base URL and models.';
+          return '<strong>Ollama Cloud:</strong> usually you can paste your key, leave the defaults alone, and optionally pull the live model list.';
         case 'azure':
-          return '<strong>Azure OpenAI:</strong> Base URL should be your resource root. Both model fields must be your deployment names.';
+          return '<strong>Azure OpenAI:</strong> Base URL should be your resource root. Chat and embedding model fields must be your deployment names.';
         case 'gemini':
           return '<strong>Gemini:</strong> use a Gemini API key. Base URL is prefilled and API Version can stay empty.';
         case 'ollama-local':
@@ -1179,6 +1528,143 @@
         default:
           return '<strong>Advanced mode:</strong> this override changes annotation only. It does not affect note embeddings or graph layout vectors.';
       }
+    }
+
+
+    function setModelStatus(slotKey, message, state = 'idle') {
+      const target = slotKey === 'primary' ? primaryModelsStatus : chatModelsStatus;
+      target.textContent = message;
+      target.dataset.state = state;
+    }
+
+    function providerNeedsApiKey(provider) {
+      return provider !== 'ollama-local';
+    }
+
+    function providerSupportsModelDiscovery(provider) {
+      return !['azure', 'anthropic'].includes(provider);
+    }
+
+    function getSlotConfigForModelLoading(slotKey) {
+      return slotKey === 'primary'
+        ? normalizePrimaryConfig(getPrimaryConfigFromInputs())
+        : normalizeChatOverride(getChatOverrideFromInputs());
+    }
+
+    function uniqueSortedModels(items) {
+      return Array.from(new Set((items || []).filter(Boolean))).sort((a, b) => a.localeCompare(b));
+    }
+
+    function splitModelsByCapability(provider, modelIds) {
+      const all = uniqueSortedModels(modelIds);
+      const embedding = [];
+      const chat = [];
+      for (const id of all) {
+        const low = id.toLowerCase();
+        const isEmbedding = /embed|embedding|text-embedding|nomic-embed|mistral-embed|voyage|bge|gte|e5/.test(low);
+        const isNonText = /audio|speech|tts|transcribe|image|vision|moderation|rerank|whisper|sdxl|flux|clip/.test(low);
+        if (isEmbedding) embedding.push(id);
+        else if (!isNonText) chat.push(id);
+      }
+      if (!chat.length) chat.push(...all.filter(id => !embedding.includes(id)));
+      if (!embedding.length && provider === 'gemini') {
+        embedding.push(...all.filter(id => /embedding/.test(id.toLowerCase())));
+      }
+      return {
+        all,
+        chat: uniqueSortedModels(chat),
+        embedding: uniqueSortedModels(embedding),
+      };
+    }
+
+    function populateModelSelect(selectEl, items, placeholder) {
+      const options = [`<option value="">${placeholder}</option>`].concat(items.map(id => `<option value="${id}">${id}</option>`));
+      selectEl.innerHTML = options.join('');
+    }
+
+    function renderModelOptions(slotKey, groups) {
+      if (slotKey === 'primary') {
+        populateModelSelect(primaryChatModelSelect, groups.chat, 'Keep manual chat model');
+        populateModelSelect(primaryEmbeddingModelSelect, groups.embedding, 'Keep manual embedding model');
+      } else {
+        populateModelSelect(chatModelSelect, groups.chat, 'Keep manual annotation model');
+      }
+    }
+
+    async function fetchProviderModels(slotConfig) {
+      const provider = slotConfig.provider;
+      const apiStyle = getProviderPreset(provider).apiStyle;
+      const baseUrl = trimTrailingSlash(slotConfig.baseUrl || '');
+
+      if (!providerSupportsModelDiscovery(provider)) {
+        if (provider === 'azure') {
+          throw new Error('Azure deployments usually have to be entered manually, so automatic model discovery is disabled here.');
+        }
+        throw new Error('This provider does not expose a model-list endpoint in this panel.');
+      }
+
+      if (providerNeedsApiKey(provider) && !slotConfig.apiKey) {
+        throw new Error('Paste the API key first, then load models.');
+      }
+
+      if (!baseUrl) {
+        throw new Error('Base URL is empty.');
+      }
+
+      let response;
+      if (apiStyle === 'gemini') {
+        response = await fetch(`${baseUrl}/models?key=${encodeURIComponent(slotConfig.apiKey)}`);
+      } else {
+        const headers = {};
+        if (slotConfig.apiKey) headers['Authorization'] = `Bearer ${slotConfig.apiKey}`;
+        response = await fetch(`${baseUrl}/models`, { headers });
+      }
+
+      if (!response.ok) {
+        throw new Error(await readError(response));
+      }
+
+      const payload = await response.json();
+      if (apiStyle === 'gemini') {
+        return (payload.models || []).map(model => (model.name || '').replace(/^models\//, '')).filter(Boolean);
+      }
+      return (payload.data || []).map(model => model.id).filter(Boolean);
+    }
+
+    async function loadModelChoices(slotKey) {
+      const slotConfig = getSlotConfigForModelLoading(slotKey);
+      const provider = slotConfig.provider;
+      const button = slotKey === 'primary' ? primaryLoadModelsBtn : chatLoadModelsBtn;
+      button.disabled = true;
+      setModelStatus(slotKey, 'Loading models from provider…');
+      try {
+        const modelIds = await fetchProviderModels(slotConfig);
+        const groups = splitModelsByCapability(provider, modelIds);
+        renderModelOptions(slotKey, groups);
+        if (slotKey === 'primary') {
+          if (groups.chat.includes(primaryChatModelInput.value)) primaryChatModelSelect.value = primaryChatModelInput.value;
+          if (groups.embedding.includes(primaryEmbeddingModelInput.value)) primaryEmbeddingModelSelect.value = primaryEmbeddingModelInput.value;
+        } else if (groups.chat.includes(chatModelInput.value)) {
+          chatModelSelect.value = chatModelInput.value;
+        }
+        setModelStatus(slotKey, `${groups.all.length} models loaded from ${getProviderPreset(provider).label}.`, 'success');
+      } catch (err) {
+        renderModelOptions(slotKey, { chat: [], embedding: [] });
+        setModelStatus(slotKey, err.message || String(err), 'error');
+      } finally {
+        button.disabled = false;
+      }
+    }
+
+    function scheduleModelChoicesReload(slotKey) {
+      clearTimeout(modelLoadTimers[slotKey]);
+      modelLoadTimers[slotKey] = setTimeout(() => {
+        const slotConfig = getSlotConfigForModelLoading(slotKey);
+        if (!providerSupportsModelDiscovery(slotConfig.provider)) return;
+        if (providerNeedsApiKey(slotConfig.provider) && !slotConfig.apiKey.trim()) return;
+        if (!slotConfig.baseUrl.trim()) return;
+        loadModelChoices(slotKey);
+      }, 500);
     }
 
     function getProviderPreset(provider = 'ollama-cloud') {
@@ -1362,6 +1848,14 @@
       primaryEmbeddingModelInput.placeholder = apiStyle === 'azure' ? 'EMBEDDING DEPLOYMENT' : 'EMBEDDING MODEL';
       primaryChatModelInput.placeholder = apiStyle === 'azure' ? 'CHAT DEPLOYMENT' : 'CHAT MODEL';
       primaryProviderHint.innerHTML = getPrimaryProviderHint(normalized.provider);
+      if (!providerSupportsModelDiscovery(normalized.provider)) {
+        renderModelOptions('primary', { chat: [], embedding: [] });
+        setModelStatus('primary', normalized.provider === 'azure'
+          ? 'Azure deployments are entered manually here; the picker does not auto-discover deployment names.'
+          : 'This provider uses manual model entry in this panel.', 'error');
+      } else {
+        setModelStatus('primary', 'Paste a key or press “Load model list” to fetch available models.');
+      }
     }
 
     function applyChatOverrideToInputs(config) {
@@ -1388,6 +1882,14 @@
           : 'OPTIONAL';
       chatModelInput.placeholder = apiStyle === 'azure' ? 'CHAT DEPLOYMENT' : 'CHAT MODEL';
       chatProviderHint.innerHTML = getChatOverrideHint(normalized.provider);
+      if (!providerSupportsModelDiscovery(normalized.provider)) {
+        renderModelOptions('chat', { chat: [], embedding: [] });
+        setModelStatus('chat', normalized.provider === 'azure'
+          ? 'Azure annotation deployments are entered manually here.'
+          : 'This annotation provider uses manual model entry in this panel.', 'error');
+      } else {
+        setModelStatus('chat', 'Paste a key or press “Load list” to fetch annotation models.');
+      }
     }
 
     function updateAdvancedChatVisibility() {
@@ -1474,8 +1976,14 @@
 
     applyConfigToInputs(getSavedConfig());
 
-    primaryProviderSelect.addEventListener('change', () => syncPrimaryProvider(primaryProviderSelect.value));
-    chatProviderSelect.addEventListener('change', () => syncChatOverrideProvider(chatProviderSelect.value));
+    primaryProviderSelect.addEventListener('change', () => {
+      syncPrimaryProvider(primaryProviderSelect.value);
+      scheduleModelChoicesReload('primary');
+    });
+    chatProviderSelect.addEventListener('change', () => {
+      syncChatOverrideProvider(chatProviderSelect.value);
+      scheduleModelChoicesReload('chat');
+    });
     useSeparateChatToggle.addEventListener('change', () => {
       if (useSeparateChatToggle.checked) {
         const current = getChatOverrideFromInputs();
@@ -1489,13 +1997,41 @@
             model: primary.chatModel,
           });
         }
+        scheduleModelChoicesReload('chat');
       }
       updateAdvancedChatVisibility();
       saveConfig(getConfigFromInputs());
     });
 
-    [primaryApiKeyInput, primaryBaseUrlInput, primaryApiVersionInput, primaryEmbeddingModelInput, primaryChatModelInput, chatApiKeyInput, chatBaseUrlInput, chatApiVersionInput, chatModelInput].forEach(input => {
-      input.addEventListener('input', () => saveConfig(getConfigFromInputs()));
+    primaryLoadModelsBtn.addEventListener('click', () => loadModelChoices('primary'));
+    chatLoadModelsBtn.addEventListener('click', () => loadModelChoices('chat'));
+    primaryChatModelSelect.addEventListener('change', () => {
+      if (!primaryChatModelSelect.value) return;
+      primaryChatModelInput.value = primaryChatModelSelect.value;
+      saveConfig(getConfigFromInputs());
+    });
+    primaryEmbeddingModelSelect.addEventListener('change', () => {
+      if (!primaryEmbeddingModelSelect.value) return;
+      primaryEmbeddingModelInput.value = primaryEmbeddingModelSelect.value;
+      saveConfig(getConfigFromInputs());
+    });
+    chatModelSelect.addEventListener('change', () => {
+      if (!chatModelSelect.value) return;
+      chatModelInput.value = chatModelSelect.value;
+      saveConfig(getConfigFromInputs());
+    });
+
+    [primaryApiKeyInput, primaryBaseUrlInput, primaryApiVersionInput, primaryEmbeddingModelInput, primaryChatModelInput].forEach(input => {
+      input.addEventListener('input', () => {
+        saveConfig(getConfigFromInputs());
+        scheduleModelChoicesReload('primary');
+      });
+    });
+    [chatApiKeyInput, chatBaseUrlInput, chatApiVersionInput, chatModelInput].forEach(input => {
+      input.addEventListener('input', () => {
+        saveConfig(getConfigFromInputs());
+        if (useSeparateChatToggle.checked) scheduleModelChoicesReload('chat');
+      });
     });
 
     // IndexedDB Cache
