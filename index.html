@@ -1594,6 +1594,60 @@
       }
     }
 
+    function getModelProxyUrl() {
+      if (typeof location === 'undefined' || !/^https?:$/.test(location.protocol)) return null;
+      if (['127.0.0.1', 'localhost'].includes(location.hostname)) {
+        return 'https://topologies-of-ideas-universal.vercel.app/api/provider-models';
+      }
+      return '/api/provider-models';
+    }
+
+    function shouldUseModelProxy(provider) {
+      if (provider === 'ollama-local') return false;
+      return Boolean(getModelProxyUrl());
+    }
+
+    async function normalizeModelPayload(payload, apiStyle) {
+      if (apiStyle === 'gemini') {
+        return (payload.models || []).map(model => (model.name || '').replace(/^models\//, '')).filter(Boolean);
+      }
+      return (payload.data || []).map(model => model.id).filter(Boolean);
+    }
+
+    async function fetchProviderModelsDirect(slotConfig, apiStyle, baseUrl) {
+      let response;
+      if (apiStyle === 'gemini') {
+        response = await fetch(`${baseUrl}/models?key=${encodeURIComponent(slotConfig.apiKey)}`);
+      } else {
+        const headers = {};
+        if (slotConfig.apiKey) headers['Authorization'] = `Bearer ${slotConfig.apiKey}`;
+        response = await fetch(`${baseUrl}/models`, { headers });
+      }
+      if (!response.ok) {
+        throw new Error(await readError(response));
+      }
+      const payload = await response.json();
+      return normalizeModelPayload(payload, apiStyle);
+    }
+
+    async function fetchProviderModelsViaProxy(slotConfig, apiStyle, baseUrl) {
+      const response = await fetch(getModelProxyUrl(), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          provider: slotConfig.provider,
+          apiStyle,
+          baseUrl,
+          apiKey: slotConfig.apiKey,
+        }),
+      });
+      if (!response.ok) {
+        throw new Error(await readError(response));
+      }
+      const payload = await response.json();
+      return normalizeModelPayload(payload, apiStyle);
+    }
+
     async function fetchProviderModels(slotConfig) {
       const provider = slotConfig.provider;
       const apiStyle = getProviderPreset(provider).apiStyle;
@@ -1614,24 +1668,15 @@
         throw new Error('Base URL is empty.');
       }
 
-      let response;
-      if (apiStyle === 'gemini') {
-        response = await fetch(`${baseUrl}/models?key=${encodeURIComponent(slotConfig.apiKey)}`);
-      } else {
-        const headers = {};
-        if (slotConfig.apiKey) headers['Authorization'] = `Bearer ${slotConfig.apiKey}`;
-        response = await fetch(`${baseUrl}/models`, { headers });
+      if (shouldUseModelProxy(provider)) {
+        try {
+          return await fetchProviderModelsViaProxy(slotConfig, apiStyle, baseUrl);
+        } catch (err) {
+          if (!['ollama-local'].includes(provider)) throw err;
+        }
       }
 
-      if (!response.ok) {
-        throw new Error(await readError(response));
-      }
-
-      const payload = await response.json();
-      if (apiStyle === 'gemini') {
-        return (payload.models || []).map(model => (model.name || '').replace(/^models\//, '')).filter(Boolean);
-      }
-      return (payload.data || []).map(model => model.id).filter(Boolean);
+      return fetchProviderModelsDirect(slotConfig, apiStyle, baseUrl);
     }
 
     async function loadModelChoices(slotKey) {
