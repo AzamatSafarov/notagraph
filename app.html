@@ -1659,13 +1659,32 @@
       }
     }
 
+    function canAutoLoadModels(slotConfig) {
+      if (!providerSupportsModelDiscovery(slotConfig.provider)) return false;
+      if (providerNeedsApiKey(slotConfig.provider) && !slotConfig.apiKey.trim()) return false;
+      if (!slotConfig.baseUrl.trim()) return false;
+      return true;
+    }
+
+    function hasLoadedModelChoices(slotKey) {
+      if (slotKey === 'primary') {
+        return primaryChatModelSelect.options.length > 1 || primaryEmbeddingModelSelect.options.length > 1;
+      }
+      return chatModelSelect.options.length > 1;
+    }
+
+    function ensureModelChoicesLoaded(slotKey) {
+      const slotConfig = getSlotConfigForModelLoading(slotKey);
+      if (!canAutoLoadModels(slotConfig)) return;
+      if (hasLoadedModelChoices(slotKey)) return;
+      loadModelChoices(slotKey);
+    }
+
     function scheduleModelChoicesReload(slotKey) {
       clearTimeout(modelLoadTimers[slotKey]);
       modelLoadTimers[slotKey] = setTimeout(() => {
         const slotConfig = getSlotConfigForModelLoading(slotKey);
-        if (!providerSupportsModelDiscovery(slotConfig.provider)) return;
-        if (providerNeedsApiKey(slotConfig.provider) && !slotConfig.apiKey.trim()) return;
-        if (!slotConfig.baseUrl.trim()) return;
+        if (!canAutoLoadModels(slotConfig)) return;
         loadModelChoices(slotKey);
       }, 500);
     }
@@ -1978,6 +1997,8 @@
     }
 
     applyConfigToInputs(getSavedConfig());
+    ensureModelChoicesLoaded('primary');
+    if (useSeparateChatToggle.checked) ensureModelChoicesLoaded('chat');
 
     primaryProviderSelect.addEventListener('change', () => {
       syncPrimaryProvider(primaryProviderSelect.value);
@@ -2008,6 +2029,12 @@
 
     primaryLoadModelsBtn.addEventListener('click', () => loadModelChoices('primary'));
     chatLoadModelsBtn.addEventListener('click', () => loadModelChoices('chat'));
+    [primaryChatModelSelect, primaryEmbeddingModelSelect].forEach(select => {
+      select.addEventListener('focus', () => ensureModelChoicesLoaded('primary'));
+      select.addEventListener('mousedown', () => ensureModelChoicesLoaded('primary'));
+    });
+    chatModelSelect.addEventListener('focus', () => ensureModelChoicesLoaded('chat'));
+    chatModelSelect.addEventListener('mousedown', () => ensureModelChoicesLoaded('chat'));
     primaryChatModelSelect.addEventListener('change', () => {
       if (!primaryChatModelSelect.value) return;
       primaryChatModelInput.value = primaryChatModelSelect.value;
