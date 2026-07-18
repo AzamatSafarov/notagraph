@@ -2229,9 +2229,16 @@
       return { mode: 'handle', dirHandle, folderName: dirHandle.name, filenames };
     }
 
-    async function readNotesFromSelection(selection) {
+    async function readNotesFromSelection(selection, onProgress) {
       const notes = [];
       let id = 0;
+      let processed = 0;
+      const total = selection.filenames?.length || 0;
+
+      const tick = (currentName = '') => {
+        processed += 1;
+        if (onProgress) onProgress(processed, total, currentName);
+      };
 
       if (selection.mode === 'input') {
         for (const file of selection.files) {
@@ -2245,6 +2252,7 @@
               text: text.trim(),
             });
           }
+          tick(file.webkitRelativePath || file.name);
         }
         return notes;
       }
@@ -2259,6 +2267,7 @@
               if (text.trim()) {
                 notes.push({ id: id++, filename: `${prefix}${entry.name}`, text: text.trim() });
               }
+              tick(`${prefix}${entry.name}`);
             }
           } else if (entry.kind === 'directory') {
             await readDir(entry, `${prefix}${entry.name}/`);
@@ -2322,7 +2331,9 @@
       saveConfig(inputConfig);
 
       try {
-        setupStatus.textContent = 'SCANNING...';
+        setupStatus.textContent = supportsDirectoryPicker()
+          ? 'OPENING FOLDER PICKER...'
+          : 'BROWSER IS PREPARING THE FOLDER IMPORT... THIS CAN TAKE A WHILE ON LARGE FOLDERS.';
         const selection = await pickFolder();
         const { folderName, filenames } = selection;
         if (filenames.length === 0) {
@@ -2330,7 +2341,9 @@
           return;
         }
         lastSelection = selection;
-        setupStatus.textContent = `FOUND ${filenames.length} NOTES`;
+        setupStatus.textContent = selection.mode === 'input'
+          ? `BROWSER INDEXED ${filenames.length} NOTE FILES. PREPARING TO READ THEM...`
+          : `FOUND ${filenames.length} NOTES`;
 
         // Check cache for matching folder
         const fp = folderFingerprint(folderName, filenames);
@@ -2343,13 +2356,19 @@
         }
 
         // No cache match — read full content and run pipeline
-        setupStatus.textContent = `READING ${filenames.length} NOTES...`;
-        const notes = await readNotesFromSelection(selection);
+        setupStatus.textContent = selection.mode === 'input'
+          ? `READING ${filenames.length} NOTE FILES INTO MEMORY...`
+          : `READING ${filenames.length} NOTES...`;
+        const notes = await readNotesFromSelection(selection, (done, total, currentName) => {
+          const basename = (currentName || '').split('/').pop() || currentName || 'FILE';
+          const prefix = selection.mode === 'input' ? 'READING SELECTED FOLDER' : 'READING NOTES';
+          setupStatus.textContent = `${prefix} ${done}/${total}${basename ? ` — ${basename}` : ''}`;
+        });
         if (notes.length === 0) {
           setupStatus.textContent = 'ERROR: NO .MD OR .TXT FILES FOUND';
           return;
         }
-        setupStatus.textContent = `LOADED ${notes.length} NOTES`;
+        setupStatus.textContent = `LOADED ${notes.length} NOTES. STARTING AI PIPELINE...`;
 
         document.getElementById('setup').classList.add('hidden');
         document.getElementById('main').classList.remove('hidden');
