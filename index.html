@@ -41,8 +41,9 @@
       background: var(--bg);
       color: var(--text);
       font-family: var(--sans);
-      overflow: hidden;
-      height: 100vh;
+      overflow-x: hidden;
+      overflow-y: auto;
+      min-height: 100vh;
       width: 100vw;
     }
 
@@ -65,12 +66,14 @@
     #setup {
       width: 100vw;
       min-height: 100vh;
+      height: 100dvh;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
       padding: 40px 20px 56px;
       overflow-y: auto;
+      overscroll-behavior: contain;
       background:
         radial-gradient(circle at top left, rgba(109, 140, 255, 0.22), transparent 28%),
         radial-gradient(circle at top right, rgba(255, 157, 86, 0.18), transparent 30%),
