@@ -3587,9 +3587,14 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
           cluster_name: '',
         }));
 
-        // Keep the canvas clean during annotation; render the graph only once we have the final topology.
-        setBootStage('COMPUTING TOPOLOGY...', 'GRAPH READY — WAITING FOR ANNOTATION');
+        // Initialize graph early so the user can see the topology before edge annotation finishes.
+        setBootStage('COMPUTING TOPOLOGY...', 'INITIALIZING GRAPH');
         await sleep(50);
+        if (!Graph) {
+          initGraph(graphNodes, []);
+        } else {
+          updateGraphData(graphNodes, [], true);
+        }
         buildReadouts(graphNodes.length, 0);
 
         // ── STAGE 4: ANNOTATING ──
@@ -3605,13 +3610,17 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
           n.cluster_name = clusterNames[n.cluster_id] || `Cluster ${n.cluster_id}`;
         });
 
-        // Progressive edge labeling — batch in the pipeline, but keep the canvas blank until the final graph is ready.
+        // Update graph with cluster colors and names before edge annotation starts.
+        updateGraphData(graphNodes, [], true);
+
+        // Progressive edge labeling — reveal topology as labels arrive.
         const labeledEdges = [];
         for (let i = 0; i < edges.length; i += EDGE_LABEL_BATCH) {
           const batchEdges = edges.slice(i, i + EDGE_LABEL_BATCH);
           const batchResult = await labelEdges(notes, batchEdges, config.chat);
           labeledEdges.push(...batchResult);
           setBootStage('ANNOTATING...', `EDGE LABELS ${Math.min(i + EDGE_LABEL_BATCH, edges.length)}/${edges.length}`);
+          updateGraphData(graphNodes, [...centralEdges, ...decentralEdges, ...labeledEdges]);
           buildReadouts(graphNodes.length, getCurrentLayoutEdgeCount(centralEdges, decentralEdges, labeledEdges));
         }
 
