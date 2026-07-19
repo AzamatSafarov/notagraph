@@ -1078,26 +1078,40 @@
       padding-left: 1.1em;
       text-indent: -1.1em;
       white-space: nowrap;
-      opacity: 1.0;
-      transition: opacity 0.15s ease;
+      opacity: 0.82;
+      transition: opacity 0.15s ease, transform 0.15s ease;
     }
     .node-label .nl-bullet {
-      font-size: 9px;
+      font-size: 10px;
       vertical-align: 1px;
+      filter: drop-shadow(0 0 3px rgba(255,255,255,0.12));
+    }
+    .node-label .nl-text {
+      display: none;
+    }
+    .node-label--pinned .nl-text,
+    .node-label--hover .nl-text {
+      display: inline;
+    }
+    .node-label--pinned {
+      opacity: 0.96;
+    }
+    .node-label--pinned .nl-bullet,
+    .node-label--hover .nl-bullet {
+      font-size: 11px;
+      filter: drop-shadow(0 0 5px rgba(255,255,255,0.2));
+    }
+    .node-label--hover {
+      transform: scale(1.03);
+      opacity: 1;
     }
     .node-label--special {
       color: #eedcb0;
-      opacity: 0.7;
+      opacity: 0.95;
     }
-
-    /* Square-only mode — hide text, show just the bullet */
-    .squares-only .node-label {
-      padding-left: 0;
-      text-indent: 0;
-      text-align: center;
+    .node-label--dim {
+      opacity: 0.12 !important;
     }
-    .squares-only .node-label .nl-text { display: none; }
-    .squares-only .node-label .nl-bullet { font-size: 12px; }
 
     #theme-toggle {
       position: fixed;
@@ -2311,6 +2325,7 @@
         distrib: (session.labeledEdges || []).map(e => ({ ...e, topology: 'distrib' })),
       };
       const combined = [...edgeSets.central, ...edgeSets.decentral, ...edgeSets.distrib];
+      assignFocusNodes(allNodes, combined);
       initGraph(allNodes, combined);
       buildLegend(session.clusterNames);
       buildClusterLabels(session.clusterNames);
@@ -3239,9 +3254,32 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
       return lines;
     }
 
+    function shouldPinNodeLabel(node) {
+      return Boolean(node.is_focus || node.is_medoid || node.is_llm_center);
+    }
+
+    function applyNodeLabelState(node, state = 'normal') {
+      const lbl = node.__labelDiv;
+      if (!lbl) return;
+      const pinned = shouldPinNodeLabel(node);
+      lbl.classList.toggle('node-label--pinned', pinned);
+      lbl.classList.toggle('node-label--hover', state === 'hover');
+      lbl.classList.toggle('node-label--dim', state === 'dim');
+      if (state === 'dim') {
+        lbl.style.opacity = String(Math.max(0.08, VFX.dimOpacity.val * 0.24));
+      } else if (state === 'hover') {
+        lbl.style.opacity = '1';
+      } else if (state === 'neighbor') {
+        lbl.style.opacity = pinned ? '0.94' : '0.78';
+      } else {
+        lbl.style.opacity = pinned ? '0.96' : '0.78';
+      }
+    }
+
     function createNodeObject(node) {
       const color = CLUSTER_COLORS[node.cluster_id % CLUSTER_COLORS.length];
       const isSpecial = node.is_medoid || node.is_llm_center;
+      const isFocus = shouldPinNodeLabel(node);
       const baseScale = isSpecial ? VFX.nodeScaleSpecial.val : VFX.nodeScale.val;
 
       // Invisible hit-target sprite for raycasting
@@ -3256,20 +3294,22 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
       const group = new THREE.Group();
       group.add(hitSprite);
 
-      // CSS2D label — constant screen-space size regardless of zoom
+      // CSS2D label — by default the graph reads as points; only focus ideas keep text visible
       const lines = wrapNodeLabel(node.name);
       if (lines.length) {
         const div = document.createElement('div');
-        div.className = 'node-label' + (isSpecial ? ' node-label--special' : '');
+        div.className = 'node-label'
+          + (isSpecial ? ' node-label--special' : '')
+          + (isFocus ? ' node-label--pinned' : '');
         div.style.color = VFX.labelColor.val;
-        div.style.opacity = String(VFX.labelAlpha.val);
-        let html = `<span class="nl-bullet" style="color:${color};opacity:${VFX.clusterAlpha.val}">\u25A0</span><span class="nl-text"> ${lines[0]}`;
+        let html = `<span class="nl-bullet" style="color:${color};opacity:${Math.max(VFX.clusterAlpha.val, 0.82)}">\u25A0</span><span class="nl-text"> ${lines[0]}`;
         for (let i = 1; i < lines.length; i++) html += `<br>${lines[i]}`;
         html += '</span>';
         div.innerHTML = html;
         const labelObj = new CSS2DObject(div);
         group.add(labelObj);
         node.__labelDiv = div;
+        applyNodeLabelState(node, 'normal');
       }
 
       node.__baseScale = baseScale;
@@ -3277,21 +3317,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
     }
 
     function updateNodeAppearance(node, state) {
-      const lbl = node.__labelDiv;
-      if (!lbl) return;
-      switch (state) {
-        case 'hover':
-          lbl.style.opacity = '1';
-          break;
-        case 'neighbor':
-          lbl.style.opacity = String(Math.min(1, VFX.labelAlpha.val + 0.15));
-          break;
-        case 'dim':
-          lbl.style.opacity = String(VFX.dimOpacity.val * 0.3);
-          break;
-        default:
-          lbl.style.opacity = String(VFX.labelAlpha.val);
-      }
+      applyNodeLabelState(node, state || 'normal');
     }
 
     // ═══════════════════════════════════════════════
@@ -3339,10 +3365,9 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
       // Background (with alpha)
       const bgRgb = hexToRgb(VFX.bgColor.val);
       Graph.backgroundColor(`rgba(${bgRgb},${VFX.bgAlpha.val})`);
-      // Label text color + alpha (reset non-hovered labels to current alpha)
-      document.querySelectorAll('.node-label').forEach(el => {
-        el.style.color = VFX.labelColor.val;
-        el.style.opacity = String(VFX.labelAlpha.val);
+      Graph.graphData().nodes.forEach(node => {
+        if (node.__labelDiv) node.__labelDiv.style.color = VFX.labelColor.val;
+        updateNodeAppearance(node, hoverNode === node ? 'hover' : selectedNode && selectedNode !== node ? 'dim' : 'normal');
       });
       // Links + particles
       refreshLinks();
@@ -3504,6 +3529,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
           z_distrib: distrib.z[i],
           is_medoid: i === central.medoidIdx ? 1 : 0,
           is_llm_center: 0,
+          is_focus: 0,
           cluster_name: '',
         }));
 
@@ -3543,7 +3569,8 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
         edgeSets = { central: centralEdges, decentral: decentralEdges, distrib: labeledEdges };
         allNodes = graphNodes;
         const combined = [...centralEdges, ...decentralEdges, ...labeledEdges];
-        updateGraphData(graphNodes, combined);
+        assignFocusNodes(graphNodes, combined, Object.values(clusterMedoids));
+        updateGraphData(graphNodes, combined, true);
         // Show only edges for the active topology
         Graph.linkVisibility(link => link.topology === currentLayout);
 
@@ -3559,7 +3586,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
           'x_central', 'y_central', 'z_central',
           'x_decentral', 'y_decentral', 'z_decentral',
           'x_distrib', 'y_distrib', 'z_distrib',
-          'is_medoid', 'is_llm_center',
+          'is_medoid', 'is_llm_center', 'is_focus',
         ];
         const serializableNodes = graphNodes.map(n => {
           const clean = {};
@@ -4163,6 +4190,32 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
     function buildReadouts(nodeCount, edgeCount) {
       document.getElementById('readout-nodes').textContent = nodeCount;
       document.getElementById('readout-edges').textContent = edgeCount;
+    }
+
+    function assignFocusNodes(nodes, edges, extraFocusIds = []) {
+      const degree = new Map();
+      for (const edge of edges || []) {
+        const sourceId = typeof edge.source === 'object' ? edge.source.id : edge.source;
+        const targetId = typeof edge.target === 'object' ? edge.target.id : edge.target;
+        degree.set(sourceId, (degree.get(sourceId) || 0) + 1);
+        degree.set(targetId, (degree.get(targetId) || 0) + 1);
+      }
+
+      const focusIds = new Set(extraFocusIds.filter(id => id !== undefined && id !== null));
+      nodes.forEach(node => {
+        if (node.is_medoid || node.is_llm_center) focusIds.add(node.id);
+      });
+
+      const targetCount = Math.max(8, Math.min(18, Math.round(Math.sqrt(nodes.length || 1)) + 4));
+      const ranked = [...nodes].sort((a, b) => (degree.get(b.id) || 0) - (degree.get(a.id) || 0));
+      for (const node of ranked) {
+        if (focusIds.size >= targetCount) break;
+        focusIds.add(node.id);
+      }
+
+      nodes.forEach(node => {
+        node.is_focus = focusIds.has(node.id) ? 1 : 0;
+      });
     }
 
     // ═══════════════════════════════════════════════
