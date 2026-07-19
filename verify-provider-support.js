@@ -395,10 +395,15 @@ return {
   assert.equal(selection.mode, 'input');
   assert.equal(selection.folderName, 'vault');
   assert.deepEqual(selection.filenames, ['vault/a.md', 'vault/sub/b.txt']);
-  const notes = await exported.readNotesFromSelection(selection);
+  const readResult = await exported.readNotesFromSelection(selection);
+  const notes = readResult.notes;
   assert.equal(notes.length, 2);
   assert.equal(notes[0].filename, 'vault/a.md');
   assert.equal(notes[1].filename, 'vault/sub/b.txt');
+  assert.equal(readResult.stats.totalFiles, 3);
+  assert.equal(readResult.stats.noteFiles, 2);
+  assert.equal(readResult.stats.nonNoteFiles, 1);
+  assert.equal(readResult.stats.emptySkipped, 0);
   results.folder_fallback = 'ok';
 
   console.log(JSON.stringify(results, null, 2));

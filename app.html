@@ -1330,6 +1330,12 @@
         <div class="info-row"><span class="info-key">K-NN</span><span class="info-val" id="readout-knn">5</span></div>
       </div>
       <div class="info-section">
+        <div class="info-row"><span class="info-key">FILES SCANNED</span><span class="info-val" id="readout-files-total">—</span></div>
+        <div class="info-row"><span class="info-key">MD/TXT FOUND</span><span class="info-val" id="readout-files-note">—</span></div>
+        <div class="info-row"><span class="info-key">EMPTY SKIPPED</span><span class="info-val" id="readout-files-empty">—</span></div>
+        <div class="info-row"><span class="info-key">NON-NOTE SKIPPED</span><span class="info-val" id="readout-files-other">—</span></div>
+      </div>
+      <div class="info-section">
         <div id="legend"></div>
       </div>
     </div>
@@ -2207,7 +2213,17 @@
             .map(file => file.webkitRelativePath || file.name)
             .filter(name => /\.(md|txt)$/i.test(name))
             .sort();
-          resolve({ mode: 'input', files, folderName, filenames });
+          resolve({
+            mode: 'input',
+            files,
+            folderName,
+            filenames,
+            fileStats: {
+              totalFiles: files.length,
+              noteFiles: filenames.length,
+              nonNoteFiles: Math.max(0, files.length - filenames.length),
+            },
+          });
         };
 
         const onFocus = () => {
@@ -2233,10 +2249,12 @@
 
       const dirHandle = await window.showDirectoryPicker();
       const filenames = [];
+      let totalFiles = 0;
 
       async function scanDir(handle, prefix = '') {
         for await (const entry of handle.values()) {
           if (entry.kind === 'file') {
+            totalFiles += 1;
             const name = entry.name.toLowerCase();
             if (name.endsWith('.md') || name.endsWith('.txt')) filenames.push(prefix + entry.name);
           } else if (entry.kind === 'directory') {
@@ -2247,13 +2265,24 @@
 
       await scanDir(dirHandle);
       filenames.sort();
-      return { mode: 'handle', dirHandle, folderName: dirHandle.name, filenames };
+      return {
+        mode: 'handle',
+        dirHandle,
+        folderName: dirHandle.name,
+        filenames,
+        fileStats: {
+          totalFiles,
+          noteFiles: filenames.length,
+          nonNoteFiles: Math.max(0, totalFiles - filenames.length),
+        },
+      };
     }
 
     async function readNotesFromSelection(selection, onProgress) {
       const notes = [];
       let id = 0;
       let processed = 0;
+      let emptySkipped = 0;
       const total = selection.filenames?.length || 0;
 
       const tick = (currentName = '') => {
@@ -2272,10 +2301,21 @@
               filename: file.webkitRelativePath || file.name,
               text: text.trim(),
             });
+          } else {
+            emptySkipped += 1;
           }
           tick(file.webkitRelativePath || file.name);
         }
-        return notes;
+        return {
+          notes,
+          stats: {
+            totalFiles: selection.fileStats?.totalFiles ?? total,
+            noteFiles: selection.fileStats?.noteFiles ?? total,
+            nonNoteFiles: selection.fileStats?.nonNoteFiles ?? 0,
+            emptySkipped,
+            loadedNotes: notes.length,
+          },
+        };
       }
 
       async function readDir(handle, prefix = '') {
@@ -2287,6 +2327,8 @@
               const text = await file.text();
               if (text.trim()) {
                 notes.push({ id: id++, filename: `${prefix}${entry.name}`, text: text.trim() });
+              } else {
+                emptySkipped += 1;
               }
               tick(`${prefix}${entry.name}`);
             }
@@ -2297,7 +2339,16 @@
       }
 
       await readDir(selection.dirHandle);
-      return notes;
+      return {
+        notes,
+        stats: {
+          totalFiles: selection.fileStats?.totalFiles ?? total,
+          noteFiles: selection.fileStats?.noteFiles ?? total,
+          nonNoteFiles: selection.fileStats?.nonNoteFiles ?? 0,
+          emptySkipped,
+          loadedNotes: notes.length,
+        },
+      };
     }
 
     function folderFingerprint(folderName, filenames) {
@@ -2331,6 +2382,7 @@
       buildClusterLabels(session.clusterNames);
       const activeEdges = edgeSets[currentLayout] || [];
       buildReadouts(session.nodeCount, activeEdges.length);
+      setIngestReadouts(session.fileStats || { loadedNotes: session.nodeCount, noteFiles: session.nodeCount, totalFiles: session.nodeCount, nonNoteFiles: 0, emptySkipped: 0 }, true);
 
       setBootStage(`SCOPE ONLINE // ${session.nodeCount} NODES // ${activeEdges.length} EDGES`, 'RESTORED FROM CACHE');
       setTimeout(hideBootStatus, 2000);
@@ -2381,7 +2433,7 @@
         setupStatus.textContent = selection.mode === 'input'
           ? `READING ${filenames.length} NOTE FILES INTO MEMORY...`
           : `READING ${filenames.length} NOTES...`;
-        const notes = await readNotesFromSelection(selection, (done, total, currentName) => {
+        const { notes, stats } = await readNotesFromSelection(selection, (done, total, currentName) => {
           const basename = (currentName || '').split('/').pop() || currentName || 'FILE';
           const prefix = selection.mode === 'input' ? 'READING SELECTED FOLDER' : 'READING NOTES';
           setupStatus.textContent = `${prefix} ${done}/${total}${basename ? ` — ${basename}` : ''}`;
@@ -2395,8 +2447,9 @@
         document.getElementById('setup').classList.add('hidden');
         document.getElementById('main').classList.remove('hidden');
         document.getElementById('reanalyze-btn').classList.remove('hidden');
+        setIngestReadouts(stats);
 
-        runPipeline(notes, config, fp);
+        runPipeline(notes, config, fp, stats);
       } catch (err) {
         if (err.name === 'AbortError') return; // user cancelled picker
         setupStatus.textContent = 'ERROR: ' + err.message.toUpperCase();
@@ -2432,15 +2485,16 @@
       try {
         setBootStage('RE-ANALYZING...', 'READING NOTES');
         showBootStatus();
-        const notes = await readNotesFromSelection(lastSelection);
+        const { notes, stats } = await readNotesFromSelection(lastSelection);
         if (notes.length === 0) {
           setBootStage('ERROR', 'NO NOTES FOUND');
           return;
         }
+        setIngestReadouts(stats);
         // Scan filenames for fingerprint
         const filenames = notes.map(n => n.filename).sort();
         const fp = folderFingerprint(lastSelection.folderName, filenames);
-        runPipeline(notes, config, fp);
+        runPipeline(notes, config, fp, stats);
       } catch (err) {
         setBootStage('ERROR', err.message);
       }
@@ -3407,7 +3461,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
     // Pipeline Orchestrator
     // ═══════════════════════════════════════════════
 
-    async function runPipeline(notes, config, fingerprint) {
+    async function runPipeline(notes, config, fingerprint, fileStats = null) {
       try {
         // ── STAGE 1: SCANNING ──
         setBootStage('SCANNING...', `${notes.length} NOTES LOADED`);
@@ -3607,6 +3661,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
             decentralEdges: serializeEdges(decentralEdges),
             clusterNames,
             nodeCount: notes.length,
+            fileStats: fileStats || null,
             fingerprint: fingerprint || '',
           });
           console.log('Cache saved:', serializableNodes.length, 'nodes');
@@ -4190,6 +4245,20 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
     function buildReadouts(nodeCount, edgeCount) {
       document.getElementById('readout-nodes').textContent = nodeCount;
       document.getElementById('readout-edges').textContent = edgeCount;
+    }
+
+    function setIngestReadouts(stats = {}, fromCache = false) {
+      const totalFiles = stats.totalFiles ?? stats.noteFiles ?? stats.loadedNotes ?? '—';
+      const noteFiles = stats.noteFiles ?? stats.loadedNotes ?? '—';
+      const emptySkipped = stats.emptySkipped ?? '—';
+      const nonNoteFiles = stats.nonNoteFiles ?? '—';
+      document.getElementById('readout-files-total').textContent = String(totalFiles);
+      document.getElementById('readout-files-note').textContent = String(noteFiles);
+      document.getElementById('readout-files-empty').textContent = String(emptySkipped);
+      document.getElementById('readout-files-other').textContent = String(nonNoteFiles);
+      if (fromCache) {
+        document.getElementById('readout-files-total').textContent = String(totalFiles);
+      }
     }
 
     function getCurrentLayoutEdgeCount(centralEdges = [], decentralEdges = [], distribEdges = []) {
