@@ -3533,10 +3533,9 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
           cluster_name: '',
         }));
 
-        // Initialize graph with white/uncolored nodes (no annotations yet)
-        setBootStage('COMPUTING TOPOLOGY...', 'INITIALIZING GRAPH');
+        // Keep the canvas clean during annotation; render the graph only once we have the final topology.
+        setBootStage('COMPUTING TOPOLOGY...', 'GRAPH READY — WAITING FOR ANNOTATION');
         await sleep(50);
-        initGraph(graphNodes, []);
         buildReadouts(graphNodes.length, 0);
 
         // ── STAGE 4: ANNOTATING ──
@@ -3552,18 +3551,13 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
           n.cluster_name = clusterNames[n.cluster_id] || `Cluster ${n.cluster_id}`;
         });
 
-        // Update graph with cluster colors and names (refresh node objects for LLM center decoration)
-        updateGraphData(graphNodes, [], true);
-
-        // Progressive edge labeling — batch in the pipeline for incremental reveal
+        // Progressive edge labeling — batch in the pipeline, but keep the canvas blank until the final graph is ready.
         const labeledEdges = [];
         for (let i = 0; i < edges.length; i += EDGE_LABEL_BATCH) {
           const batchEdges = edges.slice(i, i + EDGE_LABEL_BATCH);
           const batchResult = await labelEdges(notes, batchEdges, config.chat);
           labeledEdges.push(...batchResult);
           setBootStage('ANNOTATING...', `EDGE LABELS ${Math.min(i + EDGE_LABEL_BATCH, edges.length)}/${edges.length}`);
-          // Show progressive edges during labeling
-          updateGraphData(graphNodes, [...centralEdges, ...decentralEdges, ...labeledEdges]);
           buildReadouts(graphNodes.length, getCurrentLayoutEdgeCount(centralEdges, decentralEdges, labeledEdges));
         }
 
@@ -3572,7 +3566,11 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
         allNodes = graphNodes;
         const combined = [...centralEdges, ...decentralEdges, ...labeledEdges];
         assignFocusNodes(graphNodes, combined, Object.values(clusterMedoids));
-        updateGraphData(graphNodes, combined, true);
+        if (!Graph) {
+          initGraph(graphNodes, combined);
+        } else {
+          updateGraphData(graphNodes, combined, true);
+        }
         // Show only edges for the active topology
         Graph.linkVisibility(link => link.topology === currentLayout);
 
