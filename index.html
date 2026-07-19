@@ -3982,8 +3982,6 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
         topology: e.topology,
       }));
 
-      applyLayoutPositions(nodes, currentLayout);
-
       // Build neighbor lookups for only the active topology's edges
       const activeEdges = edges.filter(e => e.topology === currentLayout);
       rebuildLookups(nodes, activeEdges);
@@ -4064,7 +4062,6 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
     function updateGraphData(nodes, edges, refreshNodeObjects = false) {
       if (!Graph) return;
-      applyLayoutPositions(nodes, currentLayout);
       const activeEdges = edges.filter(e => e.topology === currentLayout);
       rebuildLookups(nodes, activeEdges);
       const links = edges.map(e => ({
@@ -4096,14 +4093,15 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
         document.getElementById('layout-desc').textContent = LAYOUT_DESCRIPTIONS[currentLayout] || '';
         if (Graph && allNodes.length) {
           const activeEdges = edgeSets[currentLayout] || [];
-          const combinedEdges = [...edgeSets.central, ...edgeSets.decentral, ...edgeSets.distrib];
-          applyLayoutPositions(allNodes, currentLayout);
-          updateGraphData(allNodes, combinedEdges);
+          // Swap visible edges without calling graphData (which resets simulation)
           Graph.linkVisibility(link => link.topology === currentLayout);
           rebuildLookups(allNodes, activeEdges);
           buildReadouts(allNodes.length, activeEdges.length);
-          setBootStage(document.getElementById('boot-stage').textContent, `VISIBLE: ${allNodes.length} NODES / ${activeEdges.length} EDGES`);
+          // Soften position force, reheat, then restore — smooth ~2s drift
+          const posForce = Graph.d3Force('position');
+          posForce.strength(0.03);
           Graph.d3ReheatSimulation();
+          setTimeout(() => posForce.strength(0.18), 3000);
         }
       });
     });
@@ -4194,27 +4192,6 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
     function buildReadouts(nodeCount, edgeCount) {
       document.getElementById('readout-nodes').textContent = nodeCount;
       document.getElementById('readout-edges').textContent = edgeCount;
-    }
-
-    function getLayoutPosition(node, layout = currentLayout) {
-      const key = layout || currentLayout;
-      return {
-        x: (node['x_' + key] || 0) * SCALE,
-        y: (node['y_' + key] || 0) * SCALE,
-        z: (node['z_' + key] || 0) * SCALE,
-      };
-    }
-
-    function applyLayoutPositions(nodes, layout = currentLayout) {
-      (nodes || []).forEach(node => {
-        const pos = getLayoutPosition(node, layout);
-        node.x = pos.x;
-        node.y = pos.y;
-        node.z = pos.z;
-        node.vx = 0;
-        node.vy = 0;
-        node.vz = 0;
-      });
     }
 
     function getCurrentLayoutEdgeCount(centralEdges = [], decentralEdges = [], distribEdges = []) {
