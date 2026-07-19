@@ -2435,6 +2435,8 @@
     // Provider API — Embeddings & Generation
     // ═══════════════════════════════════════════════
     const EMBED_BATCH_SIZE = 20;
+    const AZURE_EMBED_BATCH_SIZE = 4;
+    const EMBED_RETRY_LIMIT = 4;
 
     function trimTrailingSlash(url) {
       return url.replace(/\/+$/, '');
@@ -2468,6 +2470,30 @@
       }
     }
 
+    function getEmbeddingBatchSize(slotConfig) {
+      return getApiStyle(slotConfig) === 'azure' ? AZURE_EMBED_BATCH_SIZE : EMBED_BATCH_SIZE;
+    }
+
+    function parseRetryDelayMs(response, errorText = '') {
+      const retryAfter = response?.headers?.get?.('retry-after');
+      if (retryAfter) {
+        const seconds = Number(retryAfter);
+        if (Number.isFinite(seconds) && seconds > 0) return seconds * 1000;
+        const retryDate = Date.parse(retryAfter);
+        if (Number.isFinite(retryDate)) {
+          const diff = retryDate - Date.now();
+          if (diff > 0) return diff;
+        }
+      }
+      const match = String(errorText).match(/retry after\s+(\d+)\s+seconds?/i);
+      if (match) return Number(match[1]) * 1000;
+      return 15000;
+    }
+
+    async function sleepMs(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
     function extractOpenAIText(data) {
       const content = data.choices?.[0]?.message?.content;
       if (typeof content === 'string') return content;
@@ -2480,68 +2506,82 @@
     async function embedTexts(texts, slotConfig, onProgress) {
       const allEmbeddings = [];
       const apiStyle = getApiStyle(slotConfig);
+      const batchSize = getEmbeddingBatchSize(slotConfig);
 
       if (apiStyle === 'anthropic') {
         throw new Error('Embedding provider does not expose an embeddings API in this app. Choose OpenAI, Gemini, Azure, OpenRouter, Ollama, Mistral, or another OpenAI-compatible endpoint for embeddings.');
       }
 
-      for (let i = 0; i < texts.length; i += EMBED_BATCH_SIZE) {
-        const batch = texts.slice(i, i + EMBED_BATCH_SIZE);
+      for (let i = 0; i < texts.length; i += batchSize) {
+        const batch = texts.slice(i, i + batchSize);
         let response;
+        let data;
 
-        if (apiStyle === 'gemini') {
-          response = await fetch(
-            `${trimTrailingSlash(slotConfig.baseUrl)}/models/${slotConfig.model}:batchEmbedContents?key=${encodeURIComponent(slotConfig.apiKey)}`,
-            {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                requests: batch.map(text => ({
-                  model: `models/${slotConfig.model}`,
-                  content: { parts: [{ text }] },
-                })),
-              }),
-            }
-          );
-        } else if (apiStyle === 'azure') {
-          response = await fetch(
-            `${resolveAzureDeploymentBase(slotConfig)}/embeddings?api-version=${encodeURIComponent(slotConfig.apiVersion || AZURE_API_VERSION)}`,
-            {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'api-key': slotConfig.apiKey,
-              },
-              body: JSON.stringify({ input: batch }),
-            }
-          );
-        } else {
-          response = await fetch(
-            `${trimTrailingSlash(slotConfig.baseUrl)}/embeddings`,
-            {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${slotConfig.apiKey}`,
-              },
-              body: JSON.stringify({
-                model: slotConfig.model,
-                input: batch,
-              }),
-            }
-          );
+        for (let attempt = 1; attempt <= EMBED_RETRY_LIMIT; attempt += 1) {
+          if (apiStyle === 'gemini') {
+            response = await fetch(
+              `${trimTrailingSlash(slotConfig.baseUrl)}/models/${slotConfig.model}:batchEmbedContents?key=${encodeURIComponent(slotConfig.apiKey)}`,
+              {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  requests: batch.map(text => ({
+                    model: `models/${slotConfig.model}`,
+                    content: { parts: [{ text }] },
+                  })),
+                }),
+              }
+            );
+          } else if (apiStyle === 'azure') {
+            response = await fetch(
+              `${resolveAzureDeploymentBase(slotConfig)}/embeddings?api-version=${encodeURIComponent(slotConfig.apiVersion || AZURE_API_VERSION)}`,
+              {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'api-key': slotConfig.apiKey,
+                },
+                body: JSON.stringify({ input: batch }),
+              }
+            );
+          } else {
+            response = await fetch(
+              `${trimTrailingSlash(slotConfig.baseUrl)}/embeddings`,
+              {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${slotConfig.apiKey}`,
+                },
+                body: JSON.stringify({
+                  model: slotConfig.model,
+                  input: batch,
+                }),
+              }
+            );
+          }
+
+          if (response.ok) {
+            data = await response.json();
+            break;
+          }
+
+          const errorText = await readError(response);
+          if ((response.status === 429 || /rate limit/i.test(errorText)) && attempt < EMBED_RETRY_LIMIT) {
+            const waitMs = parseRetryDelayMs(response, errorText);
+            if (onProgress) onProgress(Math.min(i, texts.length), texts.length, `WAITING FOR EMBEDDING RATE LIMIT — RETRY ${attempt}/${EMBED_RETRY_LIMIT} IN ${Math.ceil(waitMs / 1000)}S`);
+            await sleepMs(waitMs);
+            continue;
+          }
+
+          throw new Error(`Embedding API error: ${errorText}`);
         }
 
-        if (!response.ok) {
-          throw new Error(`Embedding API error: ${await readError(response)}`);
-        }
-
-        const data = await response.json();
         const vectors = apiStyle === 'gemini'
           ? data.embeddings.map(e => e.values)
           : (data.data || []).sort((a, b) => a.index - b.index).map(e => e.embedding);
         allEmbeddings.push(...vectors);
-        if (onProgress) onProgress(Math.min(i + EMBED_BATCH_SIZE, texts.length), texts.length);
+        if (onProgress) onProgress(Math.min(i + batchSize, texts.length), texts.length);
       }
 
       return allEmbeddings;

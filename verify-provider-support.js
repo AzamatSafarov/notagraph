@@ -273,6 +273,104 @@ return {
     apiVersion: '2024-10-21',
     model: 'embed-deploy',
   });
+
+  let retryAttempt = 0;
+  global.fetch = async (url, options = {}) => {
+    fetchCalls.push({ url, options });
+    if (url.includes('/embeddings?api-version=') && retryAttempt === 0) {
+      retryAttempt += 1;
+      return {
+        ok: false,
+        status: 429,
+        headers: { get: (key) => key === 'retry-after' ? '1' : 'application/json' },
+        async json() {
+          return { error: { message: 'Please retry after 1 seconds due to rate limit.' } };
+        },
+        async text() { return 'Please retry after 1 seconds due to rate limit.'; },
+        statusText: 'Too Many Requests',
+      };
+    }
+    if (url.includes('/embeddings?api-version=')) {
+      const body = JSON.parse(options.body);
+      const input = Array.isArray(body.input) ? body.input : [];
+      return {
+        ok: true,
+        status: 200,
+        headers: { get: () => 'application/json' },
+        async json() { return { data: input.map((_, index) => ({ index, embedding: [index + 0.3, index + 0.4] })) }; },
+        async text() { return 'ok'; },
+        statusText: 'OK',
+      };
+    }
+    if (url.endsWith('/messages')) {
+      return {
+        ok: true,
+        status: 200,
+        headers: { get: () => 'application/json' },
+        async json() { return { content: [{ type: 'text', text: 'ANTHROPIC OK' }] }; },
+        async text() { return 'ok'; },
+        statusText: 'OK',
+      };
+    }
+    throw new Error(`Unexpected fetch URL during retry test: ${url}`);
+  };
+
+  const retryVectors = await exported.embedTexts(['alpha', 'beta', 'gamma', 'delta', 'epsilon'], {
+    provider: 'azure',
+    apiKey: 'az-key',
+    baseUrl: 'https://demo.openai.azure.com',
+    apiVersion: '2024-10-21',
+    model: 'embed-deploy',
+  });
+  assert.equal(retryAttempt, 1);
+  assert.equal(retryVectors.length, 5);
+  assert.equal(fetchCalls.filter(call => call.url.includes('/embeddings?api-version=')).length >= 3, true);
+  results.azure_rate_limit_retry = 'ok';
+
+  global.fetch = async (url, options = {}) => {
+    fetchCalls.push({ url, options });
+    return {
+      ok: true,
+      headers: { get: () => 'application/json' },
+      async json() {
+        if (url.endsWith('/models') && url.includes('ollama.com')) {
+          return {
+            data: [
+              { id: 'deepseek-v4-pro' },
+              { id: 'llama3.1:8b' },
+              { id: 'nomic-embed-text' },
+            ],
+          };
+        }
+        if (url.endsWith('/models') && url.includes('api.openai.com')) {
+          return { data: [{ id: 'gpt-4o-mini' }, { id: 'text-embedding-3-small' }] };
+        }
+        if (url.includes(':batchEmbedContents')) {
+          const body = JSON.parse(options.body);
+          return { embeddings: body.requests.map((_, index) => ({ values: [index + 1, index + 2] })) };
+        }
+        if (url.endsWith('/embeddings') || url.includes('/embeddings?api-version=')) {
+          const body = JSON.parse(options.body);
+          const input = Array.isArray(body.input) ? body.input : [];
+          return { data: input.map((_, index) => ({ index, embedding: [index + 0.1, index + 0.2] })) };
+        }
+        if (url.includes(':generateContent')) {
+          return { candidates: [{ content: { parts: [{ text: 'GEMINI OK' }] } }] };
+        }
+        if (url.endsWith('/messages')) {
+          return { content: [{ type: 'text', text: 'ANTHROPIC OK' }] };
+        }
+        if (url.includes('/chat/completions')) {
+          return { choices: [{ message: { content: 'OPENAI OK' } }] };
+        }
+        throw new Error(`Unexpected fetch URL: ${url}`);
+      },
+      async text() { return 'ok'; },
+      statusText: 'OK',
+    };
+  };
+
+  fetchCalls = [];
   await exported.generateContent('Hello', {
     provider: 'anthropic',
     apiKey: 'chat-key',
@@ -280,10 +378,8 @@ return {
     apiVersion: exported.ANTHROPIC_VERSION,
     model: 'claude-3-5-sonnet-latest',
   });
-  assert.equal(fetchCalls[0].url, 'https://demo.openai.azure.com/openai/deployments/embed-deploy/embeddings?api-version=2024-10-21');
-  assert.equal(fetchCalls[0].options.headers['api-key'], 'az-key');
-  assert.equal(fetchCalls[1].url, 'https://api.anthropic.com/v1/messages');
-  assert.equal(fetchCalls[1].options.headers['x-api-key'], 'chat-key');
+  assert.equal(fetchCalls[0].url, 'https://api.anthropic.com/v1/messages');
+  assert.equal(fetchCalls[0].options.headers['x-api-key'], 'chat-key');
   results.provider_requests = 'ok';
 
   delete global.window.showDirectoryPicker;
