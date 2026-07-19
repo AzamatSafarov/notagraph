@@ -209,13 +209,14 @@ return {
 (async () => {
   const results = {};
 
-  assert.equal(exported.primaryProviderSelect.value, 'ollama-cloud');
-  assert.equal(exported.primaryBaseUrlInput.value, 'https://ollama.com/v1');
-  assert.equal(exported.primaryEmbeddingModelInput.value, 'nomic-embed-text');
-  assert.equal(exported.primaryChatModelInput.value, 'deepseek-v4-pro');
+  assert.equal(exported.primaryProviderSelect.value, 'azure');
+  assert.equal(exported.primaryBaseUrlInput.value, 'https://ed-gpt-azamat.cognitiveservices.azure.com/');
+  assert.equal(exported.primaryApiVersionInput.value, '2024-02-01');
+  assert.equal(exported.primaryEmbeddingModelInput.value, 'text-embedding-3-small');
+  assert.equal(exported.primaryChatModelInput.value, 'gpt-5.4');
   assert.equal(exported.useSeparateChatToggle.checked, false);
   assert.equal(exported.advancedChatSection.classList.contains('hidden'), true);
-  assert.match(exported.primaryProviderHint.innerHTML, /Ollama Cloud/i);
+  assert.match(exported.primaryProviderHint.innerHTML, /deployment names/i);
   results.simple_defaults = 'ok';
 
   exported.primaryApiKeyInput.value = 'primary-key';

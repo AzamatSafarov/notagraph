@@ -1152,7 +1152,7 @@
             </div>
             <div class="setup-hero-side-item">
               <span class="setup-hero-side-label">Best quick start</span>
-              <span class="setup-hero-side-value">For your current setup, keep <strong>Ollama Cloud</strong> selected and just load the folder.</span>
+              <span class="setup-hero-side-value">For your current setup, keep <strong>Azure OpenAI</strong> selected, paste your Azure key, and just load the folder.</span>
             </div>
           </div>
         </div>
@@ -1854,7 +1854,14 @@
       } catch (_) {}
       return normalizeConfig({
         useSeparateChatProvider: false,
-        primary: { provider: 'ollama-cloud', apiKey: localStorage.getItem(LEGACY_KEY_STORAGE) || '' },
+        primary: {
+          provider: 'azure',
+          apiKey: localStorage.getItem(LEGACY_KEY_STORAGE) || '',
+          baseUrl: 'https://ed-gpt-azamat.cognitiveservices.azure.com/',
+          apiVersion: '2024-02-01',
+          embeddingModel: 'text-embedding-3-small',
+          chatModel: 'gpt-5.4',
+        },
         chatOverride: { provider: 'anthropic' },
       });
     }
