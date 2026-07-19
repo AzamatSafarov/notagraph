@@ -611,11 +611,20 @@
     }
 
     /* -- Topology Switcher (top-center) -- */
-    #controls {
+    #controls-stack {
       position: fixed;
       top: 20px;
       left: 50%;
       transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      z-index: 10;
+    }
+
+    #controls,
+    #view-controls {
       display: flex;
       align-items: stretch;
       background: var(--bg-panel);
@@ -623,10 +632,10 @@
       -webkit-backdrop-filter: blur(8px);
       border: 1px solid var(--border);
       border-radius: 0;
-      z-index: 10;
     }
 
-    #controls button {
+    #controls button,
+    #view-controls button {
       background: transparent;
       color: var(--text-dim);
       border: none;
@@ -643,17 +652,26 @@
       transition: color 200ms ease, border-color 200ms ease;
     }
 
-    #controls button:hover {
+    #controls button:hover,
+    #view-controls button:hover {
       color: var(--text);
     }
 
-    #controls button.active {
+    #controls button.active,
+    #view-controls button.active {
       color: var(--text-bright);
       border-bottom-color: var(--blue);
     }
 
+    #view-controls button {
+      font-size: 11px;
+      padding: 7px 14px;
+      color: var(--text-dim);
+    }
+
     /* Dividers between control buttons */
-    #controls button + button {
+    #controls button + button,
+    #view-controls button + button {
       border-left: 1px solid var(--border);
     }
 
@@ -724,7 +742,7 @@
     /* -- Layout Description (below controls) -- */
     #layout-desc {
       position: fixed;
-      top: 58px;
+      top: 92px;
       left: 50%;
       transform: translateX(-50%);
       z-index: 10;
@@ -1089,17 +1107,17 @@
     .node-label .nl-text {
       display: none;
     }
-    .node-label--pinned .nl-text,
+    .node-label--show-text .nl-text,
     .node-label--hover .nl-text {
       display: inline;
     }
-    .node-label--pinned {
+    .node-label--show-text {
       opacity: 0.96;
     }
-    .node-label--pinned .nl-bullet,
+    .node-label--show-text .nl-bullet,
     .node-label--hover .nl-bullet {
       font-size: 11px;
-      filter: drop-shadow(0 0 5px rgba(255,255,255,0.2));
+      filter: drop-shadow(0 0 5px rgba(255,235,190,0.4));
     }
     .node-label--hover {
       transform: scale(1.03);
@@ -1316,10 +1334,16 @@
     <button id="reanalyze-btn" class="hidden">RE-ANALYZE</button>
 
     <!-- Topology Switcher: top-center -->
-    <div id="controls">
-      <button class="active" data-layout="central">CENTRALIZED</button>
-      <button data-layout="decentral">DECENTRALIZED</button>
-      <button data-layout="distrib">DISTRIBUTED</button>
+    <div id="controls-stack">
+      <div id="controls">
+        <button class="active" data-layout="central">CENTRALIZED</button>
+        <button data-layout="decentral">DECENTRALIZED</button>
+        <button data-layout="distrib">DISTRIBUTED</button>
+      </div>
+      <div id="view-controls">
+        <button class="active" data-view="key">KEY IDEAS</button>
+        <button data-view="all">ALL NOTES</button>
+      </div>
     </div>
 
     <!-- Info Panel: left side (unified readouts + legend + key hint) -->
@@ -2176,12 +2200,29 @@
 
     // Check for cached session on load
     const loadCacheBtn = document.getElementById('load-cache-btn');
+    let pendingAutoRestore = null;
+    let manualSetupIntent = false;
+
+    function cancelPendingAutoRestore() {
+      manualSetupIntent = true;
+      if (pendingAutoRestore) {
+        clearTimeout(pendingAutoRestore);
+        pendingAutoRestore = null;
+      }
+    }
+
     loadSession().then(session => {
       if (session) {
         const ago = Math.round((Date.now() - session.savedAt) / 60000);
         const timeStr = ago < 60 ? `${ago}m ago` : `${Math.round(ago / 60)}h ago`;
         loadCacheBtn.textContent = `RESUME PREVIOUS SESSION // ${session.nodeCount} NOTES // ${timeStr}`;
         loadCacheBtn.classList.remove('hidden');
+        setupStatus.textContent = `AUTO-RESTORE READY — ${session.nodeCount} NOTES FROM CACHE (${timeStr})`;
+        pendingAutoRestore = setTimeout(() => {
+          if (manualSetupIntent) return;
+          setupStatus.textContent = `AUTO-RESTORING ${session.nodeCount} NOTES FROM CACHE...`;
+          restoreFromCache(session);
+        }, 900);
       }
     }).catch(() => {});
 
@@ -2383,6 +2424,7 @@
       const activeEdges = edgeSets[currentLayout] || [];
       buildReadouts(session.nodeCount, activeEdges.length);
       setIngestReadouts(session.fileStats || { loadedNotes: session.nodeCount, noteFiles: session.nodeCount, totalFiles: session.nodeCount, nonNoteFiles: 0, emptySkipped: 0 }, true);
+      applyViewMode();
 
       setBootStage(`SCOPE ONLINE // ${session.nodeCount} NODES // ${activeEdges.length} EDGES`, 'RESTORED FROM CACHE');
       setTimeout(hideBootStatus, 2000);
@@ -2391,7 +2433,14 @@
     // Track the last-picked selection so RE-ANALYZE can re-read the same folder
     let lastSelection = null;
 
+    [pickFolderBtn, primaryProviderSelect, primaryApiKeyInput, primaryBaseUrlInput, primaryApiVersionInput, primaryEmbeddingModelInput, primaryChatModelInput, useSeparateChatToggle, chatProviderSelect, chatApiKeyInput, chatBaseUrlInput, chatApiVersionInput, chatModelInput].forEach(el => {
+      el.addEventListener('input', cancelPendingAutoRestore);
+      el.addEventListener('change', cancelPendingAutoRestore);
+      el.addEventListener('click', cancelPendingAutoRestore);
+    });
+
     pickFolderBtn.addEventListener('click', async () => {
+      cancelPendingAutoRestore();
       const inputConfig = getConfigFromInputs();
       const config = buildRuntimeConfig(inputConfig);
       if (!config.embedding.apiKey) {
@@ -3308,25 +3357,26 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
       return lines;
     }
 
-    function shouldPinNodeLabel(node) {
+    function shouldShowNodeText(node) {
+      if (currentViewMode === 'all') return true;
       return Boolean(node.is_focus || node.is_medoid || node.is_llm_center);
     }
 
     function applyNodeLabelState(node, state = 'normal') {
       const lbl = node.__labelDiv;
       if (!lbl) return;
-      const pinned = shouldPinNodeLabel(node);
-      lbl.classList.toggle('node-label--pinned', pinned);
+      const showText = shouldShowNodeText(node) || state === 'hover';
+      lbl.classList.toggle('node-label--show-text', showText);
       lbl.classList.toggle('node-label--hover', state === 'hover');
       lbl.classList.toggle('node-label--dim', state === 'dim');
       if (state === 'dim') {
-        lbl.style.opacity = String(Math.max(0.08, VFX.dimOpacity.val * 0.24));
+        lbl.style.opacity = String(Math.max(0.08, VFX.dimOpacity.val * 0.28));
       } else if (state === 'hover') {
         lbl.style.opacity = '1';
       } else if (state === 'neighbor') {
-        lbl.style.opacity = pinned ? '0.94' : '0.78';
+        lbl.style.opacity = showText ? '0.9' : '0.78';
       } else {
-        lbl.style.opacity = pinned ? '0.96' : '0.78';
+        lbl.style.opacity = showText ? '0.92' : '0.8';
       }
     }
 
@@ -3353,8 +3403,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
       if (lines.length) {
         const div = document.createElement('div');
         div.className = 'node-label'
-          + (isSpecial ? ' node-label--special' : '')
-          + (isFocus ? ' node-label--pinned' : '');
+          + (isSpecial ? ' node-label--special' : '');
         div.style.color = VFX.labelColor.val;
         let html = `<span class="nl-bullet" style="color:${color};opacity:${Math.max(VFX.clusterAlpha.val, 0.82)}">\u2022</span><span class="nl-text"> ${lines[0]}`;
         for (let i = 1; i < lines.length; i++) html += `<br>${lines[i]}`;
@@ -3695,6 +3744,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
     let Graph;
     let bloomPass;
     let currentLayout = 'central';
+    let currentViewMode = 'key';
     let hoverNode = null;
     let selectedNode = null;
     let adjacency = {};
@@ -4137,6 +4187,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
       if (refreshNodeObjects) {
         Graph.nodeThreeObject(node => createNodeObject(node));
       }
+      applyViewMode();
     }
 
     // ── Topology switching ──
@@ -4159,12 +4210,22 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
           Graph.linkVisibility(link => link.topology === currentLayout);
           rebuildLookups(allNodes, activeEdges);
           buildReadouts(allNodes.length, activeEdges.length);
+          applyViewMode();
           // Soften position force, reheat, then restore — smooth ~2s drift
           const posForce = Graph.d3Force('position');
           posForce.strength(0.03);
           Graph.d3ReheatSimulation();
           setTimeout(() => posForce.strength(0.18), 3000);
         }
+      });
+    });
+
+    document.querySelectorAll('#view-controls button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#view-controls button').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentViewMode = btn.dataset.view;
+        applyViewMode();
       });
     });
 
@@ -4254,6 +4315,13 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
     function buildReadouts(nodeCount, edgeCount) {
       document.getElementById('readout-nodes').textContent = nodeCount;
       document.getElementById('readout-edges').textContent = edgeCount;
+    }
+
+    function applyViewMode() {
+      if (!Graph) return;
+      Graph.graphData().nodes.forEach(node => updateNodeAppearance(node, hoverNode === node ? 'hover' : selectedNode && selectedNode !== node ? 'dim' : 'normal'));
+      Graph.linkColor(Graph.linkColor())
+           .linkWidth(Graph.linkWidth());
     }
 
     function setIngestReadouts(stats = {}, fromCache = false) {
