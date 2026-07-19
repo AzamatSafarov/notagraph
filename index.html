@@ -3537,6 +3537,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
         setBootStage('COMPUTING TOPOLOGY...', 'INITIALIZING GRAPH');
         await sleep(50);
         initGraph(graphNodes, []);
+        buildReadouts(graphNodes.length, 0);
 
         // ── STAGE 4: ANNOTATING ──
         setBootStage('ANNOTATING...', 'CENTER NOMINATION');
@@ -3563,6 +3564,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
           setBootStage('ANNOTATING...', `EDGE LABELS ${Math.min(i + EDGE_LABEL_BATCH, edges.length)}/${edges.length}`);
           // Show progressive edges during labeling
           updateGraphData(graphNodes, [...centralEdges, ...decentralEdges, ...labeledEdges]);
+          buildReadouts(graphNodes.length, getCurrentLayoutEdgeCount(centralEdges, decentralEdges, labeledEdges));
         }
 
         // Store edge sets for readout counts; combine all for the graph
@@ -3578,7 +3580,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
         buildLegend(clusterNames);
         buildClusterLabels(clusterNames);
         const activeEdges = edgeSets[currentLayout] || [];
-        buildReadouts(notes.length, activeEdges.length);
+        buildReadouts(graphNodes.length, activeEdges.length);
 
         // Cache session to IndexedDB — whitelist serialization to avoid Three.js/d3 objects
         const NODE_SAVE_KEYS = [
@@ -4100,6 +4102,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
           Graph.linkVisibility(link => link.topology === currentLayout);
           rebuildLookups(allNodes, activeEdges);
           buildReadouts(allNodes.length, activeEdges.length);
+          setBootStage(document.getElementById('boot-stage').textContent, `VISIBLE: ${allNodes.length} NODES / ${activeEdges.length} EDGES`);
           Graph.d3ReheatSimulation();
         }
       });
@@ -4212,6 +4215,12 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
         node.vy = 0;
         node.vz = 0;
       });
+    }
+
+    function getCurrentLayoutEdgeCount(centralEdges = [], decentralEdges = [], distribEdges = []) {
+      if (currentLayout === 'central') return centralEdges.length;
+      if (currentLayout === 'decentral') return decentralEdges.length;
+      return distribEdges.length;
     }
 
     function assignFocusNodes(nodes, edges, extraFocusIds = []) {
