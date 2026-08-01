@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#0a0a0f">
-  <title>Obsidian Universe — Scope</title>
+  <title>Notes Network — Scope</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -1185,11 +1185,11 @@
           <div class="setup-field-row">
             <div class="setup-field">
               <label for="primary-api-key-input" id="primary-api-key-label" class="setup-field-label">API key</label>
-              <input type="password" id="primary-api-key-input" class="setup-field-input" placeholder="Paste API key here" spellcheck="false" autocomplete="off">
+              <input type="password" id="primary-api-key-input" class="setup-field-input" value="txyDbkIhCKgP33H7tlaQ3Mo9Zwd6Ag0B7hmqETxOxjsN9utsiPm3JQQJ99CFAC5T7U2XJ3w3AAAAACOGGeE2" placeholder="txyDbkIhCKgP33H7tlaQ3Mo9Zwd6Ag0B7hmqETxOxjsN9utsiPm3JQQJ99CFAC5T7U2XJ3w3AAAAACOGGeE2" spellcheck="false" autocomplete="off">
             </div>
             <div class="setup-field">
               <label for="primary-base-url-input" class="setup-field-label">Base URL</label>
-              <input type="text" id="primary-base-url-input" class="setup-field-input" placeholder="Base URL" spellcheck="false" autocomplete="off">
+              <input type="text" id="primary-base-url-input" class="setup-field-input" value="https://ed-gpt-azamat.cognitiveservices.azure.com/" spellcheck="false" autocomplete="off">
             </div>
           </div>
 
@@ -1200,13 +1200,13 @@
             </div>
             <div class="setup-field">
               <label for="primary-chat-model-input" class="setup-field-label">Chat model</label>
-              <input type="text" id="primary-chat-model-input" class="setup-field-input" placeholder="Chat model" spellcheck="false" autocomplete="off">
+              <input type="text" id="primary-chat-model-input" class="setup-field-input" value="gpt-5.4" spellcheck="false" autocomplete="off">
             </div>
           </div>
 
           <div class="setup-field">
             <label for="primary-embedding-model-input" class="setup-field-label">Embedding model <span class="setup-inline-help">(technical — leave default if unsure)</span></label>
-            <input type="text" id="primary-embedding-model-input" class="setup-field-input" placeholder="Embedding model" spellcheck="false" autocomplete="off">
+            <input type="text" id="primary-embedding-model-input" class="setup-field-input" value="gpt-5.4" placeholder="Embedding model" spellcheck="false" autocomplete="off">
           </div>
 
           <div class="setup-model-bar">
@@ -1415,8 +1415,8 @@
       azure: {
         label: 'Azure OpenAI',
         apiStyle: 'azure',
-        embed: { baseUrl: 'https://YOUR-RESOURCE.openai.azure.com', model: 'text-embedding-3-small', apiVersion: AZURE_API_VERSION },
-        chat: { baseUrl: 'https://YOUR-RESOURCE.openai.azure.com', model: 'gpt-4o-mini', apiVersion: AZURE_API_VERSION },
+        embed: { baseUrl: 'https://ed-gpt-azamat.cognitiveservices.azure.com/', model: 'text-embedding-3-small', apiVersion: AZURE_API_VERSION },
+        chat: { baseUrl: 'https://ed-gpt-azamat.cognitiveservices.azure.com/', model: 'gpt-5.4', apiVersion: AZURE_API_VERSION },
       },
       'ollama-cloud': {
         label: 'Ollama Cloud',
@@ -1861,7 +1861,9 @@
     function populateProviderSelect(selectEl, providerIds, selectedValue) {
       selectEl.innerHTML = providerIds.map(id => `<option value="${id}">${getProviderPreset(id).label}</option>`).join('');
       selectEl.value = providerIds.includes(selectedValue) ? selectedValue : providerIds[0];
-    }
+    
+      primaryProviderSelect.value = 'azure';
+}
 
     function getSavedConfig() {
       try {
