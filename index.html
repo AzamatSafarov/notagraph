@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#0a0a0f">
-  <title>Notes Network — Scope</title>
+  <title>Obsidian Universe — Scope</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -1149,27 +1149,11 @@
 
       <div class="setup-hero">
         <div class="setup-hero-main">
-          <div id="setup-title">Topologies of Ideas</div>
-          <div id="setup-subtitle">Universal provider console</div>
-          <div id="setup-note">Paste one key, keep the defaults, and load models directly from the provider when possible. The panel stays simple by default, but still keeps the advanced split-provider path if you ever need it.</div>
+          <div id="setup-title">Obsidian Universe</div>
+          <div id="setup-subtitle">Scope</div>
+          <div id="setup-note">Paste your API key, pick a provider, and load your notes folder.</div>
         </div>
-        <div class="setup-hero-side">
-          <div class="setup-hero-side-title">What this panel does</div>
-          <div class="setup-hero-side-list">
-            <div class="setup-hero-side-item">
-              <span class="setup-hero-side-label">Default path</span>
-              <span class="setup-hero-side-value">One provider handles everything, so you do not need to think about embeddings unless you want to.</span>
-            </div>
-            <div class="setup-hero-side-item">
-              <span class="setup-hero-side-label">Model helpers</span>
-              <span class="setup-hero-side-value">After you paste a key, the panel can pull a model list and let you choose instead of typing IDs by hand.</span>
-            </div>
-            <div class="setup-hero-side-item">
-              <span class="setup-hero-side-label">Best quick start</span>
-              <span class="setup-hero-side-value">For your current setup, keep <strong>Azure OpenAI</strong> selected, paste your Azure key, and just load the folder.</span>
-            </div>
-          </div>
-        </div>
+        
       </div>
 
       <div class="setup-grid simple-mode">
@@ -1185,113 +1169,32 @@
           <div class="setup-field-row">
             <div class="setup-field">
               <label for="primary-api-key-input" id="primary-api-key-label" class="setup-field-label">API key</label>
-              <input type="password" id="primary-api-key-input" class="setup-field-input" value="txyDbkIhCKgP33H7tlaQ3Mo9Zwd6Ag0B7hmqETxOxjsN9utsiPm3JQQJ99CFAC5T7U2XJ3w3AAAAACOGGeE2" placeholder="Paste API key here" spellcheck="false" autocomplete="off">
+              <input type="password" id="primary-api-key-input" class="setup-field-input" placeholder="Paste API key here" spellcheck="false" autocomplete="off">
             </div>
             <div class="setup-field">
               <label for="primary-base-url-input" class="setup-field-label">Base URL</label>
-              <input type="text" id="primary-base-url-input" class="setup-field-input" value="https://ed-gpt-azamat.cognitiveservices.azure.com/" spellcheck="false" autocomplete="off">
-            </div>
-          </div>
-
-          <div class="setup-field-row">
-            <div class="setup-field">
-              <label for="primary-api-version-input" class="setup-field-label">API version / extra</label>
-              <input type="text" id="primary-api-version-input" class="setup-field-input" placeholder="Optional" spellcheck="false" autocomplete="off">
-            </div>
-            <div class="setup-field">
-              <label for="primary-chat-model-input" class="setup-field-label">Chat model</label>
-              <input type="text" id="primary-chat-model-input" class="setup-field-input" value="gpt-5.4" spellcheck="false" autocomplete="off">
+              <input type="text" id="primary-base-url-input" class="setup-field-input" placeholder="Base URL" spellcheck="false" autocomplete="off">
             </div>
           </div>
 
           <div class="setup-field">
+            <label for="primary-chat-model-input" class="setup-field-label">Chat model</label>
+            <input type="text" id="primary-chat-model-input" class="setup-field-input" placeholder="Chat model" spellcheck="false" autocomplete="off">
+          </div>
+
+          <div class="setup-field">
             <label for="primary-embedding-model-input" class="setup-field-label">Embedding model <span class="setup-inline-help">(technical — leave default if unsure)</span></label>
-            <input type="text" id="primary-embedding-model-input" class="setup-field-input" value="gpt-5.4" placeholder="Embedding model" spellcheck="false" autocomplete="off">
+            <input type="text" id="primary-embedding-model-input" class="setup-field-input" placeholder="Embedding model" spellcheck="false" autocomplete="off">
           </div>
 
-          <div class="setup-model-bar">
-            <div class="setup-model-bar-copy">
-              <span class="setup-model-bar-title">Model assistant</span>
-              <span class="setup-model-bar-text">Load the provider catalog and pick chat / embedding models from a real list instead of typing raw IDs.</span>
-            </div>
-            <button type="button" id="primary-load-models-btn" class="setup-secondary-btn">Load model list</button>
-          </div>
+          
 
-          <div class="setup-model-pickers">
-            <div class="setup-model-picker-card">
-              <label for="primary-chat-model-select" class="setup-model-picker-label">Chat models from provider</label>
-              <select id="primary-chat-model-select" class="setup-model-select">
-                <option value="">Load models first or keep manual value</option>
-              </select>
-            </div>
-            <div class="setup-model-picker-card">
-              <label for="primary-embedding-model-select" class="setup-model-picker-label">Embedding models from provider</label>
-              <select id="primary-embedding-model-select" class="setup-model-select">
-                <option value="">Load models first or keep manual value</option>
-              </select>
-            </div>
-          </div>
+          
 
-          <div id="primary-models-status" class="setup-model-status" data-state="idle"></div>
-          <div id="primary-provider-hint" class="setup-provider-hint"></div>
+                    <div id="primary-provider-hint" class="setup-provider-hint"></div>
         </section>
 
-        <section class="setup-section setup-section-advanced">
-          <div class="setup-section-title">Optional advanced override</div>
-          <div class="setup-section-caption">Only use this if you want one provider for the graph itself and another provider only for naming clusters and labeling note connections.</div>
-
-          <label class="setup-toggle-row" for="use-separate-chat-toggle">
-            <input type="checkbox" id="use-separate-chat-toggle">
-            <span>Use a separate annotation provider</span>
-          </label>
-
-          <div id="advanced-chat-section" class="hidden">
-            <div class="setup-field">
-              <label for="chat-provider-select" class="setup-field-label">Annotation provider</label>
-              <select id="chat-provider-select" class="setup-field-select"></select>
-            </div>
-
-            <div class="setup-field-row">
-              <div class="setup-field">
-                <label for="chat-api-key-input" id="chat-api-key-label" class="setup-field-label">Annotation API key</label>
-                <input type="password" id="chat-api-key-input" class="setup-field-input" placeholder="Paste API key here" spellcheck="false" autocomplete="off">
-              </div>
-              <div class="setup-field">
-                <label for="chat-base-url-input" class="setup-field-label">Annotation base URL</label>
-                <input type="text" id="chat-base-url-input" class="setup-field-input" placeholder="Base URL" spellcheck="false" autocomplete="off">
-              </div>
-            </div>
-
-            <div class="setup-field-row">
-              <div class="setup-field">
-                <label for="chat-api-version-input" class="setup-field-label">API version / extra</label>
-                <input type="text" id="chat-api-version-input" class="setup-field-input" placeholder="Optional" spellcheck="false" autocomplete="off">
-              </div>
-              <div class="setup-field">
-                <label for="chat-model-input" class="setup-field-label">Annotation chat model</label>
-                <input type="text" id="chat-model-input" class="setup-field-input" placeholder="Chat model" spellcheck="false" autocomplete="off">
-              </div>
-            </div>
-
-            <div class="setup-model-bar">
-              <div class="setup-model-bar-copy">
-                <span class="setup-model-bar-title">Annotation model picker</span>
-                <span class="setup-model-bar-text">If this provider supports model discovery, you can pull the list and choose the annotation model from it.</span>
-              </div>
-              <button type="button" id="chat-load-models-btn" class="setup-secondary-btn">Load list</button>
-            </div>
-
-            <div class="setup-model-picker-card">
-              <label for="chat-model-select" class="setup-model-picker-label">Annotation chat models from provider</label>
-              <select id="chat-model-select" class="setup-model-select">
-                <option value="">Load models first or keep manual value</option>
-              </select>
-            </div>
-
-            <div id="chat-models-status" class="setup-model-status" data-state="idle"></div>
-            <div id="chat-provider-hint" class="setup-provider-hint"></div>
-          </div>
-        </section>
+        
       </div>
 
       <div class="setup-actions">
@@ -1371,6 +1274,13 @@
     <!-- Cluster Labels Overlay -->
     <div id="cluster-labels"></div>
 
+    
+    <!-- Toolbar: top-right -->
+    <div id="main-toolbar" style="position:fixed;top:20px;right:20px;z-index:10;display:flex;gap:8px;align-items:center;">
+      <button id="cache-btn" style="background:var(--bg-panel);backdrop-filter:blur(8px);border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;padding:8px 14px;cursor:pointer;transition:color 200ms ease,border-color 200ms ease;">CACHE</button>
+      <button id="export-snapshot-btn" style="background:var(--bg-panel);backdrop-filter:blur(8px);border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:11px;letter-spacing:0.08em;text-transform:uppercase;padding:8px 14px;cursor:pointer;transition:color 200ms ease,border-color 200ms ease;">EXPORT</button>
+    </div>
+
     <!-- Config Panel: bottom-right -->
     <button id="theme-toggle" title="Switch color theme">WARM</button>
 
@@ -1415,8 +1325,8 @@
       azure: {
         label: 'Azure OpenAI',
         apiStyle: 'azure',
-        embed: { baseUrl: 'https://ed-gpt-azamat.cognitiveservices.azure.com/', model: 'text-embedding-3-small', apiVersion: AZURE_API_VERSION },
-        chat: { baseUrl: 'https://ed-gpt-azamat.cognitiveservices.azure.com/', model: 'gpt-5.4', apiVersion: AZURE_API_VERSION },
+        embed: { baseUrl: 'https://ed-gpt-azamat.cognitiveservices.azure.com', model: 'text-embedding-3-small', apiVersion: AZURE_API_VERSION },
+        chat: { baseUrl: 'https://ed-gpt-azamat.cognitiveservices.azure.com', model: 'gpt-5.4', apiVersion: AZURE_API_VERSION },
       },
       'ollama-cloud': {
         label: 'Ollama Cloud',
@@ -1492,7 +1402,7 @@
       },
     };
 
-    const SIMPLE_PROVIDER_OPTIONS = ['ollama-cloud', 'azure', 'openrouter', 'openai', 'gemini', 'ollama-local', 'mistral', 'custom-openai'];
+    const SIMPLE_PROVIDER_OPTIONS = ['azure', 'gemini', 'openai', 'openrouter', 'ollama-cloud', 'ollama-local', 'mistral', 'custom-openai'];
     const CHAT_PROVIDER_OPTIONS = ['gemini', 'openai', 'openrouter', 'azure', 'ollama-cloud', 'ollama-local', 'anthropic', 'groq', 'together', 'deepseek', 'xai', 'mistral', 'fireworks', 'cerebras', 'perplexity', 'custom-openai'];
 
     const primaryProviderSelect = document.getElementById('primary-provider-select');
@@ -4379,6 +4289,59 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
     });
 
     // (label-toggle and config panel removed from release build)
+  
+    // ═══════════════════════════════════════════════
+    // Export standalone snapshot
+    // ═══════════════════════════════════════════════
+    let latestSessionSnapshot = null;
+
+    function buildStandaloneSnapshotHtml() {
+      if (!latestSessionSnapshot) throw new Error('No cached session. Click CACHE first.');
+      const snapshot = JSON.stringify(latestSessionSnapshot);
+      const title = 'Obsidian Universe Snapshot';
+      const styles = document.querySelector('style').textContent;
+      return '<!DOCTYPE html>\n<html lang="en" style="color-scheme: dark;">\n<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>' + title + '</title><style>' + styles + '</style></head>\n<body><div id="graph"></div>\n<script>\nconst SNAPSHOT = ' + JSON.stringify(snapshot) + ';\nconst data = JSON.parse(SNAPSHOT);\nconsole.log("Snapshot loaded", data);\n<\/script>\n</body></html>';
+    }
+
+    function downloadTextFile(filename, content) {
+      const blob = new Blob([content], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function exportStandaloneSnapshot() {
+      try {
+        const html = buildStandaloneSnapshotHtml();
+        const filename = 'obsidian-universe-snapshot-' + Date.now() + '.html';
+        downloadTextFile(filename, html);
+      } catch (e) {
+        alert(e.message);
+      }
+    }
+
+    // Wire toolbar buttons
+    const exportBtn = document.getElementById('export-snapshot-btn');
+    if (exportBtn) exportBtn.addEventListener('click', exportStandaloneSnapshot);
+
+    const cacheBtnToolbar = document.getElementById('cache-btn');
+    if (cacheBtnToolbar) cacheBtnToolbar.addEventListener('click', () => {
+      if (allNodes.length && edgeSets) {
+        latestSessionSnapshot = {
+          nodes: allNodes.map(n => ({ id: n.id, name: n.name, cluster: n.cluster, x: n.x, y: n.y, z: n.z })),
+          links: Object.entries(edgeSets).flatMap(([topology, edges]) => edges.map(e => ({ ...e, topology }))),
+          metadata: { title: 'Obsidian Universe', exportedAt: Date.now() }
+        };
+        cacheBtnToolbar.textContent = 'CACHED';
+        cacheBtnToolbar.style.color = 'var(--text-bright)';
+      }
+    });
+
   </script>
 
 </body>
