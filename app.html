@@ -4,28 +4,34 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#0a0a0f">
-  <title>Obsidian Universe — Scope</title>
+  <title>Obsidian Universe</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=EB+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     /* ═══════════════════════════════════════════════
        CSS Custom Properties
        ═══════════════════════════════════════════════ */
     :root {
-      --bg: #060610;
-      --bg-panel: rgba(10, 10, 22, 0.92);
-      --border: rgba(77, 142, 255, 0.25);
-      --text: #b8c4e0;
-      --text-dim: #5a6a90;
-      --text-bright: #e0e8ff;
+      --bg: #08060a;
+      --bg-panel: rgba(12, 10, 16, 0.94);
+      --border: rgba(212, 175, 55, 0.22);
+      --text: #c4b894;
+      --text-dim: #6a5f3e;
+      --text-bright: #f0e6c8;
       --mono: 'JetBrains Mono', monospace;
+      --serif: 'Cormorant Garamond', 'EB Garamond', Georgia, serif;
       --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-      --blue: #4d8eff;
-      --cyan: #00d4ff;
-      --light-cyan: #66e0ff;
-      --indigo: #8b5cf6;
-      --amber: #00d4ff;
+      --gold: #d4af37;
+      --gold-dim: #8a7028;
+      --gold-bright: #f5d76e;
+      --blue: #4a6fa5;
+      --cyan: #7eb8d4;
+      --light-cyan: #a8d0e8;
+      --indigo: #6a5a8a;
+      --amber: #d4af37;
+      --crimson: #8b3a2a;
     }
 
     /* ═══════════════════════════════════════════════
@@ -69,47 +75,59 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 16px;
+      gap: 14px;
       background:
-        radial-gradient(ellipse at 30% 20%, rgba(77, 142, 255, 0.08), transparent 50%),
-        radial-gradient(ellipse at 70% 80%, rgba(139, 92, 246, 0.06), transparent 50%),
+        radial-gradient(circle at 25% 25%, rgba(212, 175, 55, 0.06) 1px, transparent 1.5px),
+        radial-gradient(circle at 75% 75%, rgba(212, 175, 55, 0.04) 1px, transparent 1.5px),
+        radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.03) 1px, transparent 1px),
+        radial-gradient(ellipse at 30% 20%, rgba(212, 175, 55, 0.05), transparent 50%),
+        radial-gradient(ellipse at 70% 80%, rgba(74, 111, 165, 0.04), transparent 50%),
         var(--bg);
+      background-size: 24px 24px, 32px 32px, 16px 16px, 100% 100%, 100% 100%, 100% 100%;
     }
 
     #setup-title {
-      font-family: var(--mono);
-      font-size: 28px;
-      font-weight: 700;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--text-bright);
-      text-shadow: 0 0 30px rgba(77, 142, 255, 0.3);
+      font-family: var(--serif);
+      font-size: 42px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: var(--gold-bright);
+      text-shadow: 0 0 40px rgba(212, 175, 55, 0.2);
+      position: relative;
+    }
+    #setup-title::before, #setup-title::after {
+      content: '';
+      display: block;
+      width: 60px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      margin: 8px auto;
     }
 
     #setup-subtitle {
-      font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 0.20em;
-      text-transform: uppercase;
+      font-family: var(--serif);
+      font-size: 14px;
+      font-style: italic;
+      letter-spacing: 0.02em;
       color: var(--text-dim);
-      margin-top: -8px;
-      margin-bottom: 20px;
+      margin-top: 4px;
+      margin-bottom: 24px;
     }
 
-    #api-key-label, .setup-field-label {
+    #api-key-label, #api-key-label, .setup-field-label {
       font-family: var(--mono);
       font-size: 9px;
-      letter-spacing: 0.15em;
-      color: var(--text-dim);
+      letter-spacing: 0.12em;
+      color: var(--gold-dim);
       margin-bottom: 5px;
       text-transform: uppercase;
     }
 
     #api-key-input {
-      background: rgba(10, 10, 22, 0.6);
+      background: rgba(12, 10, 16, 0.7);
       border: 1px solid var(--border);
-      border-radius: 6px;
-      color: var(--text);
+      border-radius: 4px;
+      color: var(--text-bright);
       font-family: var(--mono);
       font-size: 13px;
       padding: 12px 16px;
@@ -124,15 +142,15 @@
     }
 
     #api-key-input:focus {
-      border-color: var(--blue);
-      box-shadow: 0 0 0 3px rgba(77, 142, 255, 0.1);
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.08);
     }
 
     .setup-model-input {
-      background: rgba(10, 10, 22, 0.6);
+      background: rgba(12, 10, 16, 0.7);
       border: 1px solid var(--border);
-      border-radius: 6px;
-      color: var(--text);
+      border-radius: 4px;
+      color: var(--text-bright);
       font-family: var(--mono);
       font-size: 12px;
       padding: 10px 16px;
@@ -143,15 +161,15 @@
     }
     .setup-model-input::placeholder { color: var(--text-dim); }
     .setup-model-input:focus {
-      border-color: var(--blue);
-      box-shadow: 0 0 0 3px rgba(77, 142, 255, 0.1);
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.08);
     }
 
     #provider-select {
-      background: rgba(10, 10, 22, 0.6);
+      background: rgba(12, 10, 16, 0.7);
       border: 1px solid var(--border);
-      border-radius: 6px;
-      color: var(--text);
+      border-radius: 4px;
+      color: var(--text-bright);
       font-family: var(--mono);
       font-size: 12px;
       letter-spacing: 0.08em;
@@ -164,14 +182,14 @@
       outline: none;
       transition: border-color 200ms ease;
     }
-    #provider-select option { background: #0a0a16; color: var(--text); }
-    #provider-select:focus { border-color: var(--blue); }
+    #provider-select option { background: #0c0a10; color: var(--text-bright); }
+    #provider-select:focus { border-color: var(--gold); }
 
     #pick-folder-btn {
-      background: linear-gradient(135deg, rgba(77, 142, 255, 0.15), rgba(139, 92, 246, 0.1));
-      border: 1px solid rgba(77, 142, 255, 0.4);
-      border-radius: 6px;
-      color: var(--text-bright);
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.12), rgba(139, 58, 42, 0.08));
+      border: 1px solid rgba(212, 175, 55, 0.35);
+      border-radius: 4px;
+      color: var(--gold-bright);
       font-family: var(--mono);
       font-size: 12px;
       font-weight: 600;
@@ -186,16 +204,16 @@
     }
 
     #pick-folder-btn:hover {
-      border-color: var(--blue);
-      box-shadow: 0 0 20px rgba(77, 142, 255, 0.2);
+      border-color: var(--gold);
+      box-shadow: 0 0 20px rgba(212, 175, 55, 0.15);
       transform: translateY(-1px);
     }
 
     #load-cache-btn {
       background: transparent;
-      border: 1px solid rgba(77, 142, 255, 0.3);
-      border-radius: 6px;
-      color: var(--blue);
+      border: 1px solid rgba(212, 175, 55, 0.25);
+      border-radius: 4px;
+      color: var(--gold-dim);
       font-family: var(--mono);
       font-size: 11px;
       letter-spacing: 0.10em;
@@ -208,8 +226,8 @@
     }
 
     #load-cache-btn:hover {
-      border-color: var(--blue);
-      background: rgba(77, 142, 255, 0.05);
+      border-color: var(--gold);
+      background: rgba(212, 175, 55, 0.04);
     }
 
     #setup-status {
@@ -302,12 +320,11 @@
       top: 20px;
       left: 20px;
       z-index: 10;
-      font-family: var(--mono);
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--text-dim);
+      font-family: var(--serif);
+      font-size: 18px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      color: var(--gold-dim);
       pointer-events: none;
     }
 
@@ -345,7 +362,7 @@
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: 4px;
       z-index: 10;
     }
 
@@ -358,9 +375,9 @@
       border-radius: 0;
       cursor: pointer;
       font-family: var(--mono);
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 500;
-      letter-spacing: 0.08em;
+      letter-spacing: 0.10em;
       text-transform: uppercase;
       white-space: nowrap;
       transition: color 200ms ease, border-color 200ms ease;
@@ -371,8 +388,8 @@
     }
 
     #controls button.active {
-      color: var(--text-bright);
-      border-bottom-color: var(--blue);
+      color: var(--gold-bright);
+      border-bottom-color: var(--gold);
     }
 
     /* Dividers between control buttons */
@@ -391,7 +408,7 @@
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: 4px;
       font-family: var(--mono);
       font-size: 11px;
       letter-spacing: 0.06em;
@@ -427,7 +444,7 @@
     }
 
     .info-val {
-      color: var(--text-bright);
+      color: var(--gold);
       text-align: right;
     }
 
@@ -503,7 +520,7 @@
       -webkit-backdrop-filter: blur(16px);
       border-left: 1px solid var(--border);
       z-index: 15;
-      padding: 20px;
+      padding: 24px;
       transform: translateX(100%);
       transition: transform 300ms ease;
     }
@@ -551,12 +568,13 @@
     }
 
     .card-title {
-      font-family: var(--mono);
-      font-size: 14px;
+      font-family: var(--serif);
+      font-size: 20px;
       font-weight: 600;
-      color: var(--text-bright);
-      letter-spacing: 0.04em;
+      color: var(--gold-bright);
+      letter-spacing: 0.01em;
       word-break: break-word;
+      line-height: 1.2;
     }
 
     #card-close {
@@ -584,13 +602,13 @@
     .cluster-badge {
       display: inline-block;
       border: 1px solid var(--border);
-      border-radius: 4px;
+      border-radius: 3px;
       font-family: var(--mono);
       font-size: 10px;
       font-weight: 500;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      padding: 2px 8px;
+      padding: 3px 10px;
       color: var(--text);
     }
 
@@ -743,8 +761,8 @@
     }
 
     .legend-dot {
-      width: 8px;
-      height: 8px;
+      width: 7px;
+      height: 7px;
       border-radius: 999px;
       flex-shrink: 0;
     }
@@ -797,7 +815,7 @@
       font-family: 'Consolas', 'Courier New', monospace;
       font-size: 11px;
       line-height: 1.3;
-      color: #b8c4e0;
+      color: #c4b894;
       pointer-events: none;
       padding-left: 1.1em;
       text-indent: -1.1em;
@@ -810,7 +828,7 @@
       vertical-align: 1px;
     }
     .node-label--special {
-      color: #66e0ff;
+      color: #f5d76e;
       opacity: 0.7;
     }
 
@@ -832,7 +850,7 @@
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
       border: 1px solid var(--border);
-      border-radius: 6px;
+      border-radius: 4px;
       color: var(--text-dim);
       font-family: var(--mono);
       font-size: 11px;
@@ -855,7 +873,7 @@
        Setup Screen
        ═══════════════════════════════════════════════ -->
   <div id="setup">
-    <div id="setup-title">OBSIDIAN UNIVERSE</div>
+    <div id="setup-title">Obsidian Universe</div>
     <div id="setup-subtitle">Neural Cartography of Ideas</div>
     <select id="provider-select">
       <option value="azure">AZURE OPENAI</option>
@@ -864,7 +882,7 @@
       <option value="openrouter">OPENROUTER</option>
       <option value="ollama">OLLAMA LOCAL</option>
     </select>
-    <label for="api-key-input" id="api-key-label">API KEY</label>
+    <label for="api-key-input" id="api-key-label">API Key</label>
     <input type="password" id="api-key-input" placeholder="Paste key" spellcheck="false" autocomplete="off">
     <label class="setup-field-label" for="base-url-input">Base URL</label>
     <input type="text" id="base-url-input" class="setup-model-input" placeholder="Azure endpoint URL" spellcheck="false" autocomplete="off">
@@ -941,7 +959,7 @@
 
     <!-- Config Panel: bottom-right -->
     <button id="export-snapshot-btn" title="Export graph as HTML">EXPORT</button>
-    <button id="theme-toggle" title="Switch color theme">NEURAL</button>
+    <button id="theme-toggle" title="Switch color theme">GOLD</button>
 
   </div><!-- /main -->
 
@@ -1882,20 +1900,20 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
     const VFX = {
       // Colors + alphas
-      bgColor:            { val: '#060610', label: 'BACKGROUND',   section: 'COLORS',   refresh: 'colors', type: 'color' },
+      bgColor:            { val: '#08060a', label: 'BACKGROUND',   section: 'COLORS',   refresh: 'colors', type: 'color' },
       bgAlpha:            { val: 1.0,   min: 0, max: 1, step: 0.05, label: 'BG ALPHA',        section: 'COLORS',   refresh: 'colors' },
-      labelColor:         { val: '#b8c4e0', label: 'LABEL TEXT',    section: 'COLORS',   refresh: 'colors', type: 'color' },
+      labelColor:         { val: '#c4b894', label: 'LABEL TEXT',    section: 'COLORS',   refresh: 'colors', type: 'color' },
       labelAlpha:         { val: 1.0,   min: 0, max: 1, step: 0.05, label: 'LABEL ALPHA',     section: 'COLORS',   refresh: 'colors' },
-      linkColor:          { val: '#4d8eff', label: 'LINK',          section: 'COLORS',   refresh: 'colors', type: 'color' },
+      linkColor:          { val: '#d4af37', label: 'LINK',          section: 'COLORS',   refresh: 'colors', type: 'color' },
       linkAlpha:          { val: 0.6,   min: 0, max: 1, step: 0.01, label: 'LINK ALPHA',      section: 'COLORS',   refresh: 'colors' },
-      particleColor:      { val: '#00d4ff', label: 'PARTICLE',      section: 'COLORS',   refresh: 'colors', type: 'color' },
+      particleColor:      { val: '#f5d76e', label: 'PARTICLE',      section: 'COLORS',   refresh: 'colors', type: 'color' },
       particleAlpha:      { val: 1.0,   min: 0, max: 1, step: 0.05, label: 'PARTICLE ALPHA',  section: 'COLORS',   refresh: 'colors' },
       // Cluster colors
-      cluster0:           { val: '#4d8eff', label: 'CLUSTER 1',     section: 'CLUSTERS', refresh: 'clusters', type: 'color' },
-      cluster1:           { val: '#00d4ff', label: 'CLUSTER 2',     section: 'CLUSTERS', refresh: 'clusters', type: 'color' },
-      cluster2:           { val: '#8b5cf6', label: 'CLUSTER 3',     section: 'CLUSTERS', refresh: 'clusters', type: 'color' },
-      cluster3:           { val: '#f72585', label: 'CLUSTER 4',     section: 'CLUSTERS', refresh: 'clusters', type: 'color' },
-      cluster4:           { val: '#06ffa5', label: 'CLUSTER 5',     section: 'CLUSTERS', refresh: 'clusters', type: 'color' },
+      cluster0:           { val: '#d4af37', label: 'CLUSTER 1',     section: 'CLUSTERS', refresh: 'clusters', type: 'color' },
+      cluster1:           { val: '#7eb8d4', label: 'CLUSTER 2',     section: 'CLUSTERS', refresh: 'clusters', type: 'color' },
+      cluster2:           { val: '#8b3a2a', label: 'CLUSTER 3',     section: 'CLUSTERS', refresh: 'clusters', type: 'color' },
+      cluster3:           { val: '#4a6fa5', label: 'CLUSTER 4',     section: 'CLUSTERS', refresh: 'clusters', type: 'color' },
+      cluster4:           { val: '#6a8a4a', label: 'CLUSTER 5',     section: 'CLUSTERS', refresh: 'clusters', type: 'color' },
       clusterAlpha:       { val: 1.0,   min: 0, max: 1, step: 0.05, label: 'BULLET ALPHA',    section: 'CLUSTERS', refresh: 'clusters' },
       // Hit-target scale (affects hover detection area)
       nodeScale:          { val: 18,    min: 4,    max: 40,   step: 1,     label: 'HIT AREA',        section: 'NODES',      refresh: 'scale' },
@@ -1939,30 +1957,30 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
     const COLOR_THEMES = {
       warm: {
-        bgColor: '#060610', bgAlpha: 1.0,
-        labelColor: '#b8c4e0', labelAlpha: 1.0,
-        linkColor: '#4d8eff', linkAlpha: 0.6,
-        particleColor: '#00d4ff', particleAlpha: 1.0,
-        cluster0: '#4d8eff', cluster1: '#00d4ff', cluster2: '#8b5cf6',
-        cluster3: '#f72585', cluster4: '#06ffa5', clusterAlpha: 1.0,
-        chromeBg: '#060610', chromeBgPanel: '#0a0a16', chromeBgPanelA: 0.92,
-        chromeBorder: '#4d8eff', chromeText: '#b8c4e0', chromeTextDim: '#5a6a90',
-        chromeTextBright: '#e0e8ff', chromeAccent: '#4d8eff',
-        chromeCyan: '#00d4ff', chromeLightCyan: '#66e0ff',
-        chromeIndigo: '#8b5cf6', chromeAmber: '#00d4ff',
+        bgColor: '#08060a', bgAlpha: 1.0,
+        labelColor: '#c4b894', labelAlpha: 1.0,
+        linkColor: '#d4af37', linkAlpha: 0.5,
+        particleColor: '#f5d76e', particleAlpha: 1.0,
+        cluster0: '#d4af37', cluster1: '#7eb8d4', cluster2: '#8b3a2a',
+        cluster3: '#4a6fa5', cluster4: '#6a8a4a', clusterAlpha: 1.0,
+        chromeBg: '#08060a', chromeBgPanel: '#0c0a10', chromeBgPanelA: 0.94,
+        chromeBorder: '#d4af37', chromeText: '#c4b894', chromeTextDim: '#6a5f3e',
+        chromeTextBright: '#f0e6c8', chromeAccent: '#d4af37',
+        chromeCyan: '#7eb8d4', chromeLightCyan: '#a8d0e8',
+        chromeIndigo: '#6a5a8a', chromeAmber: '#d4af37',
       },
       grey: {
-        bgColor: '#1a1a2e', bgAlpha: 1.0,
-        labelColor: '#e0e0e0', labelAlpha: 1.0,
-        linkColor: '#7d7dff', linkAlpha: 0.4,
-        particleColor: '#00ff88', particleAlpha: 1.0,
-        cluster0: '#7d7dff', cluster1: '#ff7df0', cluster2: '#7dffea',
-        cluster3: '#ffdf7d', cluster4: '#ff7d7d', clusterAlpha: 1.0,
-        chromeBg: '#1a1a2e', chromeBgPanel: '#161628', chromeBgPanelA: 0.92,
-        chromeBorder: '#444466', chromeText: '#c0c0d0', chromeTextDim: '#666680',
-        chromeTextBright: '#ffffff', chromeAccent: '#7d7dff',
-        chromeCyan: '#7dffea', chromeLightCyan: '#a0fff0',
-        chromeIndigo: '#9d7dff', chromeAmber: '#7dffea',
+        bgColor: '#0a0a0a', bgAlpha: 1.0,
+        labelColor: '#888888', labelAlpha: 1.0,
+        linkColor: '#666666', linkAlpha: 0.3,
+        particleColor: '#aaaaaa', particleAlpha: 1.0,
+        cluster0: '#555555', cluster1: '#777777', cluster2: '#999999',
+        cluster3: '#aaaaaa', cluster4: '#666666', clusterAlpha: 1.0,
+        chromeBg: '#0a0a0a', chromeBgPanel: '#0c0c0c', chromeBgPanelA: 0.94,
+        chromeBorder: '#444444', chromeText: '#999999', chromeTextDim: '#555555',
+        chromeTextBright: '#cccccc', chromeAccent: '#666666',
+        chromeCyan: '#888888', chromeLightCyan: '#aaaaaa',
+        chromeIndigo: '#666666', chromeAmber: '#888888',
       },
     };
 
@@ -1996,7 +2014,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
       refreshChrome();
 
       // Update button label
-      document.getElementById('theme-toggle').textContent = name === 'warm' ? 'NEURAL' : name.toUpperCase();
+      document.getElementById('theme-toggle').textContent = name === 'warm' ? 'GOLD' : 'MONO';
     }
 
     // ═══════════════════════════════════════════════
@@ -2833,9 +2851,9 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
     // ── Topology switching ──
 
     const LAYOUT_DESCRIPTIONS = {
-      central: 'CORE \u2014 CENTRAL HUB, NOTES ORBIT AROUND MEDOID',
+      central: 'CORE \u2014 MEDOID AT ORIGIN, NOTES RADIATE OUTWARD',
       decentral: 'CLUSTERS \u2014 THEMATIC HUBS WITH ORBITING NOTES',
-      distrib: 'NEURAL \u2014 SEMANTIC SIMILARITY DRIVES PROXIMITY',
+      distrib: 'NEURAL \u2014 UMAP PROJECTION, SEMANTIC PROXIMITY',
     };
 
     document.querySelectorAll('#controls button').forEach(btn => {
