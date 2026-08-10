@@ -1244,9 +1244,9 @@
     // ═══════════════════════════════════════════════
     // Gemini API — Embeddings & Generation
     // ═══════════════════════════════════════════════
-    const EMBED_BATCH_SIZE = 5;
-
     async function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+    const EMBED_BATCH_SIZE = 16;
 
     async function embedTexts(texts, config, onProgress) {
       const allEmbeddings = [];
@@ -1271,7 +1271,7 @@
             );
             if (response.ok) break;
             if (response.status === 429 || response.status === 503) {
-              const retryAfter = parseInt(response.headers.get('Retry-After') || '7');
+              const retryAfter = Math.min(parseInt(response.headers.get('Retry-After') || '5'), 5);
               retries++;
               if (retries < maxRetries) {
                 await sleep(retryAfter * 1000);
@@ -1325,8 +1325,6 @@
         }
 
         if (onProgress) onProgress(Math.min(i + EMBED_BATCH_SIZE, texts.length), texts.length);
-        // Small delay between batches to avoid rate limits
-        if (i + EMBED_BATCH_SIZE < texts.length) await sleep(500);
       }
 
       return allEmbeddings;
@@ -1352,7 +1350,7 @@
           );
           if (response.ok) break;
           if (response.status === 429 || response.status === 503) {
-            const retryAfter = parseInt(response.headers.get('Retry-After') || '10');
+            const retryAfter = Math.min(parseInt(response.headers.get('Retry-After') || '5'), 5);
             retries++;
             if (retries < 5) {
               await sleep(retryAfter * 1000);
@@ -1819,8 +1817,6 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
       el.classList.remove('hidden');
       el.style.opacity = '1';
     }
-
-    // (sleep defined above)
 
     // ═══════════════════════════════════════════════
     // Config Constants
