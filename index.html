@@ -1244,7 +1244,9 @@
     // ═══════════════════════════════════════════════
     // Gemini API — Embeddings & Generation
     // ═══════════════════════════════════════════════
-    const EMBED_BATCH_SIZE = 20;
+    const EMBED_BATCH_SIZE = 5;
+
+    async function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
     async function embedTexts(texts, config, onProgress) {
       const allEmbeddings = [];
@@ -1253,17 +1255,29 @@
       for (let i = 0; i < texts.length; i += EMBED_BATCH_SIZE) {
         const batch = texts.slice(i, i + EMBED_BATCH_SIZE);
         let response;
+        let retries = 0;
+        const maxRetries = 5;
 
         if (provider === 'azure') {
-          response = await fetch(
-            `${config.baseUrl}/openai/deployments/${config.embeddingModel}/embeddings?api-version=${config.apiVersion}`,
-            {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json', 'api-key': config.apiKey },
-              body: JSON.stringify({ input: batch }),
+          // Retry with backoff for rate limits
+          while (retries < maxRetries) {
+            response = await fetch(
+              `${config.baseUrl}/openai/deployments/${config.embeddingModel}/embeddings?api-version=${config.apiVersion}`,
+              {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'api-key': config.apiKey },
+                body: JSON.stringify({ input: batch }),
+              }
+            );
+            if (response.ok) break;
+            if (response.status === 429 || response.status === 503) {
+              const retryAfter = parseInt(response.headers.get('Retry-After') || '7');
+              retries++;
+              if (retries < maxRetries) {
+                await sleep(retryAfter * 1000);
+                continue;
+              }
             }
-          );
-          if (!response.ok) {
             const err = await response.json().catch(() => ({}));
             throw new Error(`Azure embedding error: ${err.error?.message || response.statusText}`);
           }
@@ -1311,6 +1325,8 @@
         }
 
         if (onProgress) onProgress(Math.min(i + EMBED_BATCH_SIZE, texts.length), texts.length);
+        // Small delay between batches to avoid rate limits
+        if (i + EMBED_BATCH_SIZE < texts.length) await sleep(500);
       }
 
       return allEmbeddings;
@@ -1321,18 +1337,28 @@
       let response;
 
       if (provider === 'azure') {
-        response = await fetch(
-          `${config.baseUrl}/openai/deployments/${config.chatModel}/chat/completions?api-version=${config.apiVersion}`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'api-key': config.apiKey },
-            body: JSON.stringify({
-              messages: [{ role: 'user', content: prompt }],
-              max_completion_tokens: 2000,
-            }),
+        let retries = 0;
+        while (retries < 5) {
+          response = await fetch(
+            `${config.baseUrl}/openai/deployments/${config.chatModel}/chat/completions?api-version=${config.apiVersion}`,
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'api-key': config.apiKey },
+              body: JSON.stringify({
+                messages: [{ role: 'user', content: prompt }],
+                max_completion_tokens: 2000,
+              }),
+            }
+          );
+          if (response.ok) break;
+          if (response.status === 429 || response.status === 503) {
+            const retryAfter = parseInt(response.headers.get('Retry-After') || '10');
+            retries++;
+            if (retries < 5) {
+              await sleep(retryAfter * 1000);
+              continue;
+            }
           }
-        );
-        if (!response.ok) {
           const err = await response.json().catch(() => ({}));
           throw new Error(`Azure LLM error: ${err.error?.message || response.statusText}`);
         }
@@ -1794,7 +1820,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
       el.style.opacity = '1';
     }
 
-    function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+    // (sleep defined above)
 
     // ═══════════════════════════════════════════════
     // Config Constants
