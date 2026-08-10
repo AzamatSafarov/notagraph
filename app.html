@@ -1246,7 +1246,7 @@
     // ═══════════════════════════════════════════════
     async function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 
-    const EMBED_BATCH_SIZE = 16;
+    const EMBED_BATCH_SIZE = 20;
 
     async function embedTexts(texts, config, onProgress) {
       const allEmbeddings = [];
