@@ -13,19 +13,19 @@
        CSS Custom Properties
        ═══════════════════════════════════════════════ */
     :root {
-      --bg: #0a0a0f;
-      --bg-panel: rgba(8, 8, 7, 0.88);
-      --border: #cd6d13;
-      --text: #e8cea6;
-      --text-dim: #cd8218;
-      --text-bright: #ffeab8;
+      --bg: #060610;
+      --bg-panel: rgba(10, 10, 22, 0.92);
+      --border: rgba(77, 142, 255, 0.25);
+      --text: #b8c4e0;
+      --text-dim: #5a6a90;
+      --text-bright: #e0e8ff;
       --mono: 'JetBrains Mono', monospace;
       --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-      --blue: #d07b1b;
-      --cyan: #d4a843;
-      --light-cyan: #e8c46a;
-      --indigo: #c47a43;
-      --amber: #d4a843;
+      --blue: #4d8eff;
+      --cyan: #00d4ff;
+      --light-cyan: #66e0ff;
+      --indigo: #8b5cf6;
+      --amber: #00d4ff;
     }
 
     /* ═══════════════════════════════════════════════
@@ -69,48 +69,54 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 20px;
+      gap: 16px;
+      background:
+        radial-gradient(ellipse at 30% 20%, rgba(77, 142, 255, 0.08), transparent 50%),
+        radial-gradient(ellipse at 70% 80%, rgba(139, 92, 246, 0.06), transparent 50%),
+        var(--bg);
     }
 
     #setup-title {
       font-family: var(--mono);
-      font-size: 20px;
-      font-weight: 600;
-      letter-spacing: 0.12em;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 0.18em;
       text-transform: uppercase;
-      color: var(--text-dim);
+      color: var(--text-bright);
+      text-shadow: 0 0 30px rgba(77, 142, 255, 0.3);
     }
 
     #setup-subtitle {
       font-family: var(--mono);
-      font-size: 11px;
-      letter-spacing: 0.10em;
+      font-size: 10px;
+      letter-spacing: 0.20em;
       text-transform: uppercase;
       color: var(--text-dim);
-      margin-top: -10px;
-      margin-bottom: 16px;
+      margin-top: -8px;
+      margin-bottom: 20px;
     }
 
-    #api-key-label {
+    #api-key-label, .setup-field-label {
       font-family: var(--mono);
-      font-size: 10px;
-      letter-spacing: 0.12em;
+      font-size: 9px;
+      letter-spacing: 0.15em;
       color: var(--text-dim);
-      margin-bottom: 6px;
+      margin-bottom: 5px;
+      text-transform: uppercase;
     }
 
     #api-key-input {
-      background: transparent;
+      background: rgba(10, 10, 22, 0.6);
       border: 1px solid var(--border);
-      border-radius: 0;
+      border-radius: 6px;
       color: var(--text);
       font-family: var(--mono);
       font-size: 13px;
-      padding: 10px 14px;
-      width: 320px;
+      padding: 12px 16px;
+      width: 340px;
       box-sizing: border-box;
       letter-spacing: 0.04em;
-      transition: border-color 200ms ease;
+      transition: border-color 200ms ease, box-shadow 200ms ease;
     }
 
     #api-key-input::placeholder {
@@ -119,48 +125,91 @@
 
     #api-key-input:focus {
       border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(77, 142, 255, 0.1);
     }
 
-    #pick-folder-btn {
-      background: transparent;
+    .setup-model-input {
+      background: rgba(10, 10, 22, 0.6);
       border: 1px solid var(--border);
-      border-radius: 0;
+      border-radius: 6px;
       color: var(--text);
       font-family: var(--mono);
       font-size: 12px;
-      letter-spacing: 0.10em;
+      padding: 10px 16px;
+      width: 340px;
+      box-sizing: border-box;
+      letter-spacing: 0.04em;
+      transition: border-color 200ms ease, box-shadow 200ms ease;
+    }
+    .setup-model-input::placeholder { color: var(--text-dim); }
+    .setup-model-input:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(77, 142, 255, 0.1);
+    }
+
+    #provider-select {
+      background: rgba(10, 10, 22, 0.6);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
-      padding: 10px 24px;
-      width: 320px;
+      padding: 10px 16px;
+      width: 340px;
       box-sizing: border-box;
       cursor: pointer;
-      transition: border-color 200ms ease, color 200ms ease;
+      margin-bottom: 4px;
+      outline: none;
+      transition: border-color 200ms ease;
+    }
+    #provider-select option { background: #0a0a16; color: var(--text); }
+    #provider-select:focus { border-color: var(--blue); }
+
+    #pick-folder-btn {
+      background: linear-gradient(135deg, rgba(77, 142, 255, 0.15), rgba(139, 92, 246, 0.1));
+      border: 1px solid rgba(77, 142, 255, 0.4);
+      border-radius: 6px;
+      color: var(--text-bright);
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 14px 24px;
+      width: 340px;
+      box-sizing: border-box;
+      cursor: pointer;
+      transition: all 200ms ease;
+      margin-top: 8px;
     }
 
     #pick-folder-btn:hover {
       border-color: var(--blue);
-      color: var(--text-bright);
+      box-shadow: 0 0 20px rgba(77, 142, 255, 0.2);
+      transform: translateY(-1px);
     }
 
     #load-cache-btn {
       background: transparent;
-      border: 1px solid var(--blue);
-      border-radius: 0;
+      border: 1px solid rgba(77, 142, 255, 0.3);
+      border-radius: 6px;
       color: var(--blue);
       font-family: var(--mono);
-      font-size: 12px;
+      font-size: 11px;
       letter-spacing: 0.10em;
       text-transform: uppercase;
       padding: 10px 24px;
-      width: 320px;
+      width: 340px;
       box-sizing: border-box;
       cursor: pointer;
-      transition: background 200ms ease, color 200ms ease;
+      transition: all 200ms ease;
     }
 
     #load-cache-btn:hover {
-      background: var(--blue);
-      color: var(--text-bright);
+      border-color: var(--blue);
+      background: rgba(77, 142, 255, 0.05);
     }
 
     #setup-status {
@@ -293,10 +342,10 @@
       display: flex;
       align-items: stretch;
       background: var(--bg-panel);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       border: 1px solid var(--border);
-      border-radius: 0;
+      border-radius: 8px;
       z-index: 10;
     }
 
@@ -339,9 +388,10 @@
       transform: translateY(-50%);
       z-index: 10;
       background: var(--bg-panel);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       border: 1px solid var(--border);
+      border-radius: 8px;
       font-family: var(--mono);
       font-size: 11px;
       letter-spacing: 0.06em;
@@ -449,8 +499,8 @@
       height: 100vh;
       overflow-y: auto;
       background: var(--bg-panel);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       border-left: 1px solid var(--border);
       z-index: 15;
       padding: 20px;
@@ -534,7 +584,7 @@
     .cluster-badge {
       display: inline-block;
       border: 1px solid var(--border);
-      border-radius: 0;
+      border-radius: 4px;
       font-family: var(--mono);
       font-size: 10px;
       font-weight: 500;
@@ -695,7 +745,7 @@
     .legend-dot {
       width: 8px;
       height: 8px;
-      border-radius: 0;
+      border-radius: 999px;
       flex-shrink: 0;
     }
 
@@ -747,7 +797,7 @@
       font-family: 'Consolas', 'Courier New', monospace;
       font-size: 11px;
       line-height: 1.3;
-      color: #f4e7cd;
+      color: #b8c4e0;
       pointer-events: none;
       padding-left: 1.1em;
       text-indent: -1.1em;
@@ -760,7 +810,7 @@
       vertical-align: 1px;
     }
     .node-label--special {
-      color: #eedcb0;
+      color: #66e0ff;
       opacity: 0.7;
     }
 
@@ -782,6 +832,7 @@
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
       border: 1px solid var(--border);
+      border-radius: 6px;
       color: var(--text-dim);
       font-family: var(--mono);
       font-size: 11px;
@@ -805,7 +856,7 @@
        ═══════════════════════════════════════════════ -->
   <div id="setup">
     <div id="setup-title">OBSIDIAN UNIVERSE</div>
-    <div id="setup-subtitle">SCOPE // v2.0</div>
+    <div id="setup-subtitle">Neural Cartography of Ideas</div>
     <select id="provider-select">
       <option value="azure">AZURE OPENAI</option>
       <option value="gemini">GEMINI</option>
@@ -814,21 +865,15 @@
       <option value="ollama">OLLAMA LOCAL</option>
     </select>
     <label for="api-key-input" id="api-key-label">API KEY</label>
-    <input
-      type="password"
-      id="api-key-input"
-      placeholder="PASTE KEY HERE"
-      spellcheck="false"
-      autocomplete="off"
-    >
-    <label class="setup-field-label" for="base-url-input">BASE URL (Azure only)</label>
-    <input type="text" id="base-url-input" class="setup-model-input" placeholder="https://your-resource.cognitiveservices.azure.com" spellcheck="false" autocomplete="off">
-    <label class="setup-field-label" for="chat-model-input">CHAT MODEL</label>
+    <input type="password" id="api-key-input" placeholder="Paste key" spellcheck="false" autocomplete="off">
+    <label class="setup-field-label" for="base-url-input">Base URL</label>
+    <input type="text" id="base-url-input" class="setup-model-input" placeholder="Azure endpoint URL" spellcheck="false" autocomplete="off">
+    <label class="setup-field-label" for="chat-model-input">Chat Model</label>
     <input type="text" id="chat-model-input" class="setup-model-input" placeholder="gpt-5.4" spellcheck="false" autocomplete="off">
-    <label class="setup-field-label" for="embedding-model-input">EMBEDDING MODEL</label>
+    <label class="setup-field-label" for="embedding-model-input">Embedding Model</label>
     <input type="text" id="embedding-model-input" class="setup-model-input" placeholder="text-embedding-3-small" spellcheck="false" autocomplete="off">
-    <button id="pick-folder-btn">SELECT NOTES FOLDER</button>
-    <button id="load-cache-btn" class="hidden">RESUME PREVIOUS SESSION</button>
+    <button id="pick-folder-btn">Select Notes Folder</button>
+    <button id="load-cache-btn" class="hidden">Resume Previous Session</button>
     <div id="setup-status"></div>
   </div>
 
@@ -841,14 +886,14 @@
     <div id="graph"></div>
 
     <!-- Title: top-left -->
-    <div id="title">TOPOLOGIES OF IDEAS</div>
+    <div id="title">OBSIDIAN UNIVERSE</div>
     <button id="reanalyze-btn" class="hidden">RE-ANALYZE</button>
 
     <!-- Topology Switcher: top-center -->
     <div id="controls">
-      <button class="active" data-layout="central">CENTRALIZED</button>
-      <button data-layout="decentral">DECENTRALIZED</button>
-      <button data-layout="distrib">DISTRIBUTED</button>
+      <button class="active" data-layout="central">CORE</button>
+      <button data-layout="decentral">CLUSTERS</button>
+      <button data-layout="distrib">NEURAL</button>
     </div>
 
     <!-- Info Panel: left side (unified readouts + legend + key hint) -->
@@ -896,7 +941,7 @@
 
     <!-- Config Panel: bottom-right -->
     <button id="export-snapshot-btn" title="Export graph as HTML">EXPORT</button>
-    <button id="theme-toggle" title="Switch color theme">WARM</button>
+    <button id="theme-toggle" title="Switch color theme">NEURAL</button>
 
   </div><!-- /main -->
 
@@ -1837,20 +1882,20 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
     const VFX = {
       // Colors + alphas
-      bgColor:            { val: '#050505', label: 'BACKGROUND',   section: 'COLORS',   refresh: 'colors', type: 'color' },
+      bgColor:            { val: '#060610', label: 'BACKGROUND',   section: 'COLORS',   refresh: 'colors', type: 'color' },
       bgAlpha:            { val: 1.0,   min: 0, max: 1, step: 0.05, label: 'BG ALPHA',        section: 'COLORS',   refresh: 'colors' },
-      labelColor:         { val: '#f5f1eb', label: 'LABEL TEXT',    section: 'COLORS',   refresh: 'colors', type: 'color' },
+      labelColor:         { val: '#b8c4e0', label: 'LABEL TEXT',    section: 'COLORS',   refresh: 'colors', type: 'color' },
       labelAlpha:         { val: 1.0,   min: 0, max: 1, step: 0.05, label: 'LABEL ALPHA',     section: 'COLORS',   refresh: 'colors' },
-      linkColor:          { val: '#f06f05', label: 'LINK',          section: 'COLORS',   refresh: 'colors', type: 'color' },
+      linkColor:          { val: '#4d8eff', label: 'LINK',          section: 'COLORS',   refresh: 'colors', type: 'color' },
       linkAlpha:          { val: 0.6,   min: 0, max: 1, step: 0.01, label: 'LINK ALPHA',      section: 'COLORS',   refresh: 'colors' },
-      particleColor:      { val: '#e41b1b', label: 'PARTICLE',      section: 'COLORS',   refresh: 'colors', type: 'color' },
+      particleColor:      { val: '#00d4ff', label: 'PARTICLE',      section: 'COLORS',   refresh: 'colors', type: 'color' },
       particleAlpha:      { val: 1.0,   min: 0, max: 1, step: 0.05, label: 'PARTICLE ALPHA',  section: 'COLORS',   refresh: 'colors' },
       // Cluster colors
-      cluster0:           { val: '#c45c3e', label: 'CLUSTER 1',     section: 'CLUSTERS', refresh: 'clusters', type: 'color' },
-      cluster1:           { val: '#d4a843', label: 'CLUSTER 2',     section: 'CLUSTERS', refresh: 'clusters', type: 'color' },
-      cluster2:           { val: '#a8523a', label: 'CLUSTER 3',     section: 'CLUSTERS', refresh: 'clusters', type: 'color' },
-      cluster3:           { val: '#c47a43', label: 'CLUSTER 4',     section: 'CLUSTERS', refresh: 'clusters', type: 'color' },
-      cluster4:           { val: '#8b3a2a', label: 'CLUSTER 5',     section: 'CLUSTERS', refresh: 'clusters', type: 'color' },
+      cluster0:           { val: '#4d8eff', label: 'CLUSTER 1',     section: 'CLUSTERS', refresh: 'clusters', type: 'color' },
+      cluster1:           { val: '#00d4ff', label: 'CLUSTER 2',     section: 'CLUSTERS', refresh: 'clusters', type: 'color' },
+      cluster2:           { val: '#8b5cf6', label: 'CLUSTER 3',     section: 'CLUSTERS', refresh: 'clusters', type: 'color' },
+      cluster3:           { val: '#f72585', label: 'CLUSTER 4',     section: 'CLUSTERS', refresh: 'clusters', type: 'color' },
+      cluster4:           { val: '#06ffa5', label: 'CLUSTER 5',     section: 'CLUSTERS', refresh: 'clusters', type: 'color' },
       clusterAlpha:       { val: 1.0,   min: 0, max: 1, step: 0.05, label: 'BULLET ALPHA',    section: 'CLUSTERS', refresh: 'clusters' },
       // Hit-target scale (affects hover detection area)
       nodeScale:          { val: 18,    min: 4,    max: 40,   step: 1,     label: 'HIT AREA',        section: 'NODES',      refresh: 'scale' },
@@ -1894,30 +1939,30 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
     const COLOR_THEMES = {
       warm: {
-        bgColor: '#050505', bgAlpha: 1.0,
-        labelColor: '#f5f1eb', labelAlpha: 1.0,
-        linkColor: '#f06f05', linkAlpha: 0.6,
-        particleColor: '#e41b1b', particleAlpha: 1.0,
-        cluster0: '#c45c3e', cluster1: '#d4a843', cluster2: '#a8523a',
-        cluster3: '#c47a43', cluster4: '#8b3a2a', clusterAlpha: 1.0,
-        chromeBg: '#0a0a0f', chromeBgPanel: '#080807', chromeBgPanelA: 0.88,
-        chromeBorder: '#cd6d13', chromeText: '#e8cea6', chromeTextDim: '#cd8218',
-        chromeTextBright: '#ffeab8', chromeAccent: '#d07b1b',
-        chromeCyan: '#d4a843', chromeLightCyan: '#e8c46a',
-        chromeIndigo: '#c47a43', chromeAmber: '#d4a843',
+        bgColor: '#060610', bgAlpha: 1.0,
+        labelColor: '#b8c4e0', labelAlpha: 1.0,
+        linkColor: '#4d8eff', linkAlpha: 0.6,
+        particleColor: '#00d4ff', particleAlpha: 1.0,
+        cluster0: '#4d8eff', cluster1: '#00d4ff', cluster2: '#8b5cf6',
+        cluster3: '#f72585', cluster4: '#06ffa5', clusterAlpha: 1.0,
+        chromeBg: '#060610', chromeBgPanel: '#0a0a16', chromeBgPanelA: 0.92,
+        chromeBorder: '#4d8eff', chromeText: '#b8c4e0', chromeTextDim: '#5a6a90',
+        chromeTextBright: '#e0e8ff', chromeAccent: '#4d8eff',
+        chromeCyan: '#00d4ff', chromeLightCyan: '#66e0ff',
+        chromeIndigo: '#8b5cf6', chromeAmber: '#00d4ff',
       },
       grey: {
-        bgColor: '#595b5f', bgAlpha: 1.0,
-        labelColor: '#ffffff', labelAlpha: 1.0,
-        linkColor: '#ffffff', linkAlpha: 0.3,
-        particleColor: '#87e97f', particleAlpha: 1.0,
-        cluster0: '#0e15e1', cluster1: '#7babea', cluster2: '#e4a1f7',
-        cluster3: '#afdf2a', cluster4: '#3eec32', clusterAlpha: 1.0,
-        chromeBg: '#3a3c40', chromeBgPanel: '#32343a', chromeBgPanelA: 0.92,
-        chromeBorder: '#6a6c72', chromeText: '#e8e8e8', chromeTextDim: '#9a9a9a',
-        chromeTextBright: '#ffffff', chromeAccent: '#7aacdf',
-        chromeCyan: '#7aacdf', chromeLightCyan: '#a0c8ef',
-        chromeIndigo: '#8a9abf', chromeAmber: '#7aacdf',
+        bgColor: '#1a1a2e', bgAlpha: 1.0,
+        labelColor: '#e0e0e0', labelAlpha: 1.0,
+        linkColor: '#7d7dff', linkAlpha: 0.4,
+        particleColor: '#00ff88', particleAlpha: 1.0,
+        cluster0: '#7d7dff', cluster1: '#ff7df0', cluster2: '#7dffea',
+        cluster3: '#ffdf7d', cluster4: '#ff7d7d', clusterAlpha: 1.0,
+        chromeBg: '#1a1a2e', chromeBgPanel: '#161628', chromeBgPanelA: 0.92,
+        chromeBorder: '#444466', chromeText: '#c0c0d0', chromeTextDim: '#666680',
+        chromeTextBright: '#ffffff', chromeAccent: '#7d7dff',
+        chromeCyan: '#7dffea', chromeLightCyan: '#a0fff0',
+        chromeIndigo: '#9d7dff', chromeAmber: '#7dffea',
       },
     };
 
@@ -1951,7 +1996,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
       refreshChrome();
 
       // Update button label
-      document.getElementById('theme-toggle').textContent = name.toUpperCase();
+      document.getElementById('theme-toggle').textContent = name === 'warm' ? 'NEURAL' : name.toUpperCase();
     }
 
     // ═══════════════════════════════════════════════
@@ -2788,9 +2833,9 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
     // ── Topology switching ──
 
     const LAYOUT_DESCRIPTIONS = {
-      central: 'SPHERICAL \u2014 MEDOID AT ORIGIN, NOTES RADIATE OUTWARD',
-      decentral: 'FIBONACCI SPHERE \u2014 CLUSTER HUBS WITH ORBITING NOTES',
-      distrib: 'UMAP 3D \u2014 SEMANTIC SIMILARITY DRIVES PROXIMITY',
+      central: 'CORE \u2014 CENTRAL HUB, NOTES ORBIT AROUND MEDOID',
+      decentral: 'CLUSTERS \u2014 THEMATIC HUBS WITH ORBITING NOTES',
+      distrib: 'NEURAL \u2014 SEMANTIC SIMILARITY DRIVES PROXIMITY',
     };
 
     document.querySelectorAll('#controls button').forEach(btn => {
