@@ -5039,6 +5039,9 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
         const distrib = computeDistributedLayout(embeddings, K_NEIGHBORS);
 
+        setBootStage('COMPUTING TOPOLOGY...', 'PLANET LAYOUT');
+        await sleep(50);
+        const planet = computePlanetLayout(embeddings, clusterLabels, k);
 
 
         setBootStage('COMPUTING TOPOLOGY...', 'K-NN EDGES');
@@ -5182,7 +5185,6 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
 
                 // PLANET: connect notes within same cluster on the sphere surface
-        // Use k-NN within each cluster to create "continent" connections
         const planetEdges = [];
         for (let c = 0; c < k; c++) {
           const indices = [];
@@ -5191,42 +5193,46 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
           }
           if (indices.length < 2) continue;
 
-          // Compute pairwise distances within cluster using planet coords
-          const localDists = [];
-          for (let a = 0; a < indices.length; a++) {
-            for (let b = a + 1; b < indices.length; b++) {
-              const ia = indices[a], ib = indices[b];
-              const dx = planet.x[ia] - planet.x[ib];
-              const dy = planet.y[ia] - planet.y[ib];
-              const dz = planet.z[ia] - planet.z[ib];
-              const d = Math.sqrt(dx*dx + dy*dy + dz*dz);
-              localDists.push({ a: ia, b: ib, d });
+          // k-NN within cluster using planet surface distances
+          const planetK = Math.min(5, indices.length - 1);
+          for (const ia of indices) {
+            const dists = indices
+              .filter(ib => ib !== ia)
+              .map(ib => {
+                const dx = planet.x[ia] - planet.x[ib];
+                const dy = planet.y[ia] - planet.y[ib];
+                const dz = planet.z[ia] - planet.z[ib];
+                return { ib, d: Math.sqrt(dx*dx + dy*dy + dz*dz) };
+              })
+              .sort((p, q) => p.d - q.d)
+              .slice(0, planetK);
+            for (const { ib } of dists) {
+              const a = Math.min(ia, ib);
+              const b = Math.max(ia, ib);
+              // Avoid duplicates
+              if (!planetEdges.some(e => e.source === a && e.target === b)) {
+                planetEdges.push({
+                  source: a,
+                  target: b,
+                  label_forward: 'neighbors on continent',
+                  label_backward: 'neighbors on continent',
+                  topology: 'planet',
+                });
+              }
             }
           }
-          localDists.sort((p, q) => p.d - q.d);
-          // Take closest pairs (up to 3 per node)
-          const planetK = Math.min(3, indices.length - 1);
-          const planetUsed = new Set();
-          let added = 0;
-          for (const { a, b } of localDists) {
-            const key = a < b ? `${a},${b}` : `${b},${a}`;
-            if (planetUsed.has(key)) continue;
-            // Count how many edges already touch each node
-            let aCount = 0, bCount = 0;
-            for (const e of planetEdges) {
-              if (e.source === a || e.target === a) aCount++;
-              if (e.source === b || e.target === b) bCount++;
-            }
-            if (aCount >= planetK || bCount >= planetK) continue;
+        }
+        // Also connect cluster hubs to each other (inter-continent links)
+        const planetHubs = Object.values(clusterMedoids);
+        for (let a = 0; a < planetHubs.length; a++) {
+          for (let b = a + 1; b < planetHubs.length; b++) {
             planetEdges.push({
-              source: a,
-              target: b,
-              label_forward: 'neighbors on continent',
-              label_backward: 'neighbors on continent',
+              source: planetHubs[a],
+              target: planetHubs[b],
+              label_forward: 'bridges continents',
+              label_backward: 'bridges continents',
               topology: 'planet',
             });
-            planetUsed.add(key);
-            added++;
           }
         }
 
