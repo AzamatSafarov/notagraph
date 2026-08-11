@@ -7,10 +7,17 @@
   <meta charset="UTF-8">
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"><circle cx=\"50\" cy=\"50\" r=\"40\" fill=\"none\" stroke=\"%234d8eff\" stroke-width=\"4\"/><circle cx=\"50\" cy=\"50\" r=\"8\" fill=\"%234d8eff\"/><circle cx=\"30\" cy=\"35\" r=\"5\" fill=\"%23a78bfa\"/><circle cx=\"70\" cy=\"65\" r=\"5\" fill=\"%23a78bfa\"/><line x1=\"50\" y1=\"50\" x2=\"30\" y2=\"35\" stroke=\"%234d8eff\" stroke-width=\"1.5\"/><line x1=\"50\" y1=\"50\" x2=\"70\" y2=\"65\" stroke=\"%234d8eff\" stroke-width=\"1.5\"/></svg>">
 
   <meta name="theme-color" content="#0a0a0f">
 
-  <title>Obsidian Universe</title>
+  
+    <meta property="og:title" content="Obsidian Universe - Neural Cartography of Ideas">
+    <meta property="og:description" content="Visualize your notes as a 3D knowledge graph. Multi-provider AI embeddings + LLM annotations.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://topologies-of-ideas-universal.vercel.app">
+    <meta name="description" content="Visualize your notes as a 3D knowledge graph with AI embeddings and LLM annotations.">
+    <title>Obsidian Universe</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
 
@@ -1933,6 +1940,7 @@
     <label for="api-key-input" id="api-key-label">API Key</label>
 
     <input type="password" id="api-key-input" placeholder="Paste key" spellcheck="false" autocomplete="off">
+    <a id="get-key-link" href="#" target="_blank" rel="noopener" style="font-size:10px;font-family:var(--mono);color:var(--blue);text-decoration:none;letter-spacing:0.05em;text-transform:uppercase;">GET API KEY \u2192</a>
 
     <label class="setup-field-label" for="base-url-input">Base URL</label>
 
@@ -1951,6 +1959,7 @@
     <button id="load-cache-btn" class="hidden">Resume Previous Session</button>
 
     <div id="setup-status"></div>
+    <div id="https-warning" style="display:none;font-size:11px;color:#c92a2a;font-family:var(--mono);max-width:340px;text-align:center;line-height:1.5;">⚠️ Ollama runs on localhost - this is normal. For other providers, ensure you're on HTTPS.</div>
 
     <input id="folder-input" class="hidden" type="file" webkitdirectory directory multiple>
     </div>
@@ -1964,7 +1973,8 @@
 
        ═══════════════════════════════════════════════ -->
 
-  <div id="main" class="hidden">
+  <div id="main" class="hidden">
+    <div id="empty-state" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;font-family:var(--mono);color:var(--text-dim);font-size:14px;letter-spacing:0.05em;">Select a folder with .md or .txt notes to begin</div>
 
 
 
@@ -2562,6 +2572,16 @@
       embeddingModelInput.style.display = showEmbed ? 'block' : 'none';
       const embedLabel = document.querySelector('label[for="embedding-model-input"]');
       if (embedLabel) embedLabel.style.display = showEmbed ? 'block' : 'none';
+      // Update Get Key link
+      const keyLink = document.getElementById('get-key-link');
+      if (keyLink) {
+        if (showApiKey && preset.getKeyUrl) {
+          keyLink.href = preset.getKeyUrl;
+          keyLink.style.display = 'block';
+        } else {
+          keyLink.style.display = 'none';
+        }
+      }
     }
 
 

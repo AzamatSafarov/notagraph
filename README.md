@@ -1,70 +1,67 @@
 # Obsidian Universe
 
-Obsidian Universe is a standalone browser app that turns a folder of notes into an interactive 3D graph of ideas, clusters, and semantic connections.
+Neural Cartography of Ideas - visualize your notes as a 3D knowledge graph with AI embeddings and LLM annotations.
 
-No build step. No backend. Open `app.html` and run it in the browser.
+**Live:** https://topologies-of-ideas-universal.vercel.app
+
+## How to use
+
+1. Choose a provider (Azure, Gemini, OpenAI, OpenRouter, Mistral, Groq, or Ollama)
+2. Paste your API key (click "GET API KEY" link if you need one)
+3. Enter model names (pre-filled with recommended defaults)
+4. Click **SELECT NOTES FOLDER** and choose a folder with `.md` or `.txt` files
+5. Wait for the pipeline to complete (embeddings, clustering, LLM annotations)
+6. Explore your knowledge graph in 4 topology modes:
+   - **CORE** - medoid at center, notes radiate outward
+   - **CLUSTERS** - thematic hubs with orbiting notes
+   - **NEURAL** - UMAP projection, semantic proximity
+   - **PLANET** - clusters as continents on a sphere
 
 ## Features
 
-- **3D force-directed graph** with three topology modes: Core, Clusters, Neural
-- **Animated pointillism background** - colorful dots drift across the screen, connect with lines, and react to your cursor
-- **Multi-provider support** - Azure OpenAI, Gemini, OpenAI, OpenRouter, Ollama Local
-- **Automatic clustering** via KMeans with LLM-generated cluster names
-- **Semantic edge labeling** - AI describes how each pair of notes relates
-- **Light/dark theme toggle** with customizable VFX (colors, bloom, particles, link width)
-- **Export snapshot** - save the current graph as a standalone HTML file
-- **IndexedDB caching** - resume previous sessions without re-running the pipeline
+- 7 AI providers with smart field visibility
+- 3D force-directed graph with CSS2D labels and bloom post-processing
+- KMeans clustering with k-means++ initialization
+- PCA, UMAP, k-NN for layout computation
+- LLM-powered: cluster naming, edge labeling, center nomination
+- Planet topology with surface arcs connecting nodes
+- Parallel edge labeling (150 pairs per round)
+- Rate limit retry with backoff (Azure 429/503)
+- IndexedDB cache with session resume
+- Export graph as standalone HTML
+- Copy link to restore graph state
+- VFX control panel (node size, link opacity, bloom, particles)
+- Light/dark theme toggle
+- Firefox fallback (webkitdirectory when showDirectoryPicker unavailable)
+- No tracking, no telemetry. API keys stored in localStorage only.
 
-## Quick start
+## Browser support
 
-1. Open `app.html` in a Chromium-based browser (Chrome, Edge, Brave)
-2. Select your provider from the dropdown
-3. Paste your API key
-4. Click **Select Notes Folder** and choose a folder with `.md` or `.txt` files
-5. The app will embed, cluster, and annotate your notes automatically
+- Chrome / Edge (full support - showDirectoryPicker)
+- Firefox (fallback to webkitdirectory folder picker)
+- Safari (use webkitdirectory fallback)
 
-## Supported providers
+## Privacy
 
-| Provider | Chat | Embeddings | Notes |
+All processing happens in your browser. Notes are read locally and never uploaded. API keys are stored in localStorage and sent only to the chosen AI provider. No analytics, no cookies, no third-party tracking.
+
+## Providers
+
+| Provider | Chat | Embeddings | Get Key |
 |---|---|---|---|
-| Azure OpenAI | Yes | Yes | Use deployment names as model names |
-| Gemini | Yes | Yes | Native Google API |
-| OpenAI | Yes | Yes | Standard OpenAI API |
-| OpenRouter | Yes | Yes | OpenAI-compatible endpoint |
-| Ollama Local | Yes | Yes | Requires local Ollama server |
-
-## Topology modes
-
-- **Core** - Spherical layout with the medoid at the center, all notes radiate outward
-- **Clusters** - Fibonacci sphere of cluster hubs with notes orbiting their hub
-- **Neural** - UMAP 3D projection where semantic similarity drives proximity
-
-## Visual design
-
-- Light cream background with animated colorful dot network (pointillism style)
-- Cormorant Garamond serif for titles, JetBrains Mono for UI
-- Bright playful cluster colors: coral, teal, purple, yellow, green
-- Glassmorphism UI panels with soft shadows
-- Dark mode toggle available
-
-## Files
-
-- `app.html` - the standalone application
-- `index.html` - copy of app.html for static hosting
-- `LICENSE` - MIT license
+| Azure OpenAI | gpt-5.4 | text-embedding-3-small | [portal.azure.com](https://portal.azure.com) |
+| Gemini | gemini-2.5-flash | gemini-embedding-001 | [aistudio.google.com](https://aistudio.google.com/apikey) |
+| OpenAI | gpt-4o-mini | text-embedding-3-small | [platform.openai.com](https://platform.openai.com/api-keys) |
+| OpenRouter | openai/gpt-4o-mini | openai/text-embedding-3-small | [openrouter.ai](https://openrouter.ai/keys) |
+| Mistral | mistral-small-latest | mistral-embed | [console.mistral.ai](https://console.mistral.ai/api-keys) |
+| Groq | llama-3.3-70b-versatile | via Ollama fallback | [console.groq.com](https://console.groq.com/keys) |
+| Ollama | llama3.1:8b | nomic-embed-text | Local only, no key needed |
 
 ## Tech
 
-- 3D Force Graph (three.js + 3d-force-graph)
-- UMAP for dimensionality reduction
-- KMeans++ for clustering
-- PCA for layout computation
-- CSS2DRenderer for constant-size node labels
-- UnrealBloomPass for post-processing glow
-- Canvas-based animated background
+- Three.js + 3d-force-graph
+- UMAP.js, PCA power iteration
+- IndexedDB for session caching
+- Single HTML file, no build step
 
-## Deployment
-
-The app is deployed on Vercel as a static site:
-
-https://topologies-of-ideas-universal.vercel.app
+Built for the open-source community.
