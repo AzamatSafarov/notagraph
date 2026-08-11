@@ -978,6 +978,7 @@
       <button class="active" data-layout="central">CORE</button>
       <button data-layout="decentral">CLUSTERS</button>
       <button data-layout="distrib">NEURAL</button>
+      <button data-layout="planet">PLANET</button>
     </div>
 
         <!-- Search bar: top-right area -->
@@ -1475,8 +1476,9 @@
         central: (session.centralEdges || []).map(e => ({ ...e, topology: 'central' })),
         decentral: (session.decentralEdges || []).map(e => ({ ...e, topology: 'decentral' })),
         distrib: (session.labeledEdges || []).map(e => ({ ...e, topology: 'distrib' })),
+        planet: (session.planetEdges || []).map(e => ({ ...e, topology: 'planet' })),
       };
-      const combined = [...edgeSets.central, ...edgeSets.decentral, ...edgeSets.distrib];
+      const combined = [...edgeSets.central, ...edgeSets.decentral, ...edgeSets.distrib, ...(edgeSets.planet || [])];
       initGraph(allNodes, combined);
       buildLegend(session.clusterNames);
       buildClusterLabels(session.clusterNames);
@@ -2037,6 +2039,94 @@
       };
     }
 
+    // ── PLANET layout: clusters as continents on a sphere ──
+    function computePlanetLayout(embeddings, clusterLabels, k) {
+      const n = embeddings.length;
+      
+      // Assign each cluster a center on the sphere via fibonacci distribution
+      const hubCenters = fibonacciSphere(k).map(p => scaleVec(p, 0.85));
+      
+      // Count notes per cluster to size continents
+      const clusterSizes = new Array(k).fill(0);
+      for (let i = 0; i < n; i++) clusterSizes[clusterLabels[i]]++;
+      
+      // Continent radius: proportional to sqrt(cluster size)
+      const maxClusterSize = Math.max(...clusterSizes);
+      const continentRadii = clusterSizes.map(s => 0.08 + 0.18 * Math.sqrt(s / maxClusterSize));
+      
+      const x = new Array(n).fill(0);
+      const y = new Array(n).fill(0);
+      const z = new Array(n).fill(0);
+      
+      for (let c = 0; c < k; c++) {
+        const indices = [];
+        for (let i = 0; i < n; i++) {
+          if (clusterLabels[i] === c) indices.push(i);
+        }
+        if (indices.length === 0) continue;
+        
+        const hub = hubCenters[c];
+        const radius = continentRadii[c];
+        
+        if (indices.length === 1) {
+          // Single note: place at hub center on sphere
+          x[indices[0]] = hub[0];
+          y[indices[0]] = hub[1];
+          z[indices[0]] = hub[2];
+        } else {
+          // Local PCA for intra-cluster spread
+          const clusterEmbeddings = indices.map(i => embeddings[i]);
+          const localCoords = pca3d(clusterEmbeddings);
+          const localMax = Math.max(...localCoords.flat().map(Math.abs)) + 1e-9;
+          
+          indices.forEach((idx, j) => {
+            // Local position within continent (flat spread)
+            const localX = (localCoords[j][0] / localMax) * radius;
+            const localY = (localCoords[j][1] / localMax) * radius;
+            
+            // Project onto sphere surface: start from hub center, 
+            // offset along tangent plane, then renormalize to sphere
+            const hubNorm = Math.sqrt(hub[0]**2 + hub[1]**2 + hub[2]**2) || 1;
+            const hx = hub[0] / hubNorm, hy = hub[1] / hubNorm, hz = hub[2] / hubNorm;
+            
+            // Build tangent vectors at hub point
+            // Tangent 1: perpendicular to hub direction
+            let t1x, t1y, t1z;
+            if (Math.abs(hx) < 0.9) {
+              t1x = hz; t1y = 0; t1z = -hx;
+            } else {
+              t1x = 0; t1y = -hz; t1z = hy;
+            }
+            const t1n = Math.sqrt(t1x**2 + t1y**2 + t1z**2) || 1;
+            t1x /= t1n; t1y /= t1n; t1z /= t1n;
+            
+            // Tangent 2: cross product of hub and t1
+            const t2x = hy * t1z - hz * t1y;
+            const t2y = hz * t1x - hx * t1z;
+            const t2z = hx * t1y - hy * t1x;
+            
+            // Point on tangent plane
+            let px = hub[0] + localX * t1x + localY * t2x;
+            let py = hub[1] + localX * t1y + localY * t2y;
+            let pz = hub[2] + localX * t1z + localY * t2z;
+            
+            // Renormalize to sphere surface (push back to sphere)
+            const pn = Math.sqrt(px*px + py*py + pz*pz) || 1;
+            const targetR = 0.85;
+            x[idx] = (px / pn) * targetR;
+            y[idx] = (py / pn) * targetR;
+            z[idx] = (pz / pn) * targetR;
+          });
+        }
+      }
+      
+      return {
+        x: normalizeRange(x),
+        y: normalizeRange(y),
+        z: normalizeRange(z),
+      };
+    }
+
     // ═══════════════════════════════════════════════
     // LLM Annotation Pipeline
     // ═══════════════════════════════════════════════
@@ -2522,12 +2612,58 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
         await sleep(50);
         const distrib = computeDistributedLayout(embeddings, K_NEIGHBORS);
 
+        setBootStage('COMPUTING TOPOLOGY...', 'PLANET');
+        await sleep(50);
+        const planet = computePlanetLayout(embeddings, clusterLabels, k);
+
         setBootStage('COMPUTING TOPOLOGY...', 'K-NN EDGES');
         await sleep(50);
         const distMatrix = cosineDistanceMatrix(embeddings);
         const edges = knnEdges(distMatrix, K_NEIGHBORS);
 
         // ── Compute topology-specific edge sets ──
+
+        // PLANET: connect notes within same cluster on the sphere surface
+        // Use k-NN within each cluster to create "continent" connections
+        const planetEdges = [];
+        for (let c = 0; c < k; c++) {
+          const indices = [];
+          for (let i = 0; i < notes.length; i++) {
+            if (clusterLabels[i] === c) indices.push(i);
+          }
+          if (indices.length < 2) continue;
+          // Connect each note to its 2 nearest neighbors within the cluster
+          for (const i of indices) {
+            const dists = indices
+              .filter(j => j !== i)
+              .map(j => ({ j, d: cosineDistance(embeddings[i], embeddings[j]) }))
+              .sort((a, b) => a.d - b.d)
+              .slice(0, 2);
+            for (const { j } of dists) {
+              if (i < j) {
+                planetEdges.push({
+                  source: i,
+                  target: j,
+                  label_forward: 'borders',
+                  label_backward: 'borders',
+                  topology: 'planet',
+                });
+              }
+            }
+          }
+        }
+        // Connect cluster medoids (continent bridges)
+        for (let a = 0; a < hubs.length; a++) {
+          for (let b = a + 1; b < hubs.length; b++) {
+            planetEdges.push({
+              source: hubs[a],
+              target: hubs[b],
+              label_forward: 'ocean route',
+              label_backward: 'ocean route',
+              topology: 'planet',
+            });
+          }
+        }
 
         // Centralized: star from medoid to every other node
         const centralEdges = [];
@@ -2608,6 +2744,9 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
           x_distrib: distrib.x[i],
           y_distrib: distrib.y[i],
           z_distrib: distrib.z[i],
+          x_planet: planet.x[i],
+          y_planet: planet.y[i],
+          z_planet: planet.z[i],
           is_medoid: i === central.medoidIdx ? 1 : 0,
           is_llm_center: 0,
           cluster_name: '',
@@ -2649,13 +2788,13 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
           results.forEach(r => labeledEdges.push(...r));
           setBootStage('ANNOTATING...', `EDGE LABELS ${Math.min(i + EDGE_LABEL_BATCH * PARALLEL, edges.length)}/${edges.length}`);
           // Show progressive edges during labeling
-          updateGraphData(graphNodes, [...centralEdges, ...decentralEdges, ...labeledEdges]);
+          updateGraphData(graphNodes, [...centralEdges, ...decentralEdges, ...labeledEdges, ...planetEdges]);
         }
 
         // Store edge sets for readout counts; combine all for the graph
-        edgeSets = { central: centralEdges, decentral: decentralEdges, distrib: labeledEdges };
+        edgeSets = { central: centralEdges, decentral: decentralEdges, distrib: labeledEdges, planet: planetEdges };
         allNodes = graphNodes;
-        const combined = [...centralEdges, ...decentralEdges, ...labeledEdges];
+        const combined = [...centralEdges, ...decentralEdges, ...labeledEdges, ...planetEdges];
         updateGraphData(graphNodes, combined);
         // Show only edges for the active topology
         Graph.linkVisibility(link => link.topology === currentLayout);
@@ -2672,6 +2811,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
           'x_central', 'y_central', 'z_central',
           'x_decentral', 'y_decentral', 'z_decentral',
           'x_distrib', 'y_distrib', 'z_distrib',
+          'x_planet', 'y_planet', 'z_planet',
           'is_medoid', 'is_llm_center',
         ];
         const serializableNodes = graphNodes.map(n => {
@@ -2691,6 +2831,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
             labeledEdges: serializeEdges(labeledEdges),
             centralEdges: serializeEdges(centralEdges),
             decentralEdges: serializeEdges(decentralEdges),
+            planetEdges: serializeEdges(planetEdges),
             clusterNames,
             nodeCount: notes.length,
             fingerprint: fingerprint || '',
@@ -2723,7 +2864,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
     let neighborSets = {};
     let nodeById = {};
     let allNodes = [];
-    let edgeSets = { central: [], decentral: [], distrib: [] };
+    let edgeSets = { central: [], decentral: [], distrib: [], planet: [] };
 
     // ── Lookup builders ──
 
@@ -3175,6 +3316,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
       central: 'CORE \u2014 MEDOID AT ORIGIN, NOTES RADIATE OUTWARD',
       decentral: 'CLUSTERS \u2014 THEMATIC HUBS WITH ORBITING NOTES',
       distrib: 'NEURAL \u2014 UMAP PROJECTION, SEMANTIC PROXIMITY',
+      planet: 'PLANET \u2014 CLUSTERS AS CONTINENTS ON A SPHERE',
     };
 
     document.querySelectorAll('#controls button').forEach(btn => {
