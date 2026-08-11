@@ -1588,7 +1588,7 @@
         const batch = texts.slice(i, i + EMBED_BATCH_SIZE);
         let response;
         let retries = 0;
-        const maxRetries = 5;
+        const maxRetries = 8;
 
         if (provider === 'azure') {
           // Retry with backoff for rate limits
@@ -1603,7 +1603,7 @@
             );
             if (response.ok) break;
             if (response.status === 429 || response.status === 503) {
-              const retryAfter = Math.min(parseInt(response.headers.get('Retry-After') || '5'), 5);
+              const retryAfter = Math.min(parseInt(response.headers.get('Retry-After') || '15'), 20);
               retries++;
               if (retries < maxRetries) {
                 await sleep(retryAfter * 1000);
@@ -1668,7 +1668,7 @@
 
       if (provider === 'azure') {
         let retries = 0;
-        while (retries < 5) {
+        while (retries < 8) {
           response = await fetch(
             `${config.baseUrl}/openai/deployments/${config.chatModel}/chat/completions?api-version=${config.apiVersion}`,
             {
@@ -1682,7 +1682,7 @@
           );
           if (response.ok) break;
           if (response.status === 429 || response.status === 503) {
-            const retryAfter = Math.min(parseInt(response.headers.get('Retry-After') || '5'), 5);
+            const retryAfter = Math.min(parseInt(response.headers.get('Retry-After') || '15'), 20);
             retries++;
             if (retries < 5) {
               await sleep(retryAfter * 1000);
@@ -2277,25 +2277,26 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
         }
       }
 
-      // Clear stale CSS2D label DOM elements
-      const graphEl = document.getElementById('graph');
-      if (graphEl) {
-        // Find CSS2D overlay (div with pointer-events:none inside #graph)
-        graphEl.querySelectorAll('div[style*="pointer-events: none"]').forEach(overlay => {
-          // Clear all label children but keep the overlay div itself
-          while (overlay.firstChild) overlay.removeChild(overlay.firstChild);
-        });
-      }
-
       // Refresh visuals
       refreshColors();
       refreshChrome();
 
-      // Full node rebuild - recreates all CSS2D labels cleanly
+      // FULL GRAPH REBUILD to eliminate stale labels
       if (Graph && allNodes.length) {
+        const combined = [
+          ...(edgeSets.central || []).map(e => ({ ...e, topology: 'central' })),
+          ...(edgeSets.decentral || []).map(e => ({ ...e, topology: 'decentral' })),
+          ...(edgeSets.distrib || []).map(e => ({ ...e, topology: 'distrib' })),
+        ];
+        // Clear all node label references
+        allNodes.forEach(n => { n.__labelDiv = null; });
+        // Rebuild graph from scratch with same data
+        const currentNodes = [...allNodes];
+        Graph.graphData({ nodes: currentNodes, links: combined });
         Graph.nodeThreeObject(node => createNodeObject(node));
-        Graph.graphData(Graph.graphData());
-        // Reset all node appearances
+        // Show only active topology edges
+        Graph.linkVisibility(link => link.topology === currentLayout);
+        // Reset appearances
         Graph.graphData().nodes.forEach(n => updateNodeAppearance(n, 'normal'));
       }
 
@@ -3370,16 +3371,15 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
     }
 
     async function exportStandaloneSnapshot() {
-      // Build session from current graph data
-      const session = latestSessionSnapshot || await loadSession().catch(() => null);
-      if (!session && !allNodes.length) {
+      if (!allNodes.length) {
         setBootStage('EXPORT FAILED', 'NO GRAPH DATA AVAILABLE');
         showBootStatus();
         setTimeout(hideBootStatus, 1800);
         return;
       }
-      // Use current graph data if no cached session
-      const sessionData = session || {
+
+      // Build session data from current graph
+      const sessionData = {
         graphNodes: allNodes.map(n => {
           const clean = {};
           for (const k of ['id','filename','name','text_preview','cluster_id','cluster_name','x_central','y_central','z_central','x_decentral','y_decentral','z_decentral','x_distrib','y_distrib','z_distrib','is_medoid','is_llm_center']) {
@@ -3394,27 +3394,34 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
         nodeCount: allNodes.length,
       };
 
+      // Try to build standalone HTML by fetching current page
       try {
         const exportUrl = new URL(window.location.href);
         exportUrl.search = '';
         exportUrl.hash = '';
         const response = await fetch(exportUrl.toString(), { cache: 'no-store' });
-        if (!response.ok) throw new Error('SOURCE HTML ' + response.status);
-        const sourceHtml = await response.text();
-        const standaloneHtml = buildStandaloneSnapshotHtml(sourceHtml, sessionData);
-        const nameBits = [sessionData.nodeCount ? sessionData.nodeCount + '-notes' : '', sanitizeExportNamePart(Object.values(sessionData.clusterNames || {})[0] || '')].filter(Boolean).join('-');
-        downloadTextFile('obsidian-universe-' + (nameBits || 'snapshot') + '.html', standaloneHtml);
-        setBootStage('SNAPSHOT EXPORTED', 'STANDALONE HTML READY');
-        showBootStatus();
-        setTimeout(hideBootStatus, 1800);
+        if (response.ok) {
+          const sourceHtml = await response.text();
+          const standaloneHtml = buildStandaloneSnapshotHtml(sourceHtml, sessionData);
+          const nameBits = [sessionData.nodeCount ? sessionData.nodeCount + '-notes' : '', sanitizeExportNamePart(Object.values(sessionData.clusterNames || {})[0] || '')].filter(Boolean).join('-');
+          downloadTextFile('obsidian-universe-' + (nameBits || 'snapshot') + '.html', standaloneHtml);
+          setBootStage('SNAPSHOT EXPORTED', 'STANDALONE HTML READY');
+          showBootStatus();
+          setTimeout(hideBootStatus, 1800);
+          return;
+        }
       } catch (err) {
-        // Fallback: simple JSON export
-        const json = JSON.stringify(sessionData);
-        downloadTextFile('obsidian-universe-snapshot-' + Date.now() + '.json', json);
-        setBootStage('SNAPSHOT EXPORTED', 'JSON FALLBACK (COULD NOT FETCH SOURCE)');
-        showBootStatus();
-        setTimeout(hideBootStatus, 2000);
+        console.warn('Export fetch failed, using inline mode', err);
       }
+
+      // Fallback: build inline HTML with embedded data + graph viewer
+      const payload = JSON.stringify(sessionData).replace(/</g, '\u003c');
+      const html = '<!DOCTYPE html>\n<html lang="en">\n<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Obsidian Universe Snapshot</title>\n<style>body{margin:0;background:#f2efe9;font-family:monospace;}#graph{width:100vw;height:100vh;}#info{position:fixed;top:20px;left:20px;padding:12px;background:rgba(255,255,255,0.8);border-radius:8px;font-size:11px;color:#3a3a4a;}</style>\n</head>\n<body>\n<div id="info">Loading snapshot...</div>\n<div id="graph"></div>\n<script>window.__SNAPSHOT__ = ' + payload + ';\n<\/script>\n<script type="module">\nimport ForceGraph3D from "https://esm.sh/3d-force-graph@1";\nimport {CSS2DRenderer,CSS2DObject} from "https://esm.sh/three@0.170.0/addons/renderers/CSS2DRenderer.js";\nconst data=JSON.parse(window.__SNAPSHOT__||"{}");\nconst nodes=data.graphNodes||[];\nconst links=[...(data.centralEdges||[]).map(e=>({...e,topology:"central"})),...(data.decentralEdges||[]).map(e=>({...e,topology:"decentral"})),...(data.labeledEdges||[]).map(e=>({...e,topology:"distrib"}))];\ndocument.getElementById("info").textContent=nodes.length+" nodes / "+links.length+" edges";\nconst SCALE=280;\nfunction posForce(){let fn;function f(a){fn.forEach(n=>{const lk="x_"+(n.topology||"central");n.vx+=((n[lk]||0)*SCALE-n.x)*0.18*a;});}f.initialize=function(n){fn=n;};return f;}\nconst graph=ForceGraph3D()(document.getElementById("graph")).graphData({nodes,links}).backgroundColor("#f2efe9").linkVisibility(l=>l.topology==="central").nodeLabel(n=>n.name).linkColor(()=>"#4dabf7").linkOpacity(0.5);\ngraph.d3Force("position",posForce()).d3Force("center",null);\n<\/script>\n</body></html>';
+
+      downloadTextFile('obsidian-universe-snapshot-' + Date.now() + '.html', html);
+      setBootStage('SNAPSHOT EXPORTED', 'INLINE HTML READY');
+      showBootStatus();
+      setTimeout(hideBootStatus, 1800);
     }
 
     function buildCachedGraphLink() {
