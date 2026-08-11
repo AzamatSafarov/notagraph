@@ -304,6 +304,30 @@
     .setup-model-input::placeholder { color: var(--text-dim); }
     .setup-model-input:focus { border-color: var(--blue); }
 
+    #copy-graph-link-btn {
+      position: fixed;
+      bottom: 60px;
+      right: 110px;
+      z-index: 10;
+      background: var(--bg-panel);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text-dim);
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      padding: 8px 14px;
+      cursor: pointer;
+      transition: color 200ms ease, border-color 200ms ease;
+    }
+    #copy-graph-link-btn:hover {
+      color: var(--text-bright);
+      border-color: var(--accent);
+    }
+
     #export-snapshot-btn {
       background: transparent;
       border: 1px solid var(--border);
@@ -858,6 +882,19 @@
       color: #ff6b6b;
       opacity: 0.7;
     }
+.node-label .nl-text {
+      display: none;
+    }
+    .node-label--pinned .nl-text,
+    .node-label--hover .nl-text {
+      display: inline;
+    }
+    .node-label--pinned {
+      opacity: 0.9;
+    }
+    .node-label--pinned .nl-bullet {
+      font-size: 11px;
+    }
 
     /* Square-only mode — hide text, show just the bullet */
     .squares-only .node-label {
@@ -921,6 +958,7 @@
     <button id="pick-folder-btn">Select Notes Folder</button>
     <button id="load-cache-btn" class="hidden">Resume Previous Session</button>
     <div id="setup-status"></div>
+    <input id="folder-input" class="hidden" type="file" webkitdirectory directory multiple>
   </div>
 
   <!-- ═══════════════════════════════════════════════
@@ -948,6 +986,12 @@
         <div class="info-row"><span class="info-key">NODES</span><span class="info-val" id="readout-nodes">0</span></div>
         <div class="info-row"><span class="info-key">EDGES</span><span class="info-val" id="readout-edges">0</span></div>
         <div class="info-row"><span class="info-key">K-NN</span><span class="info-val" id="readout-knn">5</span></div>
+      </div>
+      <div class="info-section">
+        <div class="info-row"><span class="info-key">FILES SCANNED</span><span class="info-val" id="readout-files-total">-</span></div>
+        <div class="info-row"><span class="info-key">MD/TXT FOUND</span><span class="info-val" id="readout-files-note">-</span></div>
+        <div class="info-row"><span class="info-key">EMPTY SKIPPED</span><span class="info-val" id="readout-files-empty">-</span></div>
+        <div class="info-row"><span class="info-key">NON-NOTE SKIPPED</span><span class="info-val" id="readout-files-other">-</span></div>
       </div>
       <div class="info-section">
         <div id="legend"></div>
@@ -986,6 +1030,7 @@
     <div id="cluster-labels"></div>
 
     <!-- Config Panel: bottom-right -->
+    <button id="copy-graph-link-btn" title="Copy link to restore graph">COPY LINK</button>
     <button id="export-snapshot-btn" title="Export graph as HTML">EXPORT</button>
     <button id="theme-toggle" title="Switch color theme">LIGHT</button>
 
@@ -1287,7 +1332,73 @@
     // ═══════════════════════════════════════════════
     // Folder Picker & Note Reading
     // ═══════════════════════════════════════════════
+    function supportsDirectoryPicker() {
+      return typeof window.showDirectoryPicker === 'function';
+    }
+
+    const folderInput = document.getElementById('folder-input');
+
+    function pickFolderWithInput() {
+      return new Promise((resolve, reject) => {
+        const cleanup = () => {
+          folderInput.removeEventListener('change', onChange);
+          window.removeEventListener('focus', onFocus);
+        };
+        const onChange = () => {
+          const files = Array.from(folderInput.files || []);
+          cleanup();
+          if (!files.length) {
+            reject(new DOMException('User cancelled folder selection', 'AbortError'));
+            return;
+          }
+          const folderName = (files[0].webkitRelativePath || files[0].name || 'folder').split('/')[0];
+          const filenames = files
+            .map(file => file.webkitRelativePath || file.name)
+            .filter(name => /\.(md|txt)$/i.test(name))
+            .sort();
+          resolve({
+            mode: 'input',
+            files,
+            folderName,
+            filenames,
+            fileStats: { totalFiles: files.length, noteFiles: filenames.length, nonNoteFiles: Math.max(0, files.length - filenames.length) },
+          });
+        };
+        const onFocus = () => {
+          setTimeout(() => {
+            if (!folderInput.files || !folderInput.files.length) {
+              cleanup();
+              reject(new DOMException('User cancelled folder selection', 'AbortError'));
+            }
+          }, 1000);
+        };
+        folderInput.addEventListener('change', onChange);
+        window.addEventListener('focus', onFocus);
+        folderInput.click();
+      });
+    }
+
+    async function readNotesFromSelection(files) {
+      const notes = [];
+      let id = 0;
+      let emptySkipped = 0;
+      for (const file of files) {
+        const name = (file.webkitRelativePath || file.name).toLowerCase();
+        if (!name.endsWith('.md') && !name.endsWith('.txt')) continue;
+        const text = await file.text();
+        if (text.trim()) {
+          notes.push({ id: id++, filename: file.name, text: text.trim() });
+        } else {
+          emptySkipped++;
+        }
+      }
+      return { notes, emptySkipped };
+    }
+
     async function pickFolder() {
+      if (!supportsDirectoryPicker()) {
+        return pickFolderWithInput();
+      }
       const dirHandle = await window.showDirectoryPicker();
       const filenames = [];
 
@@ -1369,6 +1480,7 @@
 
     // Track the last-picked dirHandle so RE-ANALYZE can re-read the same folder
     let lastDirHandle = null;
+    let lastPickResult = null;
 
     pickFolderBtn.addEventListener('click', async () => {
       const config = getCurrentConfig();
@@ -2217,7 +2329,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
       const lines = wrapNodeLabel(node.name);
       if (lines.length) {
         const div = document.createElement('div');
-        div.className = 'node-label' + (isSpecial ? ' node-label--special' : '');
+        div.className = 'node-label' + (isSpecial ? ' node-label--special node-label--pinned' : '');
         div.style.color = VFX.labelColor.val;
         div.style.opacity = String(VFX.labelAlpha.val);
         let html = `<span class="nl-bullet" style="color:${color};opacity:${VFX.clusterAlpha.val}">\u25A0</span><span class="nl-text"> ${lines[0]}`;
@@ -3201,43 +3313,130 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
     // (label-toggle and config panel removed from release build)
   
     // ═══════════════════════════════════════════════
-    // Export Snapshot as HTML
+    // Export Snapshot + Copy Graph Link
     // ═══════════════════════════════════════════════
-    document.getElementById('export-snapshot-btn').addEventListener('click', () => {
-      if (!allNodes.length || !edgeSets) {
-        alert('No graph data to export. Load a vault first.');
-        return;
-      }
-      const snapshot = {
-        exportedAt: new Date().toISOString(),
-        nodes: allNodes.map(n => ({
-          id: n.id, name: n.name, filename: n.filename,
-          cluster_id: n.cluster_id, cluster_name: n.cluster_name,
-          is_medoid: n.is_medoid, is_llm_center: n.is_llm_center,
-          text_preview: n.text_preview,
-          x_central: n.x_central, y_central: n.y_central, z_central: n.z_central,
-          x_decentral: n.x_decentral, y_decentral: n.y_decentral, z_decentral: n.z_decentral,
-          x_distrib: n.x_distrib, y_distrib: n.y_distrib, z_distrib: n.z_distrib,
-        })),
-        edges: {
-          central: edgeSets.central || [],
-          decentral: edgeSets.decentral || [],
-          distrib: edgeSets.distrib || [],
-        },
-      };
-      const json = JSON.stringify(snapshot);
-      const styles = document.querySelector('style').textContent;
-      const html = '<!DOCTYPE html>\n<html lang="en" style="color-scheme: dark;">\n<head><meta charset="UTF-8"><title>Obsidian Universe Snapshot</title><style>' + styles + '</style></head>\n<body>\n<div id="graph"></div>\n<script>\nconst SNAPSHOT = ' + JSON.stringify(json) + ';\nconst data = JSON.parse(SNAPSHOT);\nconsole.log("Snapshot loaded", data);\n<\/script>\n</body></html>';
-      const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    let latestSessionSnapshot = null;
+
+    function sanitizeExportNamePart(value = '') {
+      return String(value).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 48) || 'graph';
+    }
+
+    function downloadTextFile(filename, content) {
+      const blob = new Blob([content], { type: 'text/html;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'obsidian-universe-snapshot-' + Date.now() + '.html';
+      a.download = filename;
       document.body.appendChild(a);
       a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    });
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    function buildStandaloneSnapshotHtml(sourceHtml, session) {
+      const payload = JSON.stringify(session).replace(/</g, '\u003c');
+      const injection = '<script>window.__TOPOLOGIES_EMBEDDED_SESSION__ = ' + payload + ';<\/script>\n<script>window.__TOPOLOGIES_SNAPSHOT_MODE__ = true;<\/script>\n';
+      const marker = '<script type="module">';
+      const idx = sourceHtml.indexOf(marker);
+      if (idx === -1) throw new Error('EXPORT FAILED: MODULE SCRIPT NOT FOUND');
+      return sourceHtml.slice(0, idx) + injection + sourceHtml.slice(idx);
+    }
+
+    async function exportStandaloneSnapshot() {
+      // Build session from current graph data
+      const session = latestSessionSnapshot || await loadSession().catch(() => null);
+      if (!session && !allNodes.length) {
+        setBootStage('EXPORT FAILED', 'NO GRAPH DATA AVAILABLE');
+        showBootStatus();
+        setTimeout(hideBootStatus, 1800);
+        return;
+      }
+      // Use current graph data if no cached session
+      const sessionData = session || {
+        graphNodes: allNodes.map(n => {
+          const clean = {};
+          for (const k of ['id','filename','name','text_preview','cluster_id','cluster_name','x_central','y_central','z_central','x_decentral','y_decentral','z_decentral','x_distrib','y_distrib','z_distrib','is_medoid','is_llm_center']) {
+            if (n[k] !== undefined) clean[k] = n[k];
+          }
+          return clean;
+        }),
+        centralEdges: (edgeSets.central || []).map(e => ({ source: e.source, target: e.target, label_forward: e.label_forward, label_backward: e.label_backward })),
+        decentralEdges: (edgeSets.decentral || []).map(e => ({ source: e.source, target: e.target, label_forward: e.label_forward, label_backward: e.label_backward })),
+        labeledEdges: (edgeSets.distrib || []).map(e => ({ source: e.source, target: e.target, label_forward: e.label_forward, label_backward: e.label_backward })),
+        clusterNames: {},
+        nodeCount: allNodes.length,
+      };
+
+      try {
+        const exportUrl = new URL(window.location.href);
+        exportUrl.search = '';
+        exportUrl.hash = '';
+        const response = await fetch(exportUrl.toString(), { cache: 'no-store' });
+        if (!response.ok) throw new Error('SOURCE HTML ' + response.status);
+        const sourceHtml = await response.text();
+        const standaloneHtml = buildStandaloneSnapshotHtml(sourceHtml, sessionData);
+        const nameBits = [sessionData.nodeCount ? sessionData.nodeCount + '-notes' : '', sanitizeExportNamePart(Object.values(sessionData.clusterNames || {})[0] || '')].filter(Boolean).join('-');
+        downloadTextFile('obsidian-universe-' + (nameBits || 'snapshot') + '.html', standaloneHtml);
+        setBootStage('SNAPSHOT EXPORTED', 'STANDALONE HTML READY');
+        showBootStatus();
+        setTimeout(hideBootStatus, 1800);
+      } catch (err) {
+        // Fallback: simple JSON export
+        const json = JSON.stringify(sessionData);
+        downloadTextFile('obsidian-universe-snapshot-' + Date.now() + '.json', json);
+        setBootStage('SNAPSHOT EXPORTED', 'JSON FALLBACK (COULD NOT FETCH SOURCE)');
+        showBootStatus();
+        setTimeout(hideBootStatus, 2000);
+      }
+    }
+
+    function buildCachedGraphLink() {
+      const url = new URL(window.location.href);
+      url.searchParams.set('resume', 'latest');
+      return url.toString();
+    }
+
+    async function copyCachedGraphLink() {
+      const link = buildCachedGraphLink();
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(link);
+        } else {
+          const temp = document.createElement('textarea');
+          temp.value = link;
+          temp.setAttribute('readonly', '');
+          temp.style.position = 'absolute';
+          temp.style.left = '-9999px';
+          document.body.appendChild(temp);
+          temp.select();
+          document.execCommand('copy');
+          document.body.removeChild(temp);
+        }
+        setBootStage('LINK COPIED', 'RESTORES THE LAST GRAPH FROM CACHE');
+        showBootStatus();
+        setTimeout(hideBootStatus, 1800);
+      } catch (err) {
+        setBootStage('COPY FAILED', link);
+        showBootStatus();
+        setTimeout(hideBootStatus, 3000);
+      }
+    }
+
+    document.getElementById('export-snapshot-btn').addEventListener('click', exportStandaloneSnapshot);
+    document.getElementById('copy-graph-link-btn').addEventListener('click', copyCachedGraphLink);
+
+    // Auto-resume from URL param
+    if (new URLSearchParams(window.location.search).get('resume') === 'latest') {
+      loadSession().then(session => {
+        if (session) {
+          document.getElementById('setup').classList.add('hidden');
+          document.getElementById('main').classList.remove('hidden');
+          document.getElementById('reanalyze-btn').classList.remove('hidden');
+          document.getElementById('copy-graph-link-btn').classList.remove('hidden');
+          restoreFromCache(session);
+        }
+      }).catch(() => {});
+    }
 
   </script>
 
