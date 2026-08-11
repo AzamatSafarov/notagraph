@@ -4237,19 +4237,36 @@ CLUSTER 1: <name>
 
 
 
-    const EDGE_LABEL_BATCH = 20;
+    const EDGE_LABEL_BATCH = 50;
 
 
 
     async function labelEdges(notes, edges, config, onProgress) {
 
       const labeled = [];
+      const PARALLEL = 3;
 
+      for (let i = 0; i < edges.length; i += EDGE_LABEL_BATCH * PARALLEL) {
 
+        // Launch PARALLEL batches concurrently
+        const promises = [];
+        for (let p = 0; p < PARALLEL; p++) {
+          const start = i + p * EDGE_LABEL_BATCH;
+          if (start >= edges.length) break;
+          const batch = edges.slice(start, start + EDGE_LABEL_BATCH);
+          promises.push(labelBatch(batch));
+        }
+        const results = await Promise.all(promises);
+        for (const batchLabeled of results) {
+          labeled.push(...batchLabeled);
+          if (onProgress) onProgress(labeled.length, edges.length);
+        }
+      }
 
-      for (let i = 0; i < edges.length; i += EDGE_LABEL_BATCH) {
+      return labeled;
 
-        const batch = edges.slice(i, i + EDGE_LABEL_BATCH);
+      async function labelBatch(batch) {
+        const batchLabeled = [];
 
 
 
