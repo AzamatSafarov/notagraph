@@ -42,7 +42,7 @@
 
       --bg-panel: rgba(255, 255, 255, 0.82);
 
-      --border: #cccfd4;
+      --border: rgba(60, 60, 80, 0.12);
 
       --text: #3a3a4a;
 
@@ -56,7 +56,7 @@
 
       --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
 
-      --coral: #ffd93d;
+      --coral: #ff6b6b;
 
       --teal: #4ecdc4;
 
@@ -173,7 +173,7 @@
     }
 #setup-card, .setup-card {
       background: rgba(255, 255, 255, 0.95);
-      border: 1px solid #cccfd4;
+      border: 1px solid rgba(60, 60, 80, 0.12);
       border-radius: 16px;
       padding: 28px 32px;
       box-shadow: 0 8px 32px rgba(60, 60, 80, 0.08), 0 2px 8px rgba(60, 60, 80, 0.04);
@@ -1763,7 +1763,7 @@
 
     .node-label--special {
 
-      color: #ffd93d;
+      color: #ff6b6b;
 
       opacity: 0.7;
 
@@ -2067,7 +2067,7 @@
 
       let W, H, particles = [];
 
-      const COLORS = ['#ffd93d', '#4ecdc4', '#a78bfa', '#ffd93d', '#51cf66', '#4dabf7', '#ff9ff3'];
+      const COLORS = ['#ff6b6b', '#4ecdc4', '#a78bfa', '#ffd93d', '#51cf66', '#4dabf7', '#ff9ff3'];
 
       const MAX_DIST = 140;
 
@@ -4400,7 +4400,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
     const SCALE = 280;
 
-    let CLUSTER_COLORS = ['#ff9ff3', '#4ecdc4', '#a78bfa', '#ffd93d', '#51cf66'];
+    let CLUSTER_COLORS = ['#c45c3e', '#4ecdc4', '#a8523a', '#a78bfa', '#8b3a2a'];
 
 
 
@@ -4436,7 +4436,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
       linkAlpha:          { val: 0.6,   min: 0, max: 1, step: 0.01, label: 'LINK ALPHA',      section: 'COLORS',   refresh: 'colors' },
 
-      particleColor:      { val: '#ffd93d', label: 'PARTICLE',      section: 'COLORS',   refresh: 'colors', type: 'color' },
+      particleColor:      { val: '#ff6b6b', label: 'PARTICLE',      section: 'COLORS',   refresh: 'colors', type: 'color' },
 
       particleAlpha:      { val: 1.0,   min: 0, max: 1, step: 0.05, label: 'PARTICLE ALPHA',  section: 'COLORS',   refresh: 'colors' },
 
@@ -4544,7 +4544,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
         linkColor: '#4dabf7', linkAlpha: 0.5,
 
-        particleColor: '#ffd93d', particleAlpha: 1.0,
+        particleColor: '#ff6b6b', particleAlpha: 1.0,
 
         cluster0: '#ff9ff3', cluster1: '#4ecdc4', cluster2: '#a78bfa',
 
@@ -4901,25 +4901,17 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
       });
 
-      // Update label bullet colors (the colored squares)
-      document.querySelectorAll('.nl-bullet').forEach(el => {
-        const label = el.closest('.node-label');
-        const node = allNodes.find(n => n.__labelDiv === label);
-        if (node) {
-          const c = CLUSTER_COLORS[node.cluster_id % CLUSTER_COLORS.length];
-          el.style.color = c;
-          el.style.opacity = String(VFX.clusterAlpha.val);
-        }
-      });
       // Links + particles
+
       refreshLinks();
+
     }
 
 
 
     function refreshClusters() {
+
       syncClusterColors();
-      if (Graph && allNodes.length) { Graph.nodeThreeObject(node => createNodeObject(node)); }
 
       // Update legend dot colors
 
