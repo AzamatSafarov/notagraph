@@ -4439,7 +4439,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
     const SCALE = 280;
 
-    let CLUSTER_COLORS = ['#c45c3e', '#d4a843', '#a8523a', '#c47a43', '#8b3a2a'];
+    let CLUSTER_COLORS = ['#ff9ff3', '#4ecdc4', '#a78bfa', '#ffd93d', '#51cf66'];
 
 
 
@@ -4694,6 +4694,9 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
       document.getElementById('theme-toggle').textContent = name === 'warm' ? 'LIGHT' : 'DARK';
 
     }
+
+    // Apply warm theme on load
+    applyTheme('warm');
 
 
 
