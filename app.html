@@ -4965,17 +4965,25 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
       });
 
+      // Update label bullet colors (the colored squares)
+      document.querySelectorAll('.nl-bullet').forEach(el => {
+        const label = el.closest('.node-label');
+        const node = allNodes.find(n => n.__labelDiv === label);
+        if (node) {
+          const c = CLUSTER_COLORS[node.cluster_id % CLUSTER_COLORS.length];
+          el.style.color = c;
+          el.style.opacity = String(VFX.clusterAlpha.val);
+        }
+      });
       // Links + particles
-
       refreshLinks();
-
     }
 
 
 
     function refreshClusters() {
-
       syncClusterColors();
+      if (Graph && allNodes.length) { Graph.nodeThreeObject(node => createNodeObject(node)); }
 
       // Update legend dot colors
 
