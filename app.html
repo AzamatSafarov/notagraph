@@ -614,9 +614,9 @@
 
       position: fixed;
 
-      bottom: 60px;
+      top: 88px;
 
-      right: 110px;
+      left: 20px;
 
       z-index: 10;
 
@@ -660,11 +660,23 @@
 
     #export-snapshot-btn {
 
-      background: transparent;
+      position: fixed;
+
+      top: 128px;
+
+      left: 20px;
+
+      z-index: 10;
+
+      background: var(--bg-panel);
+
+      backdrop-filter: blur(8px);
+
+      -webkit-backdrop-filter: blur(8px);
 
       border: 1px solid var(--border);
 
-      border-radius: 0;
+      border-radius: 6px;
 
       color: var(--text-dim);
 
@@ -1977,18 +1989,7 @@
 
       </div>
 
-      <div class="info-section">
-
-        <div class="info-row"><span class="info-key">FILES SCANNED</span><span class="info-val" id="readout-files-total">-</span></div>
-
-        <div class="info-row"><span class="info-key">MD/TXT FOUND</span><span class="info-val" id="readout-files-note">-</span></div>
-
-        <div class="info-row"><span class="info-key">EMPTY SKIPPED</span><span class="info-val" id="readout-files-empty">-</span></div>
-
-        <div class="info-row"><span class="info-key">NON-NOTE SKIPPED</span><span class="info-val" id="readout-files-other">-</span></div>
-
-      </div>
-
+      
       <div class="info-section">
 
         <div id="legend"></div>
@@ -2063,9 +2064,9 @@
 
     <!-- Config Panel: bottom-right -->
 
-    <button id="copy-graph-link-btn" title="Copy link to restore graph">COPY LINK</button>
+    <button id="copy-graph-link-btn" title="Copy link to restore graph">COPY GRAPH LINK</button>
 
-    <button id="export-snapshot-btn" title="Export graph as HTML">EXPORT</button>
+    <button id="export-snapshot-btn" title="Export graph as HTML">EXPORT SNAPSHOT HTML</button>
 
     <button id="theme-toggle" title="Switch color theme">LIGHT</button>
 
@@ -6883,7 +6884,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
 
 
-    async function exportStandaloneSnapshot() {
+    async async function exportStandaloneSnapshot() {
 
       // Build session from current graph data
 
@@ -6909,7 +6910,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
           const clean = {};
 
-          for (const k of ['id','filename','name','text_preview','cluster_id','cluster_name','x_central','y_central','z_central','x_decentral','y_decentral','z_decentral','x_distrib','y_distrib','z_distrib','is_medoid','is_llm_center']) {
+          for (const k of ['id','filename','name','text_preview','cluster_id','cluster_name','x_central','y_central','z_central','x_decentral','y_decentral','z_decentral','x_distrib','y_distrib','z_distrib','x_planet','y_planet','z_planet','is_medoid','is_llm_center']) {
 
             if (n[k] !== undefined) clean[k] = n[k];
 
@@ -6924,6 +6925,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
         decentralEdges: (edgeSets.decentral || []).map(e => ({ source: e.source, target: e.target, label_forward: e.label_forward, label_backward: e.label_backward })),
 
         labeledEdges: (edgeSets.distrib || []).map(e => ({ source: e.source, target: e.target, label_forward: e.label_forward, label_backward: e.label_backward })),
+        planetEdges: (edgeSets.planet || []).map(e => ({ source: e.source, target: e.target, label_forward: e.label_forward, label_backward: e.label_backward })),
 
         clusterNames: {},
 
