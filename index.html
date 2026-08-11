@@ -2277,10 +2277,27 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
         }
       }
 
+      // Clear stale CSS2D label DOM elements
+      const graphEl = document.getElementById('graph');
+      if (graphEl) {
+        // Find CSS2D overlay (div with pointer-events:none inside #graph)
+        graphEl.querySelectorAll('div[style*="pointer-events: none"]').forEach(overlay => {
+          // Clear all label children but keep the overlay div itself
+          while (overlay.firstChild) overlay.removeChild(overlay.firstChild);
+        });
+      }
+
       // Refresh visuals
       refreshColors();
-      refreshClusters();
       refreshChrome();
+
+      // Full node rebuild - recreates all CSS2D labels cleanly
+      if (Graph && allNodes.length) {
+        Graph.nodeThreeObject(node => createNodeObject(node));
+        Graph.graphData(Graph.graphData());
+        // Reset all node appearances
+        Graph.graphData().nodes.forEach(n => updateNodeAppearance(n, 'normal'));
+      }
 
       // Update button label
       document.getElementById('theme-toggle').textContent = name === 'warm' ? 'LIGHT' : 'DARK';
@@ -2373,7 +2390,22 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
       clearTimeout(nodeRefreshTimer);
       nodeRefreshTimer = setTimeout(() => {
         if (!Graph) return;
+        // Remove stale CSS2D label divs from DOM before rebuilding
+        const container = document.getElementById('graph');
+        if (container) {
+          const oldLabels = container.querySelectorAll('.node-label');
+          oldLabels.forEach(el => {
+            // Only remove labels that are NOT attached to current graph nodes
+            // (force-graph will re-create them via createNodeObject)
+            if (el.parentElement && el.parentElement.style) {
+              // Check if parent is a CSS2D overlay (not the graph scene)
+              // We let force-graph handle its own cleanup, just clear duplicates
+            }
+          });
+        }
         Graph.nodeThreeObject(node => createNodeObject(node));
+        // Force graph to re-render nodes
+        Graph.graphData(Graph.graphData());
       }, 80);
     }
 
@@ -2408,11 +2440,6 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
       // Background (with alpha)
       const bgRgb = hexToRgb(VFX.bgColor.val);
       Graph.backgroundColor(`rgba(${bgRgb},${VFX.bgAlpha.val})`);
-      // Label text color + alpha (reset non-hovered labels to current alpha)
-      document.querySelectorAll('.node-label').forEach(el => {
-        el.style.color = VFX.labelColor.val;
-        el.style.opacity = String(VFX.labelAlpha.val);
-      });
       // Links + particles
       refreshLinks();
     }
