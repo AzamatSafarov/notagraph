@@ -4368,19 +4368,14 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
           const bwd = match ? match[2].trim().replace(/\.$/, '') : 'connects to';
 
-          labeled.push({ source: a, target: b, label_forward: fwd, label_backward: bwd, topology: 'distrib' });
+          batchLabeled.push({ source: a, target: b, label_forward: fwd, label_backward: bwd, topology: 'distrib' });
 
         });
 
 
 
-        if (onProgress) onProgress(Math.min(i + EDGE_LABEL_BATCH, edges.length), edges.length);
-
+        return batchLabeled;
       }
-
-
-
-      return labeled;
 
     }
 
