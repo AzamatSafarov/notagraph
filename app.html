@@ -7,7 +7,7 @@
   <meta charset="UTF-8">
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx=\"50\" cy=\"50\" r=\"40\" fill=\"none\" stroke=\"%234d8eff\" stroke-width=\"4\"/><circle cx=\"50\" cy=\"50\" r=\"8\" fill=\"%234d8eff\"/><circle cx=\"30\" cy=\"35\" r=\"5\" fill=\"%23a78bfa\"/><circle cx=\"70\" cy=\"65\" r=\"5\" fill=\"%23a78bfa\"/><line x1=\"50\" y1=\"50\" x2=\"30\" y2=\"35\" stroke=\"%234d8eff\" stroke-width=\"1.5\"/><line x1=\"50\" y1=\"50\" x2=\"70\" y2=\"65\" stroke=\"%234d8eff\" stroke-width=\"1.5\"/></svg>">
+    <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="%234d8eff" stroke-width="4"/><circle cx="50" cy="50" r="8" fill="%234d8eff"/><circle cx="30" cy="35" r="5" fill="%23a78bfa"/><circle cx="70" cy="65" r="5" fill="%23a78bfa"/><line x1="50" y1="50" x2="30" y2="35" stroke="%234d8eff" stroke-width="1.5"/><line x1="50" y1="50" x2="70" y2="65" stroke="%234d8eff" stroke-width="1.5"/></svg>'>
 
   <meta name="theme-color" content="#f2efe9">
 
@@ -17,6 +17,7 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://topologies-of-ideas-universal.vercel.app">
     <meta name="description" content="Visualize your notes as a 3D knowledge graph with AI embeddings and LLM annotations.">
+
     <title>Obsidian Universe</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -547,6 +548,56 @@
 
 
     
+
+
+
+    .setup-field-label {
+
+      font-family: var(--mono);
+
+      font-size: 10px;
+
+      letter-spacing: 0.12em;
+
+      color: var(--text-dim);
+
+      margin-bottom: 4px;
+
+      margin-top: 10px;
+
+    }
+
+
+
+    .setup-model-input {
+
+      background: transparent;
+
+      border: 1px solid var(--border);
+
+      border-radius: 0;
+
+      color: var(--text);
+
+      font-family: var(--mono);
+
+      font-size: 12px;
+
+      padding: 8px 14px;
+
+      width: 320px;
+
+      box-sizing: border-box;
+
+      letter-spacing: 0.04em;
+
+      transition: border-color 200ms ease;
+
+    }
+
+    .setup-model-input::placeholder { color: var(--text-dim); }
+
+    .setup-model-input:focus { border-color: var(--blue); }
 
 
 
@@ -1830,9 +1881,11 @@
 
     <canvas id="bg-canvas"></canvas>
 
-    <div class="setup-card">
     <div id="setup-title">Obsidian Universe</div>
+
     <div id="setup-subtitle">Neural Cartography of Ideas</div>
+
+    <div class="setup-card">
     <select id="provider-select">
 
       <option value="azure">AZURE OPENAI</option>
@@ -1854,7 +1907,7 @@
     <label for="api-key-input" id="api-key-label">API Key</label>
 
     <input type="password" id="api-key-input" placeholder="Paste key" spellcheck="false" autocomplete="off">
-    <a id="get-key-link" href="#" target="_blank" rel="noopener" style="font-size:10px;font-family:var(--mono);color:var(--blue);text-decoration:none;letter-spacing:0.05em;text-transform:uppercase;">GET API KEY \u2192</a>
+    <a id="get-key-link" href="#" target="_blank" rel="noopener" style="font-size:10px;font-family:var(--mono);color:var(--blue);text-decoration:none;letter-spacing:0.05em;text-transform:uppercase;">GET API KEY →</a>
 
     <label class="setup-field-label" for="base-url-input">Base URL</label>
 
@@ -1873,7 +1926,6 @@
     <button id="load-cache-btn" class="hidden">Resume Previous Session</button>
 
     <div id="setup-status"></div>
-    <div id="https-warning" style="display:none;font-size:11px;color:#c92a2a;font-family:var(--mono);max-width:340px;text-align:center;line-height:1.5;">⚠️ Ollama runs on localhost - this is normal. For other providers, ensure you're on HTTPS.</div>
 
     <input id="folder-input" class="hidden" type="file" webkitdirectory directory multiple>
     </div>
@@ -1887,8 +1939,7 @@
 
        ═══════════════════════════════════════════════ -->
 
-  <div id="main" class="hidden">
-    <div id="empty-state" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;font-family:var(--mono);color:var(--text-dim);font-size:14px;letter-spacing:0.05em;">Select a folder with .md or .txt notes to begin</div>
+  <div id="main" class="hidden">
 
 
 
@@ -2315,6 +2366,7 @@
       azure: {
 
         label: 'Azure OpenAI',
+        getKeyUrl: 'https://portal.azure.com/#create/Microsoft.CognitiveServicesOpenAI',
 
         apiKey: 'txyDbkIhCKgP33H7tlaQ3Mo9Zwd6Ag0B7hmqETxOxjsN9utsiPm3JQQJ99CFAC5T7U2XJ3w3AAAAACOGGeE2',
 
@@ -2331,6 +2383,7 @@
       gemini: {
 
         label: 'Gemini',
+        getKeyUrl: 'https://aistudio.google.com/apikey',
 
         apiKey: '',
 
@@ -2347,6 +2400,7 @@
       openai: {
 
         label: 'OpenAI',
+        getKeyUrl: 'https://platform.openai.com/api-keys',
 
         apiKey: '',
 
@@ -2363,6 +2417,7 @@
       openrouter: {
 
         label: 'OpenRouter',
+        getKeyUrl: 'https://openrouter.ai/keys',
 
         apiKey: '',
 
@@ -2391,39 +2446,23 @@
         embeddingModel: 'nomic-embed-text',
 
       },
-
       mistral: {
-
         label: 'Mistral',
-
         apiKey: '',
-
         baseUrl: 'https://api.mistral.ai/v1',
-
         apiVersion: '',
-
         chatModel: 'mistral-small-latest',
-
         embeddingModel: 'mistral-embed',
-
+        getKeyUrl: 'https://console.mistral.ai/api-keys',
       },
-
       groq: {
-
         label: 'Groq',
-
         apiKey: '',
-
         baseUrl: 'https://api.groq.com/openai/v1',
-
         apiVersion: '',
-
         chatModel: 'llama-3.3-70b-versatile',
-
         embeddingModel: '',
-
-        groqEmbedFallback: 'ollama',
-
+        getKeyUrl: 'https://console.groq.com/keys',
       },
 
     };
@@ -2472,21 +2511,17 @@
       baseUrlInput.value = preset.baseUrl || '';
       chatModelInput.value = preset.chatModel || '';
       embeddingModelInput.value = preset.embeddingModel || '';
-      // Show/hide API Key (Ollama doesn't need it)
       const showApiKey = provider !== 'ollama';
       apiKeyInput.style.display = showApiKey ? 'block' : 'none';
       const apiKeyLabel = document.getElementById('api-key-label');
       if (apiKeyLabel) apiKeyLabel.style.display = showApiKey ? 'block' : 'none';
-      // Show/hide Base URL (Azure, Ollama, Mistral, Groq show it)
       const showBaseUrl = ['azure', 'ollama', 'mistral', 'groq'].includes(provider);
       baseUrlInput.style.display = showBaseUrl ? 'block' : 'none';
       if (baseUrlInput.previousElementSibling) baseUrlInput.previousElementSibling.style.display = baseUrlInput.style.display;
-      // Show/hide Embedding Model (Groq has no embeddings API)
       const showEmbed = provider !== 'groq';
       embeddingModelInput.style.display = showEmbed ? 'block' : 'none';
       const embedLabel = document.querySelector('label[for="embedding-model-input"]');
       if (embedLabel) embedLabel.style.display = showEmbed ? 'block' : 'none';
-      // Update Get Key link
       const keyLink = document.getElementById('get-key-link');
       if (keyLink) {
         if (showApiKey && preset.getKeyUrl) {
@@ -3272,36 +3307,20 @@
           allEmbeddings.push(...vectors);
 
         } else if (provider === 'groq') {
-
-          // Groq has no embeddings API - use Ollama fallback
-
           const ollamaUrl = 'http://localhost:11434/v1';
-
           response = await fetch(`${ollamaUrl}/embeddings`, {
-
             method: 'POST',
-
             headers: { 'Content-Type': 'application/json' },
-
             body: JSON.stringify({ model: 'nomic-embed-text', input: batch }),
-
           });
-
           if (!response.ok) {
-
             throw new Error('Groq has no embeddings API. Start Ollama locally with nomic-embed-text model for embeddings.');
-
           }
-
           const data = await response.json();
-
           const vectors = data.data.map(e => e.embedding);
-
           allEmbeddings.push(...vectors);
-
         } else {
-
-          // OpenAI-compatible (OpenAI, OpenRouter, Ollama, Mistral)
+          // OpenAI-compatible (OpenAI, OpenRouter, Ollama)
 
           response = await fetch(
 
@@ -6945,6 +6964,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
         decentralEdges: (edgeSets.decentral || []).map(e => ({ source: e.source, target: e.target, label_forward: e.label_forward, label_backward: e.label_backward })),
 
         labeledEdges: (edgeSets.distrib || []).map(e => ({ source: e.source, target: e.target, label_forward: e.label_forward, label_backward: e.label_backward })),
+        planetEdges: (edgeSets.planet || []).map(e => ({ source: e.source, target: e.target, label_forward: e.label_forward, label_backward: e.label_backward })),
         planetEdges: (edgeSets.planet || []).map(e => ({ source: e.source, target: e.target, label_forward: e.label_forward, label_backward: e.label_backward })),
 
         clusterNames: {},
