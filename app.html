@@ -1,3141 +1,6888 @@
 <!DOCTYPE html>
+
 <html lang="en" style="color-scheme: dark;">
+
 <head>
+
   <meta charset="UTF-8">
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <meta name="theme-color" content="#0a0a0f">
+
   <title>Obsidian Universe</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
+
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=EB+Garamond:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
-    /* ═══════════════════════════════════════════════
-       CSS Custom Properties
-       ═══════════════════════════════════════════════ */
-    :root {
-      --bg: #f2efe9;
-      --bg-panel: rgba(255, 255, 255, 0.82);
-      --border: rgba(60, 60, 80, 0.12);
-      --text: #3a3a4a;
-      --text-dim: #8a8a9a;
-      --text-bright: #1a1a2a;
-      --mono: 'JetBrains Mono', monospace;
-      --serif: 'Cormorant Garamond', 'EB Garamond', Georgia, serif;
-      --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-      --coral: #ff6b6b;
-      --teal: #4ecdc4;
-      --yellow: #ffd93d;
-      --purple: #a78bfa;
-      --green: #51cf66;
-      --blue: #4dabf7;
-      --pink: #ff9ff3;
-      --accent: #4dabf7;
-    }
 
     /* ═══════════════════════════════════════════════
-       Reset & Base
+
+       CSS Custom Properties
+
        ═══════════════════════════════════════════════ */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+
+    :root {
+
+      --bg: #f2efe9;
+
+      --bg-panel: rgba(255, 255, 255, 0.82);
+
+      --border: rgba(60, 60, 80, 0.12);
+
+      --text: #3a3a4a;
+
+      --text-dim: #8a8a9a;
+
+      --text-bright: #1a1a2a;
+
+      --mono: 'JetBrains Mono', monospace;
+
+      --serif: 'Cormorant Garamond', 'EB Garamond', Georgia, serif;
+
+      --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+
+      --coral: #ff6b6b;
+
+      --teal: #4ecdc4;
+
+      --yellow: #ffd93d;
+
+      --purple: #a78bfa;
+
+      --green: #51cf66;
+
+      --blue: #4dabf7;
+
+      --pink: #ff9ff3;
+
+      --accent: #4dabf7;
+
     }
+
+
+
+    /* ═══════════════════════════════════════════════
+
+       Reset & Base
+
+       ═══════════════════════════════════════════════ */
+
+    * {
+
+      margin: 0;
+
+      padding: 0;
+
+      box-sizing: border-box;
+
+    }
+
+
 
     body {
+
       background: var(--bg);
+
       color: var(--text);
+
       font-family: var(--sans);
+
       overflow: hidden;
+
       height: 100vh;
+
       width: 100vw;
+
     }
 
-    /* Animated pointillism dot background */
-    @keyframes dotDrift {
-      0%, 100% { transform: translate(0, 0); opacity: 0.3; }
-      50% { transform: translate(10px, -8px); opacity: 0.5; }
-    }
-    @keyframes dotPulse {
-      0%, 100% { opacity: 0.15; }
-      50% { opacity: 0.35; }
-    }
-    @keyframes dotFloat {
-      0% { transform: translateY(0) scale(1); }
-      50% { transform: translateY(-12px) scale(1.1); }
-      100% { transform: translateY(0) scale(1); }
-    }
+
+
+
+
+
 
     :focus-visible {
+
       outline: 2px solid var(--blue);
+
       outline-offset: 2px;
+
     }
+
+
 
     :focus:not(:focus-visible) {
+
       outline: none;
+
     }
+
+
 
     .hidden {
+
       display: none !important;
+
     }
+
+
 
     /* ═══════════════════════════════════════════════
+
        Setup Screen
+
        ═══════════════════════════════════════════════ */
+
     #setup {
+
       width: 100vw;
+
       height: 100vh;
+
       display: flex;
+
       flex-direction: column;
+
       align-items: center;
+
       justify-content: center;
+
       gap: 14px;
-      background:
-        radial-gradient(circle at 15% 20%, var(--coral) 1.2px, transparent 1.8px),
-        radial-gradient(circle at 85% 30%, var(--teal) 1.2px, transparent 1.8px),
-        radial-gradient(circle at 45% 80%, var(--purple) 1.2px, transparent 1.8px),
-        radial-gradient(circle at 70% 60%, var(--yellow) 1px, transparent 1.5px),
-        radial-gradient(circle at 30% 50%, var(--green) 1px, transparent 1.5px),
-        radial-gradient(circle at 90% 90%, var(--blue) 1px, transparent 1.5px),
-        radial-gradient(circle at 10% 70%, var(--pink) 1px, transparent 1.5px),
-        radial-gradient(circle at 60% 15%, var(--coral) 0.8px, transparent 1.2px),
-        radial-gradient(circle at 50% 45%, rgba(100,100,140,0.12) 0.8px, transparent 1.2px),
-        linear-gradient(180deg, #f5f2ec 0%, #ede9e2 100%);
-      background-size: 80px 80px, 120px 120px, 100px 100px, 60px 60px, 90px 90px, 70px 70px, 110px 110px, 50px 50px, 40px 40px, 100% 100%;
-      animation: dotPulse 8s ease-in-out infinite;
+
+      background: linear-gradient(180deg, #f5f2ec 0%, #ede9e2 100%);
+
       position: relative;
+
       overflow: hidden;
+
     }
 
-    /* Floating dot layer overlay */
-    #setup::before {
-      content: '';
+
+
+    #bg-canvas {
+
       position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background:
-        radial-gradient(circle at 25% 35%, var(--teal) 2px, transparent 3px),
-        radial-gradient(circle at 75% 65%, var(--purple) 2px, transparent 3px),
-        radial-gradient(circle at 50% 50%, var(--coral) 1.5px, transparent 2.5px);
-      background-size: 200px 200px, 250px 250px, 180px 180px;
-      animation: dotFloat 12s ease-in-out infinite;
+
+      top: 0;
+
+      left: 0;
+
+      width: 100%;
+
+      height: 100%;
+
       pointer-events: none;
-      opacity: 0.4;
+
+      z-index: 0;
+
     }
+
+
 
     #setup-title {
+
       font-family: var(--serif);
+
       font-size: 44px;
+
       font-weight: 600;
+
       letter-spacing: 0.01em;
+
       color: var(--text-bright);
+
       position: relative;
+
       z-index: 1;
+
     }
+
+
 
     #setup-subtitle {
+
       font-family: var(--mono);
+
       font-size: 11px;
+
       letter-spacing: 0.15em;
+
       text-transform: uppercase;
+
       color: var(--text-dim);
+
       margin-top: 2px;
+
       margin-bottom: 24px;
+
       z-index: 1;
+
       position: relative;
+
     }
+
+
 
     #api-key-label, #api-key-label, .setup-field-label {
+
       font-family: var(--mono);
+
       font-size: 9px;
+
       letter-spacing: 0.12em;
+
       color: var(--text-dim);
+
       margin-bottom: 5px;
+
       text-transform: uppercase;
+
       z-index: 1;
+
       position: relative;
+
     }
+
+
 
     #api-key-input {
-      background: rgba(255, 255, 255, 0.7);
-      border: 1px solid var(--border);
-      border-radius: 8px;
+
+      background: rgba(255, 255, 255, 0.9);
+
+      border: 1px solid rgba(60, 60, 80, 0.15);
+
+      border-radius: 10px;
+
       color: var(--text-bright);
+
       font-family: var(--mono);
+
       font-size: 13px;
+
       padding: 12px 16px;
+
       width: 340px;
+
       box-sizing: border-box;
+
       letter-spacing: 0.04em;
+
       transition: border-color 200ms ease, box-shadow 200ms ease;
+
       z-index: 1;
+
       position: relative;
+
       backdrop-filter: blur(4px);
+
     }
+
+
 
     #api-key-input::placeholder {
+
       color: var(--text-dim);
+
     }
+
+
 
     #api-key-input:focus {
+
       border-color: var(--blue);
+
       box-shadow: 0 0 0 3px rgba(77, 171, 247, 0.12);
+
     }
+
+
 
     .setup-model-input {
-      background: rgba(255, 255, 255, 0.7);
-      border: 1px solid var(--border);
-      border-radius: 8px;
+
+      background: rgba(255, 255, 255, 0.9);
+
+      border: 1px solid rgba(60, 60, 80, 0.15);
+
+      border-radius: 10px;
+
       color: var(--text-bright);
+
       font-family: var(--mono);
+
       font-size: 12px;
+
       padding: 10px 16px;
+
       width: 340px;
+
       box-sizing: border-box;
+
       letter-spacing: 0.04em;
+
       transition: border-color 200ms ease, box-shadow 200ms ease;
+
       z-index: 1;
+
       position: relative;
+
       backdrop-filter: blur(4px);
-    }
-    .setup-model-input::placeholder { color: var(--text-dim); }
-    .setup-model-input:focus {
-      border-color: var(--blue);
-      box-shadow: 0 0 0 3px rgba(77, 171, 247, 0.12);
+
     }
 
-    #provider-select {
-      background: rgba(255, 255, 255, 0.7);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text-bright);
-      font-family: var(--mono);
-      font-size: 12px;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      padding: 10px 16px;
-      width: 340px;
-      box-sizing: border-box;
-      cursor: pointer;
-      margin-bottom: 4px;
-      outline: none;
-      transition: border-color 200ms ease;
-      z-index: 1;
-      position: relative;
-      backdrop-filter: blur(4px);
+    .setup-model-input::placeholder { color: var(--text-dim); }
+
+    .setup-model-input:focus {
+
+      border-color: var(--blue);
+
+      box-shadow: 0 0 0 3px rgba(77, 171, 247, 0.12);
+
     }
+
+
+
+    #provider-select {
+
+      background: rgba(255, 255, 255, 0.9);
+
+      border: 1px solid rgba(60, 60, 80, 0.15);
+
+      border-radius: 10px;
+
+      color: var(--text-bright);
+
+      font-family: var(--mono);
+
+      font-size: 12px;
+
+      letter-spacing: 0.08em;
+
+      text-transform: uppercase;
+
+      padding: 10px 16px;
+
+      width: 340px;
+
+      box-sizing: border-box;
+
+      cursor: pointer;
+
+      margin-bottom: 4px;
+
+      outline: none;
+
+      transition: border-color 200ms ease;
+
+      z-index: 1;
+
+      position: relative;
+
+      backdrop-filter: blur(4px);
+
+    }
+
     #provider-select option { background: #fff; color: var(--text-bright); }
+
     #provider-select:focus { border-color: var(--blue); }
+
+
 
     #pick-folder-btn {
-      background: linear-gradient(135deg, var(--blue), var(--purple));
+
+      background: linear-gradient(135deg, #4dabf7, #a78bfa);
+
       border: none;
-      border-radius: 8px;
-      color: #fff;
+
+      border-radius: 10px;
+
+      color: #ffffff;
+
       font-family: var(--mono);
-      font-size: 12px;
-      font-weight: 600;
+
+      font-size: 13px;
+
+      font-weight: 700;
+
       letter-spacing: 0.12em;
+
       text-transform: uppercase;
-      padding: 14px 24px;
+
+      padding: 16px 24px;
+
       width: 340px;
+
       box-sizing: border-box;
+
       cursor: pointer;
+
       transition: all 200ms ease;
+
       margin-top: 8px;
+
       z-index: 1;
+
       position: relative;
-      box-shadow: 0 4px 14px rgba(77, 171, 247, 0.25);
+
+      box-shadow: 0 4px 16px rgba(77, 171, 247, 0.3);
+
     }
+
+
 
     #pick-folder-btn:hover {
+
       transform: translateY(-2px);
-      box-shadow: 0 8px 22px rgba(77, 171, 247, 0.35);
+
+      box-shadow: 0 8px 26px rgba(77, 171, 247, 0.45);
+
+      filter: brightness(1.08);
+
     }
+
+
 
     #load-cache-btn {
-      background: rgba(255, 255, 255, 0.6);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text-dim);
+
+      background: rgba(255, 255, 255, 0.85);
+
+      border: 1px solid rgba(60, 60, 80, 0.15);
+
+      border-radius: 10px;
+
+      color: #4dabf7;
+
       font-family: var(--mono);
+
       font-size: 11px;
+
+      font-weight: 600;
+
       letter-spacing: 0.10em;
+
       text-transform: uppercase;
-      padding: 10px 24px;
+
+      padding: 12px 24px;
+
       width: 340px;
+
       box-sizing: border-box;
+
       cursor: pointer;
+
       transition: all 200ms ease;
+
       z-index: 1;
+
       position: relative;
+
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+
     }
+
+
 
     #load-cache-btn:hover {
-      border-color: var(--blue);
-      color: var(--blue);
+
+      border-color: #4dabf7;
+
+      color: #3a8de0;
+
+      box-shadow: 0 4px 14px rgba(77, 171, 247, 0.15);
+
     }
+
+
 
     #setup-status {
+
       font-family: var(--mono);
+
       font-size: 11px;
+
       color: var(--text-dim);
+
       letter-spacing: 0.06em;
+
       min-height: 1.4em;
+
       margin-top: 8px;
+
       z-index: 1;
+
       position: relative;
+
     }
+
+
 
     #provider-select {
+
       background: transparent;
+
       border: 1px solid var(--border);
+
       border-radius: 0;
+
       color: var(--text);
+
       font-family: var(--mono);
+
       font-size: 12px;
+
       letter-spacing: 0.08em;
+
       text-transform: uppercase;
+
       padding: 8px 10px;
+
       width: 320px;
+
       box-sizing: border-box;
+
       cursor: pointer;
+
       margin-bottom: 12px;
+
       outline: none;
+
     }
+
     #provider-select option { background: #0a0a0f; color: var(--text); }
+
     #provider-select:focus { border-color: var(--blue); }
 
+
+
     .setup-field-label {
+
       font-family: var(--mono);
+
       font-size: 10px;
+
       letter-spacing: 0.12em;
+
       color: var(--text-dim);
+
       margin-bottom: 4px;
+
       margin-top: 10px;
+
     }
+
+
 
     .setup-model-input {
+
       background: transparent;
+
       border: 1px solid var(--border);
+
       border-radius: 0;
+
       color: var(--text);
+
       font-family: var(--mono);
+
       font-size: 12px;
+
       padding: 8px 14px;
+
       width: 320px;
+
       box-sizing: border-box;
+
       letter-spacing: 0.04em;
+
       transition: border-color 200ms ease;
+
     }
+
     .setup-model-input::placeholder { color: var(--text-dim); }
+
     .setup-model-input:focus { border-color: var(--blue); }
 
-    #export-snapshot-btn {
-      background: transparent;
+
+
+    #copy-graph-link-btn {
+
+      position: fixed;
+
+      bottom: 60px;
+
+      right: 110px;
+
+      z-index: 10;
+
+      background: var(--bg-panel);
+
+      backdrop-filter: blur(8px);
+
+      -webkit-backdrop-filter: blur(8px);
+
       border: 1px solid var(--border);
-      border-radius: 0;
+
+      border-radius: 8px;
+
       color: var(--text-dim);
+
       font-family: var(--mono);
+
       font-size: 11px;
+
       letter-spacing: 0.10em;
+
       text-transform: uppercase;
+
       padding: 8px 14px;
+
       cursor: pointer;
+
       transition: color 200ms ease, border-color 200ms ease;
-    }
-    #export-snapshot-btn:hover {
-      border-color: var(--blue);
-      color: var(--text-bright);
+
     }
 
+    #copy-graph-link-btn:hover {
+
+      color: var(--text-bright);
+
+      border-color: var(--accent);
+
+    }
+
+
+
+    #export-snapshot-btn {
+
+      background: transparent;
+
+      border: 1px solid var(--border);
+
+      border-radius: 0;
+
+      color: var(--text-dim);
+
+      font-family: var(--mono);
+
+      font-size: 11px;
+
+      letter-spacing: 0.10em;
+
+      text-transform: uppercase;
+
+      padding: 8px 14px;
+
+      cursor: pointer;
+
+      transition: color 200ms ease, border-color 200ms ease;
+
+    }
+
+    #export-snapshot-btn:hover {
+
+      border-color: var(--blue);
+
+      color: var(--text-bright);
+
+    }
+
+
+
     /* ═══════════════════════════════════════════════
+
        Main View
+
        ═══════════════════════════════════════════════ */
+
+
 
     /* -- Graph container -- */
+
     #graph {
+
       width: 100vw;
+
       height: 100vh;
+
       position: absolute;
+
       top: 0;
+
       left: 0;
+
     }
+
+
 
     /* -- Title (top-left) -- */
+
     #title {
+
       position: fixed;
+
       top: 20px;
+
       left: 20px;
+
       z-index: 10;
+
       font-family: var(--serif);
+
       font-size: 20px;
+
       font-weight: 600;
+
       letter-spacing: 0.01em;
+
       color: var(--text);
+
       pointer-events: none;
+
     }
+
+
 
     #reanalyze-btn {
+
       position: fixed;
+
       top: 48px;
+
       left: 20px;
+
       z-index: 10;
+
       background: var(--bg-panel);
+
       backdrop-filter: blur(8px);
+
       -webkit-backdrop-filter: blur(8px);
+
       border: 1px solid var(--border);
+
       border-radius: 6px;
+
       color: var(--text-dim);
+
       font-family: var(--mono);
+
       font-size: 10px;
+
       letter-spacing: 0.10em;
+
       text-transform: uppercase;
+
       padding: 5px 12px;
+
       cursor: pointer;
+
       transition: border-color 200ms ease, color 200ms ease;
+
     }
+
+
 
     #reanalyze-btn:hover {
+
       border-color: var(--blue);
+
       color: var(--blue);
+
     }
+
+
 
     /* -- Topology Switcher (top-center) -- */
+
     #controls {
+
       position: fixed;
+
       top: 20px;
+
       left: 50%;
+
       transform: translateX(-50%);
+
       display: flex;
+
       align-items: stretch;
+
       background: var(--bg-panel);
+
       backdrop-filter: blur(12px);
+
       -webkit-backdrop-filter: blur(12px);
+
       border: 1px solid var(--border);
+
       border-radius: 10px;
+
       z-index: 10;
+
       box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+
     }
+
+
 
     #controls button {
+
       background: transparent;
+
       color: var(--text-dim);
+
       border: none;
+
       padding: 8px 18px;
+
       border-bottom: 2px solid transparent;
+
       border-radius: 0;
+
       cursor: pointer;
+
       font-family: var(--mono);
+
       font-size: 11px;
+
       font-weight: 500;
+
       letter-spacing: 0.10em;
+
       text-transform: uppercase;
+
       white-space: nowrap;
+
       transition: color 200ms ease, border-color 200ms ease;
+
     }
+
+
 
     #controls button:hover {
+
       color: var(--text);
+
     }
+
+
 
     #controls button.active {
+
       color: var(--blue);
+
       border-bottom-color: var(--blue);
+
     }
+
+
 
     /* Dividers between control buttons */
+
     #controls button + button {
+
       border-left: 1px solid var(--border);
+
     }
+
+
 
     /* -- Info Panel (left side: network stats + clusters + key hint) -- */
+
     #info-panel {
+
       position: fixed;
+
       top: 50%;
+
       left: 20px;
+
       transform: translateY(-50%);
+
       z-index: 10;
+
       background: var(--bg-panel);
+
       backdrop-filter: blur(12px);
+
       -webkit-backdrop-filter: blur(12px);
+
       border: 1px solid var(--border);
+
       border-radius: 10px;
+
       font-family: var(--mono);
+
       font-size: 11px;
+
       letter-spacing: 0.06em;
+
       text-transform: uppercase;
+
       color: var(--text-dim);
+
       pointer-events: none;
+
       min-width: 180px;
+
       box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+
     }
+
+
 
     .info-section {
+
       padding: 7px 12px;
+
     }
+
+
 
     .info-section + .info-section {
+
       border-top: 1px solid var(--border);
+
     }
+
+
 
     .info-row {
+
       display: flex;
+
       justify-content: space-between;
+
       gap: 16px;
+
       margin-bottom: 2px;
+
       line-height: 1.5;
+
     }
+
+
 
     .info-row:last-child {
+
       margin-bottom: 0;
+
     }
+
+
 
     .info-key {
+
       color: var(--text-dim);
+
       flex-shrink: 0;
+
     }
+
+
 
     .info-val {
+
       color: var(--text-bright);
+
       text-align: right;
+
     }
+
+
 
     #key-hint {
+
       position: fixed;
+
       bottom: 16px;
+
       left: 50%;
+
       transform: translateX(-50%);
+
       font-family: var(--mono);
+
       font-size: 11px;
+
       letter-spacing: 0.1em;
+
       color: var(--text-dim);
+
       opacity: 0.6;
+
       pointer-events: none;
+
       z-index: 10;
+
     }
+
+
 
     /* -- Layout Description (below controls) -- */
+
     #layout-desc {
+
       position: fixed;
+
       top: 58px;
+
       left: 50%;
+
       transform: translateX(-50%);
+
       z-index: 10;
+
       font-family: var(--mono);
+
       font-size: 11px;
+
       letter-spacing: 0.06em;
+
       color: var(--text-dim);
+
       pointer-events: none;
+
       white-space: nowrap;
+
     }
+
+
 
     /* -- Boot Status Overlay (centered) -- */
+
     #boot-status {
+
       position: fixed;
+
       top: 50%;
+
       left: 50%;
+
       transform: translate(-50%, -50%);
+
       z-index: 20;
+
       display: flex;
+
       flex-direction: column;
+
       align-items: center;
+
       gap: 8px;
+
       pointer-events: none;
+
     }
+
+
 
     #boot-stage {
+
       font-family: var(--mono);
+
       font-size: 16px;
+
       font-weight: 500;
+
       letter-spacing: 0.10em;
+
       text-transform: uppercase;
+
       color: var(--text-bright);
+
     }
+
+
 
     #boot-detail {
+
       font-family: var(--mono);
+
       font-size: 12px;
+
       letter-spacing: 0.06em;
+
       color: var(--text-dim);
+
     }
+
+
 
     /* -- Side Panel (Detail Card) -- */
+
     #detail-card {
+
       position: fixed;
+
       top: 0;
+
       right: 0;
+
       width: var(--panel-width, 360px);
+
       height: 100vh;
+
       overflow-y: auto;
+
       background: var(--bg-panel);
+
       backdrop-filter: blur(16px);
+
       -webkit-backdrop-filter: blur(16px);
+
       border-left: 1px solid var(--border);
+
       z-index: 15;
+
       padding: 24px;
+
       transform: translateX(100%);
+
       transition: transform 300ms ease;
+
       box-shadow: -4px 0 24px rgba(0,0,0,0.08);
+
     }
+
+
 
     #detail-card.visible {
+
       transform: translateX(0);
+
     }
+
+
 
     /* -- Panel Resize Handle -- */
+
     #panel-resize {
+
       position: fixed;
+
       top: 0;
+
       width: 5px;
+
       height: 100vh;
+
       cursor: col-resize;
+
       z-index: 16;
+
       background: transparent;
+
       transition: background 150ms ease;
+
       display: none;
+
     }
+
+
 
     #panel-resize:hover,
+
     #panel-resize.dragging {
+
       background: var(--blue);
+
     }
+
+
 
     /* Scrollbar styling for detail card */
+
     #detail-card::-webkit-scrollbar {
+
       width: 4px;
+
     }
+
+
 
     #detail-card::-webkit-scrollbar-track {
+
       background: transparent;
+
     }
+
+
 
     #detail-card::-webkit-scrollbar-thumb {
+
       background: var(--border);
+
     }
+
+
 
     .card-header {
+
       display: flex;
+
       justify-content: space-between;
+
       align-items: flex-start;
+
       margin-bottom: 8px;
+
     }
+
+
 
     .card-title {
+
       font-family: var(--serif);
+
       font-size: 22px;
+
       font-weight: 600;
+
       color: var(--text-bright);
+
       letter-spacing: 0.01em;
+
       word-break: break-word;
+
       line-height: 1.2;
+
     }
+
+
 
     #card-close {
+
       background: transparent;
+
       border: none;
+
       border-radius: 0;
+
       color: var(--text-dim);
+
       font-family: var(--mono);
+
       font-size: 16px;
+
       cursor: pointer;
+
       padding: 0 0 0 8px;
+
       line-height: 1;
+
       transition: color 200ms ease;
+
       flex-shrink: 0;
+
     }
+
+
 
     #card-close:hover {
+
       color: var(--text-bright);
+
     }
+
+
 
     #card-cluster {
+
       margin-bottom: 10px;
+
     }
+
+
 
     .cluster-badge {
+
       display: inline-block;
+
       border: 1px solid var(--border);
+
       border-radius: 3px;
+
       font-family: var(--mono);
+
       font-size: 10px;
+
       font-weight: 500;
+
       letter-spacing: 0.08em;
+
       text-transform: uppercase;
+
       padding: 3px 10px;
+
       color: var(--text);
+
     }
+
+
 
     #card-meta {
+
       border-top: 1px solid var(--border);
+
       padding-top: 10px;
+
       margin-top: 10px;
+
     }
+
+
 
     .meta-row {
+
       display: flex;
+
       gap: 8px;
+
       font-size: 11px;
+
       line-height: 1.6;
+
       margin-bottom: 2px;
+
     }
+
+
 
     .meta-key {
+
       font-family: var(--mono);
+
       color: var(--text-dim);
+
       flex-shrink: 0;
+
       text-transform: uppercase;
+
       letter-spacing: 0.04em;
+
     }
+
+
 
     .meta-val {
+
       font-family: var(--sans);
+
       color: var(--text);
+
       word-break: break-word;
+
     }
+
+
 
     .meta-val a {
+
       color: var(--blue);
+
       text-decoration: none;
+
     }
+
+
 
     #card-preview {
+
       font-family: var(--sans);
+
       font-size: 13px;
+
       line-height: 1.6;
+
       color: var(--text-dim);
+
       border-top: 1px solid var(--border);
+
       padding-top: 10px;
+
       margin-top: 10px;
+
       white-space: pre-wrap;
+
       word-break: break-word;
+
     }
+
+
 
     #card-connections {
+
       border-top: 1px solid var(--border);
+
       padding-top: 10px;
+
       margin-top: 10px;
+
     }
+
+
 
     .conn-header {
+
       font-family: var(--mono);
+
       font-size: 11px;
+
       font-weight: 500;
+
       letter-spacing: 0.08em;
+
       text-transform: uppercase;
+
       color: var(--text-dim);
+
       margin-bottom: 6px;
+
     }
+
+
 
     .conn-item {
+
       font-size: 11px;
+
       line-height: 1.4;
+
       padding: 8px 0;
+
       border-bottom: 1px solid rgba(26, 42, 58, 0.5);
+
     }
+
+
 
     .conn-item:last-child {
+
       border-bottom: none;
+
     }
+
+
 
     .conn-edge {
+
       font-family: var(--mono);
+
       color: var(--text-dim);
+
       font-size: 12px;
+
       letter-spacing: 0.04em;
+
       display: block;
+
       margin-bottom: 3px;
+
     }
+
+
 
     .conn-edge .arrow {
+
       color: var(--text-dim);
+
       opacity: 0.6;
+
     }
+
+
 
     .conn-edge .label {
+
       font-family: var(--sans);
+
       font-style: italic;
+
       color: var(--text-dim);
+
     }
+
+
 
     .conn-name {
+
       font-family: var(--mono);
+
       color: var(--text);
+
       display: block;
+
       padding-left: 16px;
+
       font-size: 11px;
+
       cursor: pointer;
+
       transition: color 150ms ease;
+
     }
+
+
 
     .conn-name:hover {
+
       color: var(--text-bright);
+
     }
+
+
 
     /* -- Markers (medoid, LLM center) -- */
+
     .marker.medoid {
+
       color: #ef4444;
+
     }
+
+
 
     .marker.llm-center {
+
       color: #fb923c;
+
     }
+
+
 
     /* -- Cluster Labels Overlay -- */
+
     #cluster-labels {
+
       position: fixed;
+
       top: 0;
+
       left: 0;
+
       width: 100vw;
+
       height: 100vh;
+
       pointer-events: none;
+
       z-index: 5;
+
     }
+
+
 
     .cluster-label {
+
       position: absolute;
+
       font-family: var(--mono);
+
       font-size: 11px;
+
       letter-spacing: 0.10em;
+
       text-transform: uppercase;
+
       pointer-events: none;
+
     }
+
+
 
     /* -- Legend items inside info-panel -- */
+
     .legend-item {
+
       display: flex;
+
       align-items: center;
+
       gap: 8px;
+
       margin-bottom: 3px;
+
       line-height: 1.5;
+
     }
+
+
 
     .legend-item:last-child {
+
       margin-bottom: 0;
+
     }
+
+
 
     .legend-dot {
+
       width: 7px;
+
       height: 7px;
+
       border-radius: 999px;
+
       flex-shrink: 0;
+
     }
+
+
 
     .legend-label {
+
       font-size: 11px;
+
       color: var(--text-bright);
+
       white-space: nowrap;
+
     }
+
+
 
     .legend-special {
+
       border-top: 1px solid var(--border);
+
       margin-top: 5px;
+
       padding-top: 5px;
+
     }
+
+
 
     /* -- Scene Tooltip -- */
+
     .scene-tooltip {
+
       font-family: var(--mono);
+
       font-size: 12px;
+
       letter-spacing: 0.04em;
+
       background: var(--bg-panel);
+
       backdrop-filter: blur(8px);
+
       -webkit-backdrop-filter: blur(8px);
+
       border: 1px solid var(--border);
+
       border-radius: 0;
+
       padding: 6px 10px;
+
       color: var(--text);
+
       pointer-events: none;
+
     }
 
+
+
     /* ═══════════════════════════════════════════════
+
        Reduced Motion
+
        ═══════════════════════════════════════════════ */
+
     @media (prefers-reduced-motion: reduce) {
+
       *,
+
       *::before,
+
       *::after {
+
         animation-duration: 0.01ms !important;
+
         animation-iteration-count: 1 !important;
+
         transition-duration: 0.01ms !important;
+
       }
+
     }
 
+
+
     /* ═══════════════════════════════════════════════
+
        Config Panel
+
        ═══════════════════════════════════════════════ */
+
     /* ── CSS2D node labels ── */
+
     .node-label {
+
       font-family: 'Consolas', 'Courier New', monospace;
+
       font-size: 11px;
+
       line-height: 1.3;
+
       color: #3a3a4a;
+
       pointer-events: none;
+
       padding-left: 1.1em;
+
       text-indent: -1.1em;
+
       white-space: nowrap;
+
       opacity: 1.0;
+
       transition: opacity 0.15s ease;
+
     }
+
     .node-label .nl-bullet {
+
       font-size: 9px;
+
       vertical-align: 1px;
+
     }
+
     .node-label--special {
+
       color: #ff6b6b;
+
       opacity: 0.7;
+
     }
+
+.node-label .nl-text {
+
+      display: none;
+
+    }
+
+    .node-label--pinned .nl-text,
+
+    .node-label--hover .nl-text {
+
+      display: inline;
+
+    }
+
+    .node-label--pinned {
+
+      opacity: 0.9;
+
+    }
+
+    .node-label--pinned .nl-bullet {
+
+      font-size: 11px;
+
+    }
+
+
 
     /* Square-only mode — hide text, show just the bullet */
+
     .squares-only .node-label {
+
       padding-left: 0;
+
       text-indent: 0;
+
       text-align: center;
+
     }
+
     .squares-only .node-label .nl-text { display: none; }
+
     .squares-only .node-label .nl-bullet { font-size: 12px; }
 
+
+
     #theme-toggle {
+
       position: fixed;
+
       bottom: 20px;
+
       right: 20px;
+
       z-index: 10;
+
       background: var(--bg-panel);
+
       backdrop-filter: blur(8px);
+
       -webkit-backdrop-filter: blur(8px);
+
       border: 1px solid var(--border);
+
       border-radius: 8px;
+
       color: var(--text-dim);
+
       font-family: var(--mono);
+
       font-size: 11px;
+
       letter-spacing: 0.10em;
+
       text-transform: uppercase;
+
       padding: 8px 14px;
+
       cursor: pointer;
+
       transition: color 200ms ease, border-color 200ms ease;
+
     }
+
     #theme-toggle:hover {
+
       color: var(--text);
+
       border-color: var(--blue);
+
     }
+
+
 
   </style>
+
 </head>
+
 <body>
 
+
+
   <!-- ═══════════════════════════════════════════════
+
        Setup Screen
+
        ═══════════════════════════════════════════════ -->
+
   <div id="setup">
+
+    <canvas id="bg-canvas"></canvas>
+
     <div id="setup-title">Obsidian Universe</div>
+
     <div id="setup-subtitle">Neural Cartography of Ideas</div>
+
     <select id="provider-select">
+
       <option value="azure">AZURE OPENAI</option>
+
       <option value="gemini">GEMINI</option>
+
       <option value="openai">OPENAI</option>
+
       <option value="openrouter">OPENROUTER</option>
+
       <option value="ollama">OLLAMA LOCAL</option>
+
     </select>
+
     <label for="api-key-input" id="api-key-label">API Key</label>
+
     <input type="password" id="api-key-input" placeholder="Paste key" spellcheck="false" autocomplete="off">
+
     <label class="setup-field-label" for="base-url-input">Base URL</label>
+
     <input type="text" id="base-url-input" class="setup-model-input" placeholder="Azure endpoint URL" spellcheck="false" autocomplete="off">
+
     <label class="setup-field-label" for="chat-model-input">Chat Model</label>
+
     <input type="text" id="chat-model-input" class="setup-model-input" placeholder="gpt-5.4" spellcheck="false" autocomplete="off">
+
     <label class="setup-field-label" for="embedding-model-input">Embedding Model</label>
+
     <input type="text" id="embedding-model-input" class="setup-model-input" placeholder="text-embedding-3-small" spellcheck="false" autocomplete="off">
+
     <button id="pick-folder-btn">Select Notes Folder</button>
+
     <button id="load-cache-btn" class="hidden">Resume Previous Session</button>
+
     <div id="setup-status"></div>
+
+    <input id="folder-input" class="hidden" type="file" webkitdirectory directory multiple>
+
   </div>
 
+
+
   <!-- ═══════════════════════════════════════════════
+
        Main View
+
        ═══════════════════════════════════════════════ -->
+
   <div id="main" class="hidden">
 
+
+
     <!-- Graph container -->
+
     <div id="graph"></div>
 
+
+
     <!-- Title: top-left -->
+
     <div id="title">OBSIDIAN UNIVERSE</div>
+
     <button id="reanalyze-btn" class="hidden">RE-ANALYZE</button>
 
+
+
     <!-- Topology Switcher: top-center -->
+
     <div id="controls">
+
       <button class="active" data-layout="central">CORE</button>
+
       <button data-layout="decentral">CLUSTERS</button>
+
       <button data-layout="distrib">NEURAL</button>
+
     </div>
 
+
+
     <!-- Info Panel: left side (unified readouts + legend + key hint) -->
+
     <div id="info-panel">
+
       <div class="info-section">
+
         <div class="info-row"><span class="info-key">NODES</span><span class="info-val" id="readout-nodes">0</span></div>
+
         <div class="info-row"><span class="info-key">EDGES</span><span class="info-val" id="readout-edges">0</span></div>
+
         <div class="info-row"><span class="info-key">K-NN</span><span class="info-val" id="readout-knn">5</span></div>
+
       </div>
+
       <div class="info-section">
-        <div id="legend"></div>
+
+        <div class="info-row"><span class="info-key">FILES SCANNED</span><span class="info-val" id="readout-files-total">-</span></div>
+
+        <div class="info-row"><span class="info-key">MD/TXT FOUND</span><span class="info-val" id="readout-files-note">-</span></div>
+
+        <div class="info-row"><span class="info-key">EMPTY SKIPPED</span><span class="info-val" id="readout-files-empty">-</span></div>
+
+        <div class="info-row"><span class="info-key">NON-NOTE SKIPPED</span><span class="info-val" id="readout-files-other">-</span></div>
+
       </div>
+
+      <div class="info-section">
+
+        <div id="legend"></div>
+
+      </div>
+
     </div>
+
+
 
     <div id="key-hint">H — RECENTER</div>
 
+
+
     <!-- Layout Description: below controls -->
+
     <div id="layout-desc"></div>
 
+
+
     <!-- Boot Status Overlay: centered -->
+
     <div id="boot-status">
+
       <div id="boot-stage">INITIALIZING</div>
+
       <div id="boot-detail"></div>
+
     </div>
+
+
 
     <!-- Side Panel -->
+
     <div id="panel-resize"></div>
+
     <div id="detail-card">
+
       <div class="card-header">
+
         <div id="card-title" class="card-title"></div>
+
         <button id="card-close">&times;</button>
+
       </div>
+
       <div id="card-cluster">
+
         <span class="cluster-badge"></span>
+
       </div>
+
       <div id="card-meta"></div>
+
       <div id="card-preview"></div>
+
       <div id="card-connections">
+
         <div class="conn-header">CONNECTIONS</div>
+
       </div>
+
     </div>
 
+
+
     <!-- Cluster Labels Overlay -->
+
     <div id="cluster-labels"></div>
 
+
+
     <!-- Config Panel: bottom-right -->
+
+    <button id="copy-graph-link-btn" title="Copy link to restore graph">COPY LINK</button>
+
     <button id="export-snapshot-btn" title="Export graph as HTML">EXPORT</button>
+
     <button id="theme-toggle" title="Switch color theme">LIGHT</button>
+
+
 
   </div><!-- /main -->
 
+
+
   <script type="module">
+
     import { UMAP } from 'https://esm.sh/umap-js@1.4.0';
+
     import ForceGraph3D from 'https://esm.sh/3d-force-graph@1';
+
     import * as THREE from 'https://esm.sh/three@0.170.0';
+
     import { CSS2DRenderer, CSS2DObject } from 'https://esm.sh/three@0.170.0/addons/renderers/CSS2DRenderer.js';
+
     import { EffectComposer } from 'https://esm.sh/three@0.170.0/addons/postprocessing/EffectComposer.js';
+
     import { RenderPass } from 'https://esm.sh/three@0.170.0/addons/postprocessing/RenderPass.js';
+
     import { UnrealBloomPass } from 'https://esm.sh/three@0.170.0/addons/postprocessing/UnrealBloomPass.js';
 
+
+
+
+
     // ═══════════════════════════════════════════════
+
+    // Animated Pointillism Network Background
+
+    // ═══════════════════════════════════════════════
+
+    (function() {
+
+      const canvas = document.getElementById('bg-canvas');
+
+      if (!canvas) return;
+
+      const ctx = canvas.getContext('2d');
+
+      let W, H, particles = [];
+
+      const COLORS = ['#ff6b6b', '#4ecdc4', '#a78bfa', '#ffd93d', '#51cf66', '#4dabf7', '#ff9ff3'];
+
+      const MAX_DIST = 140;
+
+      const PARTICLE_COUNT = 80;
+
+
+
+      function resize() {
+
+        W = canvas.width = window.innerWidth;
+
+        H = canvas.height = window.innerHeight;
+
+      }
+
+      resize();
+
+      window.addEventListener('resize', resize);
+
+
+
+      function initParticles() {
+
+        particles = [];
+
+        for (let i = 0; i < PARTICLE_COUNT; i++) {
+
+          particles.push({
+
+            x: Math.random() * W,
+
+            y: Math.random() * H,
+
+            vx: (Math.random() - 0.5) * 0.4,
+
+            vy: (Math.random() - 0.5) * 0.4,
+
+            r: 1.5 + Math.random() * 2.5,
+
+            color: COLORS[Math.floor(Math.random() * COLORS.length)],
+
+            phase: Math.random() * Math.PI * 2,
+
+          });
+
+        }
+
+      }
+
+      initParticles();
+
+
+
+      let mouseX = -1000, mouseY = -1000;
+
+      window.addEventListener('mousemove', e => {
+
+        mouseX = e.clientX;
+
+        mouseY = e.clientY;
+
+      });
+
+      window.addEventListener('mouseleave', () => {
+
+        mouseX = -1000; mouseY = -1000;
+
+      });
+
+
+
+      let t = 0;
+
+      function animate() {
+
+        t += 0.01;
+
+        ctx.clearRect(0, 0, W, H);
+
+
+
+        // Update + draw particles
+
+        for (let i = 0; i < particles.length; i++) {
+
+          const p = particles[i];
+
+          p.x += p.vx;
+
+          p.y += p.vy;
+
+
+
+          // Bounce edges
+
+          if (p.x < 0 || p.x > W) p.vx *= -1;
+
+          if (p.y < 0 || p.y > H) p.vy *= -1;
+
+
+
+          // Mouse repel
+
+          const dx = p.x - mouseX;
+
+          const dy = p.y - mouseY;
+
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < 100) {
+
+            const force = (100 - dist) / 100;
+
+            p.x += (dx / dist) * force * 1.5;
+
+            p.y += (dy / dist) * force * 1.5;
+
+          }
+
+
+
+          // Pulse size
+
+          const pulseR = p.r + Math.sin(t + p.phase) * 0.5;
+
+
+
+          // Draw dot
+
+          ctx.beginPath();
+
+          ctx.arc(p.x, p.y, pulseR, 0, Math.PI * 2);
+
+          ctx.fillStyle = p.color;
+
+          ctx.globalAlpha = 0.5 + Math.sin(t + p.phase) * 0.15;
+
+          ctx.fill();
+
+        }
+
+
+
+        // Draw connections
+
+        ctx.globalAlpha = 1;
+
+        for (let i = 0; i < particles.length; i++) {
+
+          for (let j = i + 1; j < particles.length; j++) {
+
+            const p1 = particles[i];
+
+            const p2 = particles[j];
+
+            const dx = p1.x - p2.x;
+
+            const dy = p1.y - p2.y;
+
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < MAX_DIST) {
+
+              const alpha = (1 - dist / MAX_DIST) * 0.25;
+
+              ctx.beginPath();
+
+              ctx.moveTo(p1.x, p1.y);
+
+              ctx.lineTo(p2.x, p2.y);
+
+              ctx.strokeStyle = p1.color;
+
+              ctx.globalAlpha = alpha;
+
+              ctx.lineWidth = 0.8;
+
+              ctx.stroke();
+
+            }
+
+          }
+
+        }
+
+
+
+        // Draw mouse connections
+
+        if (mouseX > 0) {
+
+          for (let i = 0; i < particles.length; i++) {
+
+            const p = particles[i];
+
+            const dx = p.x - mouseX;
+
+            const dy = p.y - mouseY;
+
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < 160) {
+
+              const alpha = (1 - dist / 160) * 0.4;
+
+              ctx.beginPath();
+
+              ctx.moveTo(p.x, p.y);
+
+              ctx.lineTo(mouseX, mouseY);
+
+              ctx.strokeStyle = p.color;
+
+              ctx.globalAlpha = alpha;
+
+              ctx.lineWidth = 1;
+
+              ctx.stroke();
+
+            }
+
+          }
+
+        }
+
+
+
+        ctx.globalAlpha = 1;
+
+        requestAnimationFrame(animate);
+
+      }
+
+      animate();
+
+    })();
+
+
+
+    // ═══════════════════════════════════════════════
+
     // Provider Config Persistence
+
     // ═══════════════════════════════════════════════
+
     const CONFIG_STORAGE = 'obsidian-universe-config-v2';
+
     const AZURE_API_VERSION = '2024-02-01';
 
+
+
     const PROVIDER_PRESETS = {
+
       azure: {
+
         label: 'Azure OpenAI',
+
         apiKey: 'txyDbkIhCKgP33H7tlaQ3Mo9Zwd6Ag0B7hmqETxOxjsN9utsiPm3JQQJ99CFAC5T7U2XJ3w3AAAAACOGGeE2',
+
         baseUrl: 'https://ed-gpt-azamat.cognitiveservices.azure.com',
+
         apiVersion: AZURE_API_VERSION,
+
         chatModel: 'gpt-5.4',
+
         embeddingModel: 'text-embedding-3-small',
+
       },
+
       gemini: {
+
         label: 'Gemini',
+
         apiKey: '',
+
         baseUrl: 'https://generativelanguage.googleapis.com/v1beta',
+
         apiVersion: '',
+
         chatModel: 'gemini-2.5-flash',
+
         embeddingModel: 'gemini-embedding-001',
+
       },
+
       openai: {
+
         label: 'OpenAI',
+
         apiKey: '',
+
         baseUrl: 'https://api.openai.com/v1',
+
         apiVersion: '',
+
         chatModel: 'gpt-4o-mini',
+
         embeddingModel: 'text-embedding-3-small',
+
       },
+
       openrouter: {
+
         label: 'OpenRouter',
+
         apiKey: '',
+
         baseUrl: 'https://openrouter.ai/api/v1',
+
         apiVersion: '',
+
         chatModel: 'openai/gpt-4o-mini',
+
         embeddingModel: 'openai/text-embedding-3-small',
+
       },
+
       ollama: {
+
         label: 'Ollama Local',
+
         apiKey: '',
+
         baseUrl: 'http://localhost:11434/v1',
+
         apiVersion: '',
+
         chatModel: 'llama3.1:8b',
+
         embeddingModel: 'nomic-embed-text',
+
       },
+
     };
 
+
+
     function getSavedConfig() {
+
       try {
+
         const raw = localStorage.getItem(CONFIG_STORAGE);
+
         if (raw) return JSON.parse(raw);
+
       } catch (_) {}
+
       return null;
+
     }
+
+
 
     function saveConfig(config) {
+
       localStorage.setItem(CONFIG_STORAGE, JSON.stringify(config));
+
     }
+
+
 
     const providerSelect = document.getElementById('provider-select');
+
     const apiKeyInput = document.getElementById('api-key-input');
+
     const baseUrlInput = document.getElementById('base-url-input');
+
     const chatModelInput = document.getElementById('chat-model-input');
+
     const embeddingModelInput = document.getElementById('embedding-model-input');
 
+
+
     function applyProviderPreset(provider) {
+
       const preset = PROVIDER_PRESETS[provider] || PROVIDER_PRESETS.azure;
+
       apiKeyInput.value = preset.apiKey;
+
       baseUrlInput.value = preset.baseUrl;
+
       chatModelInput.value = preset.chatModel;
+
       embeddingModelInput.value = preset.embeddingModel;
+
       // Show/hide base URL field
+
       baseUrlInput.style.display = (provider === 'azure') ? 'block' : (provider === 'ollama' ? 'block' : 'none');
+
       baseUrlInput.previousElementSibling.style.display = baseUrlInput.style.display;
+
     }
+
+
 
     function getCurrentConfig() {
+
       return {
+
         provider: providerSelect.value,
+
         apiKey: apiKeyInput.value.trim(),
+
         baseUrl: baseUrlInput.value.trim(),
+
         apiVersion: providerSelect.value === 'azure' ? AZURE_API_VERSION : '',
+
         chatModel: chatModelInput.value.trim(),
+
         embeddingModel: embeddingModelInput.value.trim(),
+
       };
+
     }
+
+
 
     // Load saved config or defaults
+
     const savedCfg = getSavedConfig();
+
     if (savedCfg) {
+
       providerSelect.value = savedCfg.provider || 'azure';
+
       apiKeyInput.value = savedCfg.apiKey || '';
+
       baseUrlInput.value = savedCfg.baseUrl || '';
+
       chatModelInput.value = savedCfg.chatModel || '';
+
       embeddingModelInput.value = savedCfg.embeddingModel || '';
+
     } else {
+
       applyProviderPreset('azure');
+
     }
+
+
 
     providerSelect.addEventListener('change', () => {
+
       applyProviderPreset(providerSelect.value);
+
     });
 
+
+
     // ═══════════════════════════════════════════════
+
     // IndexedDB Cache
+
     // ═══════════════════════════════════════════════
+
+
 
     const DB_NAME = 'notes-network-cache';
+
     const DB_VERSION = 1;
+
     const STORE_NAME = 'sessions';
 
+
+
     function openDB() {
+
       return new Promise((resolve, reject) => {
+
         const req = indexedDB.open(DB_NAME, DB_VERSION);
+
         req.onupgradeneeded = () => {
+
           req.result.createObjectStore(STORE_NAME, { keyPath: 'id' });
+
         };
+
         req.onsuccess = () => resolve(req.result);
+
         req.onerror = () => reject(req.error);
+
       });
+
     }
+
+
 
     async function saveSession(data) {
+
       const db = await openDB();
+
       return new Promise((resolve, reject) => {
+
         const tx = db.transaction(STORE_NAME, 'readwrite');
+
         tx.objectStore(STORE_NAME).put({ id: 'latest', ...data, savedAt: Date.now() });
+
         tx.oncomplete = () => resolve();
+
         tx.onerror = () => reject(tx.error);
+
       });
+
     }
+
+
 
     async function loadSession() {
+
       const db = await openDB();
+
       return new Promise((resolve, reject) => {
+
         const tx = db.transaction(STORE_NAME, 'readonly');
+
         const req = tx.objectStore(STORE_NAME).get('latest');
+
         req.onsuccess = () => resolve(req.result || null);
+
         req.onerror = () => reject(req.error);
+
       });
+
     }
+
+
 
     // Check for cached session on load
+
     const loadCacheBtn = document.getElementById('load-cache-btn');
+
     loadSession().then(session => {
+
       if (session) {
+
         const ago = Math.round((Date.now() - session.savedAt) / 60000);
+
         const timeStr = ago < 60 ? `${ago}m ago` : `${Math.round(ago / 60)}h ago`;
+
         loadCacheBtn.textContent = `RESUME PREVIOUS SESSION // ${session.nodeCount} NOTES // ${timeStr}`;
+
         loadCacheBtn.classList.remove('hidden');
+
       }
+
     }).catch(() => {});
 
+
+
     // ═══════════════════════════════════════════════
+
     // Folder Picker & Note Reading
+
     // ═══════════════════════════════════════════════
-    async function pickFolder() {
-      const dirHandle = await window.showDirectoryPicker();
-      const filenames = [];
 
-      async function scanDir(handle) {
-        for await (const entry of handle.values()) {
-          if (entry.kind === 'file') {
-            const name = entry.name.toLowerCase();
-            if (name.endsWith('.md') || name.endsWith('.txt')) filenames.push(entry.name);
-          } else if (entry.kind === 'directory') {
-            await scanDir(entry);
-          }
-        }
-      }
+    function supportsDirectoryPicker() {
 
-      await scanDir(dirHandle);
-      filenames.sort();
-      return { dirHandle, folderName: dirHandle.name, filenames };
+      return typeof window.showDirectoryPicker === 'function';
+
     }
 
-    async function readNotesFromHandle(dirHandle) {
+
+
+    const folderInput = document.getElementById('folder-input');
+
+
+
+    function pickFolderWithInput() {
+
+      return new Promise((resolve, reject) => {
+
+        const cleanup = () => {
+
+          folderInput.removeEventListener('change', onChange);
+
+          window.removeEventListener('focus', onFocus);
+
+        };
+
+        const onChange = () => {
+
+          const files = Array.from(folderInput.files || []);
+
+          cleanup();
+
+          if (!files.length) {
+
+            reject(new DOMException('User cancelled folder selection', 'AbortError'));
+
+            return;
+
+          }
+
+          const folderName = (files[0].webkitRelativePath || files[0].name || 'folder').split('/')[0];
+
+          const filenames = files
+
+            .map(file => file.webkitRelativePath || file.name)
+
+            .filter(name => /\.(md|txt)$/i.test(name))
+
+            .sort();
+
+          resolve({
+
+            mode: 'input',
+
+            files,
+
+            folderName,
+
+            filenames,
+
+            fileStats: { totalFiles: files.length, noteFiles: filenames.length, nonNoteFiles: Math.max(0, files.length - filenames.length) },
+
+          });
+
+        };
+
+        const onFocus = () => {
+
+          setTimeout(() => {
+
+            if (!folderInput.files || !folderInput.files.length) {
+
+              cleanup();
+
+              reject(new DOMException('User cancelled folder selection', 'AbortError'));
+
+            }
+
+          }, 1000);
+
+        };
+
+        folderInput.addEventListener('change', onChange);
+
+        window.addEventListener('focus', onFocus);
+
+        folderInput.click();
+
+      });
+
+    }
+
+
+
+    async function readNotesFromSelection(files) {
+
       const notes = [];
+
       let id = 0;
 
-      async function readDir(handle) {
-        for await (const entry of handle.values()) {
-          if (entry.kind === 'file') {
-            const name = entry.name.toLowerCase();
-            if (name.endsWith('.md') || name.endsWith('.txt')) {
-              const file = await entry.getFile();
-              const text = await file.text();
-              if (text.trim()) {
-                notes.push({ id: id++, filename: entry.name, text: text.trim() });
-              }
-            }
-          } else if (entry.kind === 'directory') {
-            await readDir(entry);
-          }
+      let emptySkipped = 0;
+
+      for (const file of files) {
+
+        const name = (file.webkitRelativePath || file.name).toLowerCase();
+
+        if (!name.endsWith('.md') && !name.endsWith('.txt')) continue;
+
+        const text = await file.text();
+
+        if (text.trim()) {
+
+          notes.push({ id: id++, filename: file.name, text: text.trim() });
+
+        } else {
+
+          emptySkipped++;
+
         }
+
       }
 
-      await readDir(dirHandle);
-      return notes;
+      return { notes, emptySkipped };
+
     }
+
+
+
+    async function pickFolder() {
+
+      if (!supportsDirectoryPicker()) {
+
+        return pickFolderWithInput();
+
+      }
+
+      const dirHandle = await window.showDirectoryPicker();
+
+      const filenames = [];
+
+
+
+      async function scanDir(handle) {
+
+        for await (const entry of handle.values()) {
+
+          if (entry.kind === 'file') {
+
+            const name = entry.name.toLowerCase();
+
+            if (name.endsWith('.md') || name.endsWith('.txt')) filenames.push(entry.name);
+
+          } else if (entry.kind === 'directory') {
+
+            await scanDir(entry);
+
+          }
+
+        }
+
+      }
+
+
+
+      await scanDir(dirHandle);
+
+      filenames.sort();
+
+      return { dirHandle, folderName: dirHandle.name, filenames };
+
+    }
+
+
+
+    async function readNotesFromHandle(dirHandle) {
+
+      const notes = [];
+
+      let id = 0;
+
+
+
+      async function readDir(handle) {
+
+        for await (const entry of handle.values()) {
+
+          if (entry.kind === 'file') {
+
+            const name = entry.name.toLowerCase();
+
+            if (name.endsWith('.md') || name.endsWith('.txt')) {
+
+              const file = await entry.getFile();
+
+              const text = await file.text();
+
+              if (text.trim()) {
+
+                notes.push({ id: id++, filename: entry.name, text: text.trim() });
+
+              }
+
+            }
+
+          } else if (entry.kind === 'directory') {
+
+            await readDir(entry);
+
+          }
+
+        }
+
+      }
+
+
+
+      await readDir(dirHandle);
+
+      return notes;
+
+    }
+
+
 
     function folderFingerprint(folderName, filenames) {
+
       return folderName + '::' + filenames.join('|');
+
     }
 
+
+
     // ═══════════════════════════════════════════════
+
     // Button Wiring & Screen Transition
+
     // ═══════════════════════════════════════════════
+
     const pickFolderBtn = document.getElementById('pick-folder-btn');
+
     const setupStatus = document.getElementById('setup-status');
 
+
+
     // Restore graph from a cached session object
+
     async function restoreFromCache(session) {
+
       document.getElementById('setup').classList.add('hidden');
+
       document.getElementById('main').classList.remove('hidden');
+
       document.getElementById('reanalyze-btn').classList.remove('hidden');
+
+
 
       setBootStage('RESTORING...', `${session.nodeCount} NOTES`);
 
+
+
       allNodes = session.graphNodes;
+
       edgeSets = {
+
         central: (session.centralEdges || []).map(e => ({ ...e, topology: 'central' })),
+
         decentral: (session.decentralEdges || []).map(e => ({ ...e, topology: 'decentral' })),
+
         distrib: (session.labeledEdges || []).map(e => ({ ...e, topology: 'distrib' })),
+
       };
+
       const combined = [...edgeSets.central, ...edgeSets.decentral, ...edgeSets.distrib];
+
       initGraph(allNodes, combined);
+
       buildLegend(session.clusterNames);
+
       buildClusterLabels(session.clusterNames);
+
       const activeEdges = edgeSets[currentLayout] || [];
+
       buildReadouts(session.nodeCount, activeEdges.length);
 
+
+
       setBootStage(`SCOPE ONLINE // ${session.nodeCount} NODES // ${activeEdges.length} EDGES`, 'RESTORED FROM CACHE');
+
       setTimeout(hideBootStatus, 2000);
+
     }
 
+
+
     // Track the last-picked dirHandle so RE-ANALYZE can re-read the same folder
+
     let lastDirHandle = null;
 
+    let lastPickResult = null;
+
+
+
     pickFolderBtn.addEventListener('click', async () => {
+
       const config = getCurrentConfig();
+
       if (!config.apiKey) {
+
         setupStatus.textContent = 'ERROR: API KEY REQUIRED';
+
         return;
+
       }
+
       saveConfig(config);
 
+
+
       try {
+
         setupStatus.textContent = 'SCANNING...';
+
         const { dirHandle, folderName, filenames } = await pickFolder();
+
         if (filenames.length === 0) {
+
           setupStatus.textContent = 'ERROR: NO .MD OR .TXT FILES FOUND';
+
           return;
+
         }
+
         lastDirHandle = dirHandle;
+
         setupStatus.textContent = `FOUND ${filenames.length} NOTES`;
 
+
+
         // Check cache for matching folder
+
         const fp = folderFingerprint(folderName, filenames);
+
         const session = await loadSession().catch(() => null);
+
         if (session && session.fingerprint === fp) {
+
           setupStatus.textContent = `CACHE HIT — RESTORING ${session.nodeCount} NOTES`;
+
           await sleep(300);
+
           restoreFromCache(session);
+
           return;
+
         }
+
+
 
         // No cache match — read full content and run pipeline
+
         setupStatus.textContent = `READING ${filenames.length} NOTES...`;
+
         const notes = await readNotesFromHandle(dirHandle);
+
         if (notes.length === 0) {
+
           setupStatus.textContent = 'ERROR: NO .MD OR .TXT FILES FOUND';
+
           return;
+
         }
+
         setupStatus.textContent = `LOADED ${notes.length} NOTES`;
 
+
+
         document.getElementById('setup').classList.add('hidden');
+
         document.getElementById('main').classList.remove('hidden');
+
         document.getElementById('reanalyze-btn').classList.remove('hidden');
 
+
+
         runPipeline(notes, config, fp);
+
       } catch (err) {
+
         if (err.name === 'AbortError') return; // user cancelled picker
+
         setupStatus.textContent = 'ERROR: ' + err.message.toUpperCase();
+
       }
+
     });
+
+
 
     // Load from cache (fallback button — no folder match needed)
+
     loadCacheBtn.addEventListener('click', async () => {
+
       try {
+
         setupStatus.textContent = 'LOADING CACHED SESSION...';
+
         const session = await loadSession();
+
         if (!session) {
+
           setupStatus.textContent = 'ERROR: NO CACHED SESSION FOUND';
+
           return;
+
         }
+
         restoreFromCache(session);
+
       } catch (err) {
+
         setupStatus.textContent = 'ERROR: ' + err.message.toUpperCase();
+
       }
+
     });
+
+
 
     // RE-ANALYZE button — force re-run pipeline on the same folder
+
     document.getElementById('reanalyze-btn').addEventListener('click', async () => {
+
       const savedConfig = getSavedConfig() || getCurrentConfig();
+
       if (!savedConfig.apiKey) return;
+
       if (!lastDirHandle) {
+
         // No folder handle — need to re-pick
+
         document.getElementById('main').classList.add('hidden');
+
         document.getElementById('setup').classList.remove('hidden');
+
         setupStatus.textContent = 'SELECT FOLDER AGAIN TO RE-ANALYZE';
+
         return;
+
       }
+
       try {
+
         setBootStage('RE-ANALYZING...', 'READING NOTES');
+
         showBootStatus();
+
         const notes = await readNotesFromHandle(lastDirHandle);
+
         if (notes.length === 0) {
+
           setBootStage('ERROR', 'NO NOTES FOUND');
+
           return;
+
         }
+
         // Scan filenames for fingerprint
+
         const filenames = notes.map(n => n.filename).sort();
+
         const fp = folderFingerprint(lastDirHandle.name, filenames);
+
         runPipeline(notes, config, fp);
+
       } catch (err) {
+
         setBootStage('ERROR', err.message);
+
       }
+
     });
 
+
+
     // ═══════════════════════════════════════════════
+
     // Gemini API — Embeddings & Generation
+
     // ═══════════════════════════════════════════════
+
     async function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+
 
     const EMBED_BATCH_SIZE = 20;
 
+
+
     async function embedTexts(texts, config, onProgress) {
+
       const allEmbeddings = [];
+
       const provider = config.provider;
+
+
 
       for (let i = 0; i < texts.length; i += EMBED_BATCH_SIZE) {
+
         const batch = texts.slice(i, i + EMBED_BATCH_SIZE);
+
         let response;
+
         let retries = 0;
+
         const maxRetries = 5;
 
+
+
         if (provider === 'azure') {
+
           // Retry with backoff for rate limits
+
           while (retries < maxRetries) {
+
             response = await fetch(
+
               `${config.baseUrl}/openai/deployments/${config.embeddingModel}/embeddings?api-version=${config.apiVersion}`,
+
               {
+
                 method: 'POST',
+
                 headers: { 'Content-Type': 'application/json', 'api-key': config.apiKey },
+
                 body: JSON.stringify({ input: batch }),
+
               }
+
             );
+
             if (response.ok) break;
+
             if (response.status === 429 || response.status === 503) {
+
               const retryAfter = Math.min(parseInt(response.headers.get('Retry-After') || '5'), 5);
+
               retries++;
+
               if (retries < maxRetries) {
+
                 await sleep(retryAfter * 1000);
+
                 continue;
+
               }
+
             }
+
             const err = await response.json().catch(() => ({}));
+
             throw new Error(`Azure embedding error: ${err.error?.message || response.statusText}`);
+
           }
+
           const data = await response.json();
+
           const vectors = data.data.map(e => e.embedding);
+
           allEmbeddings.push(...vectors);
+
         } else if (provider === 'gemini') {
+
           response = await fetch(
+
             `${config.baseUrl}/models/${config.embeddingModel}:batchEmbedContents?key=${config.apiKey}`,
+
             {
+
               method: 'POST',
+
               headers: { 'Content-Type': 'application/json' },
+
               body: JSON.stringify({
+
                 requests: batch.map(text => ({
+
                   model: `models/${config.embeddingModel}`,
+
                   content: { parts: [{ text }] },
+
                 })),
+
               }),
+
             }
+
           );
+
           if (!response.ok) {
+
             const err = await response.json().catch(() => ({}));
+
             throw new Error(`Gemini embedding error: ${err.error?.message || response.statusText}`);
+
           }
+
           const data = await response.json();
+
           const vectors = data.embeddings.map(e => e.values);
+
           allEmbeddings.push(...vectors);
+
         } else {
+
           // OpenAI-compatible (OpenAI, OpenRouter, Ollama)
+
           response = await fetch(
+
             `${config.baseUrl}/embeddings`,
+
             {
+
               method: 'POST',
+
               headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${config.apiKey}` },
+
               body: JSON.stringify({ model: config.embeddingModel, input: batch }),
+
             }
+
           );
+
           if (!response.ok) {
+
             const err = await response.json().catch(() => ({}));
+
             throw new Error(`Embedding error: ${err.error?.message || response.statusText}`);
+
           }
+
           const data = await response.json();
+
           const vectors = data.data.map(e => e.embedding);
+
           allEmbeddings.push(...vectors);
+
         }
+
+
 
         if (onProgress) onProgress(Math.min(i + EMBED_BATCH_SIZE, texts.length), texts.length);
+
       }
+
+
 
       return allEmbeddings;
+
     }
+
+
 
     async function generateContent(prompt, config) {
+
       const provider = config.provider;
+
       let response;
 
+
+
       if (provider === 'azure') {
+
         let retries = 0;
+
         while (retries < 5) {
+
           response = await fetch(
+
             `${config.baseUrl}/openai/deployments/${config.chatModel}/chat/completions?api-version=${config.apiVersion}`,
+
             {
+
               method: 'POST',
+
               headers: { 'Content-Type': 'application/json', 'api-key': config.apiKey },
+
               body: JSON.stringify({
+
                 messages: [{ role: 'user', content: prompt }],
+
                 max_completion_tokens: 2000,
+
               }),
+
             }
+
           );
+
           if (response.ok) break;
+
           if (response.status === 429 || response.status === 503) {
+
             const retryAfter = Math.min(parseInt(response.headers.get('Retry-After') || '5'), 5);
+
             retries++;
+
             if (retries < 5) {
+
               await sleep(retryAfter * 1000);
+
               continue;
+
             }
+
           }
+
           const err = await response.json().catch(() => ({}));
+
           throw new Error(`Azure LLM error: ${err.error?.message || response.statusText}`);
+
         }
+
         const data = await response.json();
+
         return data.choices?.[0]?.message?.content || '';
+
       } else if (provider === 'gemini') {
+
         response = await fetch(
+
           `${config.baseUrl}/models/${config.chatModel}:generateContent?key=${config.apiKey}`,
+
           {
+
             method: 'POST',
+
             headers: { 'Content-Type': 'application/json' },
+
             body: JSON.stringify({
+
               contents: [{ parts: [{ text: prompt }] }],
+
             }),
+
           }
+
         );
+
         if (!response.ok) {
+
           const err = await response.json().catch(() => ({}));
+
           throw new Error(`Gemini LLM error: ${err.error?.message || response.statusText}`);
+
         }
+
         const data = await response.json();
+
         return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
       } else {
+
         // OpenAI-compatible (OpenAI, OpenRouter, Ollama)
+
         response = await fetch(
+
           `${config.baseUrl}/chat/completions`,
+
           {
+
             method: 'POST',
+
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${config.apiKey}` },
+
             body: JSON.stringify({
+
               model: config.chatModel,
+
               messages: [{ role: 'user', content: prompt }],
+
             }),
+
           }
+
         );
+
         if (!response.ok) {
+
           const err = await response.json().catch(() => ({}));
+
           throw new Error(`LLM error: ${err.error?.message || response.statusText}`);
+
         }
+
         const data = await response.json();
+
         return data.choices?.[0]?.message?.content || '';
+
       }
+
     }
 
+
+
     // ═══════════════════════════════════════════════
+
     // Math Pipeline — Vector Ops, Clustering, PCA, k-NN
+
     // ═══════════════════════════════════════════════
+
+
 
     function dot(a, b) {
+
       let sum = 0;
+
       for (let i = 0; i < a.length; i++) sum += a[i] * b[i];
+
       return sum;
+
     }
+
+
 
     function vecNorm(a) {
+
       return Math.sqrt(dot(a, a));
+
     }
+
+
 
     function cosineDistance(a, b) {
+
       const d = dot(a, b) / (vecNorm(a) * vecNorm(b) + 1e-9);
+
       return 1 - d;
+
     }
+
+
 
     function cosineDistanceMatrix(embeddings) {
+
       const n = embeddings.length;
+
       const matrix = Array.from({ length: n }, () => new Float64Array(n));
+
       for (let i = 0; i < n; i++) {
+
         for (let j = i + 1; j < n; j++) {
+
           const d = cosineDistance(embeddings[i], embeddings[j]);
+
           matrix[i][j] = d;
+
           matrix[j][i] = d;
+
         }
+
       }
+
       return matrix;
+
     }
+
+
 
     function normalizeRange(arr) {
+
       let mn = Infinity, mx = -Infinity;
+
       for (const v of arr) { if (v < mn) mn = v; if (v > mx) mx = v; }
+
       const range = mx - mn || 1e-9;
+
       return arr.map(v => 2 * (v - mn) / range - 1);
+
     }
+
+
 
     function subtractVec(a, b) {
+
       return a.map((v, i) => v - b[i]);
+
     }
+
+
 
     function addVec(a, b) {
+
       return a.map((v, i) => v + b[i]);
+
     }
+
+
 
     function scaleVec(a, s) {
+
       return a.map(v => v * s);
+
     }
 
+
+
     function meanVec(vectors) {
+
       const n = vectors.length;
+
       const dim = vectors[0].length;
+
       const result = new Array(dim).fill(0);
+
       for (const v of vectors) {
+
         for (let i = 0; i < dim; i++) result[i] += v[i];
+
       }
+
       return result.map(v => v / n);
+
     }
+
+
 
     // --- KMeans Clustering (k-means++ init) ---
 
+
+
     function kmeans(embeddings, k, maxIter = 50) {
+
       const n = embeddings.length;
+
       const dim = embeddings[0].length;
 
+
+
       // k-means++ initialization
+
       const centroids = [];
+
       const used = new Set();
+
       let first = Math.floor(Math.random() * n);
+
       centroids.push([...embeddings[first]]);
+
       used.add(first);
 
+
+
       for (let c = 1; c < k; c++) {
+
         let bestIdx = 0, bestDist = -1;
+
         for (let i = 0; i < n; i++) {
+
           if (used.has(i)) continue;
+
           const minDist = Math.min(...centroids.map(cen => cosineDistance(embeddings[i], cen)));
+
           if (minDist > bestDist) { bestDist = minDist; bestIdx = i; }
+
         }
+
         centroids.push([...embeddings[bestIdx]]);
+
         used.add(bestIdx);
+
       }
+
+
 
       let labels = new Int32Array(n);
 
+
+
       for (let iter = 0; iter < maxIter; iter++) {
+
         let changed = false;
+
         for (let i = 0; i < n; i++) {
+
           let bestC = 0, bestD = Infinity;
+
           for (let c = 0; c < k; c++) {
+
             const d = cosineDistance(embeddings[i], centroids[c]);
+
             if (d < bestD) { bestD = d; bestC = c; }
+
           }
+
           if (labels[i] !== bestC) changed = true;
+
           labels[i] = bestC;
+
         }
+
         if (!changed) break;
 
+
+
         for (let c = 0; c < k; c++) {
+
           const members = [];
+
           for (let i = 0; i < n; i++) {
+
             if (labels[i] === c) members.push(embeddings[i]);
+
           }
+
           if (members.length > 0) centroids[c] = meanVec(members);
+
         }
+
       }
 
+
+
       return { labels: Array.from(labels), centroids };
+
     }
+
+
 
     // --- PCA 3D (power iteration) ---
 
+
+
     function pca3d(embeddings) {
+
       const n = embeddings.length;
+
       const dim = embeddings[0].length;
+
       const mean = meanVec(embeddings);
+
       const centered = embeddings.map(e => subtractVec(e, mean));
+
       const components = [];
+
       let residual = centered.map(row => [...row]);
 
+
+
       for (let comp = 0; comp < Math.min(3, n - 1); comp++) {
+
         let vec = Array.from({ length: dim }, () => Math.random() - 0.5);
+
         let vn = vecNorm(vec);
+
         vec = vec.map(v => v / vn);
 
+
+
         for (let iter = 0; iter < 100; iter++) {
+
           const projections = residual.map(row => dot(row, vec));
+
           const newVec = new Array(dim).fill(0);
+
           for (let i = 0; i < n; i++) {
+
             for (let j = 0; j < dim; j++) {
+
               newVec[j] += residual[i][j] * projections[i];
+
             }
+
           }
+
           vn = vecNorm(newVec);
+
           if (vn < 1e-12) break;
+
           vec = newVec.map(v => v / vn);
+
         }
 
+
+
         components.push(vec);
+
         const projections = residual.map(row => dot(row, vec));
+
         residual = residual.map((row, i) =>
+
           row.map((v, j) => v - projections[i] * vec[j])
+
         );
+
       }
+
+
 
       // Pad to 3 components if fewer
+
       while (components.length < 3) {
+
         components.push(new Array(dim).fill(0));
+
       }
 
+
+
       return centered.map(row => components.map(comp => dot(row, comp)));
+
     }
+
+
 
     // --- k-NN Edge Builder ---
 
+
+
     function knnEdges(distMatrix, k) {
+
       const n = distMatrix.length;
+
       const edgeSet = new Set();
 
+
+
       for (let i = 0; i < n; i++) {
+
         const neighbors = Array.from({ length: n }, (_, j) => j)
+
           .filter(j => j !== i)
+
           .sort((a, b) => distMatrix[i][a] - distMatrix[i][b])
+
           .slice(0, k);
 
+
+
         for (const j of neighbors) {
+
           const edge = i < j ? `${i},${j}` : `${j},${i}`;
+
           edgeSet.add(edge);
+
         }
+
       }
+
+
 
       return Array.from(edgeSet).map(e => {
+
         const [a, b] = e.split(',').map(Number);
+
         return [a, b];
+
       }).sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+
     }
 
+
+
     // ═══════════════════════════════════════════════
+
     // Layout Computation — Centralized, Decentralized, Distributed
+
     // ═══════════════════════════════════════════════
+
+
 
     function fibonacciSphere(n) {
+
       const points = [];
+
       const goldenRatio = (1 + Math.sqrt(5)) / 2;
+
       for (let i = 0; i < n; i++) {
+
         const theta = Math.acos(1 - 2 * (i + 0.5) / n);
+
         const phi = 2 * Math.PI * i / goldenRatio;
+
         points.push([
+
           Math.sin(theta) * Math.cos(phi),
+
           Math.sin(theta) * Math.sin(phi),
+
           Math.cos(theta),
+
         ]);
+
       }
+
       return points;
+
     }
+
+
 
     function computeCentralizedLayout(embeddings, pcaCoords) {
+
       const n = embeddings.length;
+
       const centroid = meanVec(embeddings);
 
+
+
       // Find medoid (closest to centroid)
+
       let medoidIdx = 0, bestDist = Infinity;
+
       for (let i = 0; i < n; i++) {
+
         const d = cosineDistance(embeddings[i], centroid);
+
         if (d < bestDist) { bestDist = d; medoidIdx = i; }
+
       }
+
+
 
       // Spherical layout: PCA angles, cosine distance for radius
+
       const centerPca = pcaCoords[medoidIdx];
+
       const relative = pcaCoords.map(p => subtractVec(p, centerPca));
 
+
+
       const rPca = relative.map(r => Math.sqrt(r[0]**2 + r[1]**2 + r[2]**2) + 1e-9);
+
       const theta = relative.map((r, i) => Math.acos(Math.max(-1, Math.min(1, r[2] / rPca[i]))));
+
       const phi = relative.map(r => Math.atan2(r[1], r[0]));
 
+
+
       const distsFromMedoid = embeddings.map(e => cosineDistance(e, embeddings[medoidIdx]));
+
       const maxDist = Math.max(...distsFromMedoid) + 1e-9;
+
       const radii = distsFromMedoid.map(d => d / maxDist);
 
+
+
       const x = radii.map((r, i) => r * Math.sin(theta[i]) * Math.cos(phi[i]));
+
       const y = radii.map((r, i) => r * Math.sin(theta[i]) * Math.sin(phi[i]));
+
       const z = radii.map((r, i) => r * Math.cos(theta[i]));
 
+
+
       return {
+
         x: normalizeRange(x),
+
         y: normalizeRange(y),
+
         z: normalizeRange(z),
+
         medoidIdx,
+
       };
+
     }
+
+
 
     function computeDecentralizedLayout(embeddings, clusterLabels, k) {
+
       const n = embeddings.length;
+
       const hubPositions = fibonacciSphere(k).map(p => scaleVec(p, 0.6));
+
       const orbitRadius = 0.25;
 
+
+
       const x = new Array(n).fill(0);
+
       const y = new Array(n).fill(0);
+
       const z = new Array(n).fill(0);
 
+
+
       for (let c = 0; c < k; c++) {
+
         const indices = [];
+
         for (let i = 0; i < n; i++) {
+
           if (clusterLabels[i] === c) indices.push(i);
+
         }
+
         const nInCluster = indices.length;
 
+
+
         if (nInCluster === 0) continue;
+
         if (nInCluster === 1) {
+
           x[indices[0]] = hubPositions[c][0];
+
           y[indices[0]] = hubPositions[c][1];
+
           z[indices[0]] = hubPositions[c][2];
+
         } else if (nInCluster === 2) {
+
           const offset = orbitRadius * 0.3;
+
           x[indices[0]] = hubPositions[c][0] - offset;
+
           y[indices[0]] = hubPositions[c][1];
+
           z[indices[0]] = hubPositions[c][2];
+
           x[indices[1]] = hubPositions[c][0] + offset;
+
           y[indices[1]] = hubPositions[c][1];
+
           z[indices[1]] = hubPositions[c][2];
+
         } else {
+
           const clusterEmbeddings = indices.map(i => embeddings[i]);
+
           const localCoords = pca3d(clusterEmbeddings);
+
           const localMax = Math.max(...localCoords.flat().map(Math.abs)) + 1e-9;
 
+
+
           indices.forEach((idx, j) => {
+
             x[idx] = hubPositions[c][0] + (localCoords[j][0] / localMax) * orbitRadius;
+
             y[idx] = hubPositions[c][1] + (localCoords[j][1] / localMax) * orbitRadius;
+
             z[idx] = hubPositions[c][2] + (localCoords[j][2] / localMax) * orbitRadius;
+
           });
+
         }
+
       }
 
+
+
       return { x: normalizeRange(x), y: normalizeRange(y), z: normalizeRange(z) };
+
     }
 
+
+
     function computeDistributedLayout(embeddings, kNeighbors) {
+
       const umap = new UMAP({
+
         nComponents: 3,
+
         nNeighbors: Math.min(kNeighbors, embeddings.length - 1),
+
         minDist: 0.1,
+
         distanceFn: cosineDistance,
+
       });
+
+
 
       const coords = umap.fit(embeddings);
 
+
+
       return {
+
         x: normalizeRange(coords.map(c => c[0])),
+
         y: normalizeRange(coords.map(c => c[1])),
+
         z: normalizeRange(coords.map(c => c[2])),
+
       };
+
     }
 
-    // ═══════════════════════════════════════════════
-    // LLM Annotation Pipeline
+
+
     // ═══════════════════════════════════════════════
 
+    // LLM Annotation Pipeline
+
+    // ═══════════════════════════════════════════════
+
+
+
     async function nominateCenter(notes, config) {
+
       const summaries = notes.map(n => `[${n.id}] ${n.text.slice(0, 150)}`).join('\n');
+
+
 
       const prompt = `I have a collection of personal notes. I want to find the ONE core idea that all others secretly orbit around — the gravitational center.
 
+
+
 Here are all the notes:
+
 ${summaries}
 
+
+
 Which ONE note (by its [id]) is the core idea that all others connect back to? Respond with:
+
 - The note id (just the number)
+
 - A 1-2 sentence explanation of why this is the center
 
+
+
 Format:
+
 CENTER: <id>
+
 REASON: <explanation>`;
 
+
+
       const response = await generateContent(prompt, config);
+
       const match = response.match(/CENTER:\s*(\d+)/);
+
       return match ? parseInt(match[1]) : 0;
+
     }
 
+
+
     async function nameClusters(notes, clusterLabels, k, config) {
+
       let clusterInfo = '';
+
       for (let c = 0; c < k; c++) {
+
         const indices = clusterLabels.map((l, i) => l === c ? i : -1).filter(i => i >= 0);
+
         const clusterNotes = indices.map(i => `  [${notes[i].id}] ${notes[i].text.slice(0, 100)}`).join('\n');
+
         clusterInfo += `\nCLUSTER ${c} (${indices.length} notes):\n${clusterNotes}\n`;
+
       }
+
+
 
       const prompt = `I've clustered a collection of personal notes into ${k} groups. Name each cluster.
 
+
+
 ${clusterInfo}
+
+
 
 For each cluster, give it a short name (2-4 words) that captures its theme.
 
+
+
 Format:
+
 CLUSTER 0: <name>
+
 CLUSTER 1: <name>
+
 ...`;
 
+
+
       const response = await generateContent(prompt, config);
+
       const names = {};
+
       for (const match of response.matchAll(/CLUSTER\s+(\d+):\s*(.+)/g)) {
+
         names[parseInt(match[1])] = match[2].trim().replace(/\*\*/g, '');
+
       }
+
       for (let c = 0; c < k; c++) {
+
         if (!names[c]) names[c] = `Cluster ${c}`;
+
       }
+
       return names;
+
     }
+
+
 
     const EDGE_LABEL_BATCH = 20;
 
+
+
     async function labelEdges(notes, edges, config, onProgress) {
+
       const labeled = [];
 
+
+
       for (let i = 0; i < edges.length; i += EDGE_LABEL_BATCH) {
+
         const batch = edges.slice(i, i + EDGE_LABEL_BATCH);
 
+
+
         let pairsText = '';
+
         batch.forEach(([a, b], idx) => {
+
           pairsText += `\nPAIR ${idx}:\n  A [${a}]: ${notes[a].text.slice(0, 200)}\n  B [${b}]: ${notes[b].text.slice(0, 200)}\n`;
+
         });
+
+
 
         const prompt = `I have pairs of personal notes that are neighbors in an idea network. For each pair, describe the specific relationship in BOTH directions using short, actionable verb phrases (2-5 words).
 
+
+
 Be specific and contextual — NOT generic labels like "relates to" or "is similar to". Think about HOW they connect:
+
 - Does one inspire the other? ("could spark", "seeds the idea of")
+
 - Is one a premise for the other? ("grounds", "is the foundation for")
+
 - Do they contradict? ("tensions with", "challenges")
+
 - Does one extend the other? ("builds on", "takes further")
+
 - Does one reframe the other? ("reframes", "is the same thing seen from")
+
+
 
 ${pairsText}
 
+
+
 Format (one line per pair):
+
 PAIR 0: A→B: <verb phrase> | B→A: <verb phrase>
+
 PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
+
 ...`;
+
+
 
         const response = await generateContent(prompt, config);
 
+
+
         batch.forEach(([a, b], idx) => {
+
           const pattern = new RegExp(`PAIR\\s+${idx}:.*?A→B:\\s*(.+?)\\s*\\|\\s*B→A:\\s*(.+?)\\s*$`, 'm');
+
           const match = response.match(pattern);
+
           const fwd = match ? match[1].trim().replace(/\.$/, '') : 'connects to';
+
           const bwd = match ? match[2].trim().replace(/\.$/, '') : 'connects to';
+
           labeled.push({ source: a, target: b, label_forward: fwd, label_backward: bwd, topology: 'distrib' });
+
         });
 
+
+
         if (onProgress) onProgress(Math.min(i + EDGE_LABEL_BATCH, edges.length), edges.length);
+
       }
 
+
+
       return labeled;
+
     }
 
+
+
     // ═══════════════════════════════════════════════
+
     // Boot Status Helpers
+
     // ═══════════════════════════════════════════════
+
+
 
     function setBootStage(stage, detail = '') {
+
       document.getElementById('boot-stage').textContent = stage;
+
       document.getElementById('boot-detail').textContent = detail;
+
     }
+
+
 
     function hideBootStatus() {
+
       const el = document.getElementById('boot-status');
+
       el.style.transition = 'opacity 600ms ease';
+
       el.style.opacity = '0';
+
       setTimeout(() => { el.classList.add('hidden'); }, 600);
+
     }
+
+
 
     function showBootStatus() {
+
       const el = document.getElementById('boot-status');
+
       el.classList.remove('hidden');
+
       el.style.opacity = '1';
+
     }
 
+
+
     // ═══════════════════════════════════════════════
+
     // Config Constants
+
     // ═══════════════════════════════════════════════
+
+
 
     const N_CLUSTERS = 5;
+
     const K_NEIGHBORS = 5;
+
     const SCALE = 280;
+
     let CLUSTER_COLORS = ['#c45c3e', '#d4a843', '#a8523a', '#c47a43', '#8b3a2a'];
 
+
+
     function syncClusterColors() {
+
       CLUSTER_COLORS = [VFX.cluster0.val, VFX.cluster1.val, VFX.cluster2.val, VFX.cluster3.val, VFX.cluster4.val];
+
     }
 
+
+
     // ═══════════════════════════════════════════════
+
     // VFX Configuration
+
     // ═══════════════════════════════════════════════
+
+
 
     const VFX = {
+
       // Colors + alphas
+
       bgColor:            { val: '#f2efe9', label: 'BACKGROUND',   section: 'COLORS',   refresh: 'colors', type: 'color' },
+
       bgAlpha:            { val: 1.0,   min: 0, max: 1, step: 0.05, label: 'BG ALPHA',        section: 'COLORS',   refresh: 'colors' },
+
       labelColor:         { val: '#3a3a4a', label: 'LABEL TEXT',    section: 'COLORS',   refresh: 'colors', type: 'color' },
+
       labelAlpha:         { val: 1.0,   min: 0, max: 1, step: 0.05, label: 'LABEL ALPHA',     section: 'COLORS',   refresh: 'colors' },
+
       linkColor:          { val: '#4dabf7', label: 'LINK',          section: 'COLORS',   refresh: 'colors', type: 'color' },
+
       linkAlpha:          { val: 0.6,   min: 0, max: 1, step: 0.01, label: 'LINK ALPHA',      section: 'COLORS',   refresh: 'colors' },
+
       particleColor:      { val: '#ff6b6b', label: 'PARTICLE',      section: 'COLORS',   refresh: 'colors', type: 'color' },
+
       particleAlpha:      { val: 1.0,   min: 0, max: 1, step: 0.05, label: 'PARTICLE ALPHA',  section: 'COLORS',   refresh: 'colors' },
+
       // Cluster colors
+
       cluster0:           { val: '#ff6b6b', label: 'CLUSTER 1',     section: 'CLUSTERS', refresh: 'clusters', type: 'color' },
+
       cluster1:           { val: '#4ecdc4', label: 'CLUSTER 2',     section: 'CLUSTERS', refresh: 'clusters', type: 'color' },
+
       cluster2:           { val: '#a78bfa', label: 'CLUSTER 3',     section: 'CLUSTERS', refresh: 'clusters', type: 'color' },
+
       cluster3:           { val: '#ffd93d', label: 'CLUSTER 4',     section: 'CLUSTERS', refresh: 'clusters', type: 'color' },
+
       cluster4:           { val: '#51cf66', label: 'CLUSTER 5',     section: 'CLUSTERS', refresh: 'clusters', type: 'color' },
+
       clusterAlpha:       { val: 1.0,   min: 0, max: 1, step: 0.05, label: 'BULLET ALPHA',    section: 'CLUSTERS', refresh: 'clusters' },
+
       // Hit-target scale (affects hover detection area)
+
       nodeScale:          { val: 18,    min: 4,    max: 40,   step: 1,     label: 'HIT AREA',        section: 'NODES',      refresh: 'scale' },
+
       nodeScaleSpecial:   { val: 26,    min: 8,    max: 50,   step: 1,     label: 'HIT SPECIAL',     section: 'NODES',      refresh: 'scale' },
+
       // Hover
+
       hoverScale:         { val: 1.5,   min: 1.0,  max: 2.5,  step: 0.1,   label: 'HOVER SCALE',     section: 'HOVER',      refresh: 'none' },
+
       neighborScale:      { val: 1.1,   min: 1.0,  max: 1.5,  step: 0.05,  label: 'NEIGHBOR SCALE',  section: 'HOVER',      refresh: 'none' },
+
       dimOpacity:         { val: 0.15,  min: 0,    max: 0.5,  step: 0.05,  label: 'DIM ALPHA',       section: 'HOVER',      refresh: 'none' },
+
       dimScale:           { val: 0.85,  min: 0.5,  max: 1.0,  step: 0.05,  label: 'DIM SCALE',       section: 'HOVER',      refresh: 'none' },
+
       // Edges
+
       linkOpacityHover:   { val: 0.20,  min: 0,    max: 0.6,  step: 0.01,  label: 'LINK ALPHA HOVER', section: 'EDGES',     refresh: 'none' },
+
       linkWidthVal:       { val: 0.9,   min: 0.1,  max: 4,    step: 0.1,   label: 'LINK WIDTH',      section: 'EDGES',      refresh: 'links' },
+
       linkWidthHover:     { val: 1,     min: 0.5,  max: 6,    step: 0.5,   label: 'LINK W HOVER',    section: 'EDGES',      refresh: 'none' },
+
       particleCount:      { val: 1,     min: 0,    max: 8,    step: 1,     label: 'PARTICLES',       section: 'EDGES',      refresh: 'links' },
+
       particleSpeed:      { val: 0.006, min: 0.001, max: 0.015, step: 0.001, label: 'PARTICLE SPD',  section: 'EDGES',      refresh: 'links' },
+
       particleWidth:      { val: 2,     min: 0.5,  max: 4,    step: 0.5,   label: 'PARTICLE W',      section: 'EDGES',      refresh: 'links' },
+
       linkCurvatureVal:   { val: 0.50,  min: 0,    max: 0.5,  step: 0.05,  label: 'CURVATURE',       section: 'EDGES',      refresh: 'links' },
+
       linkHoverPrec:      { val: 18,    min: 2,    max: 40,   step: 1,     label: 'HOVER PREC',      section: 'EDGES',      refresh: 'links' },
+
       // Post-processing
+
       bloomStrength:      { val: 0.4,   min: 0,    max: 3.0,  step: 0.05,  label: 'BLOOM STR',       section: 'POST FX',    refresh: 'postfx' },
+
       bloomRadius:        { val: 0.4,   min: 0,    max: 1.0,  step: 0.05,  label: 'BLOOM RADIUS',    section: 'POST FX',    refresh: 'postfx' },
+
       bloomThreshold:     { val: 0.15,  min: 0,    max: 1.0,  step: 0.05,  label: 'BLOOM THRESH',    section: 'POST FX',    refresh: 'postfx' },
+
       // UI Chrome (CSS variable colors)
+
       chromeBg:           { val: '#0a0a0f', label: 'UI BG',        section: 'UI CHROME', refresh: 'chrome', type: 'color' },
+
       chromeBgPanel:      { val: '#080807', label: 'PANEL BG',     section: 'UI CHROME', refresh: 'chrome', type: 'color' },
+
       chromeBgPanelA:     { val: 0.88, min: 0, max: 1, step: 0.05, label: 'PANEL ALPHA', section: 'UI CHROME', refresh: 'chrome' },
+
       chromeBorder:       { val: '#cd6d13', label: 'BORDER',       section: 'UI CHROME', refresh: 'chrome', type: 'color' },
+
       chromeText:         { val: '#e8cea6', label: 'TEXT',          section: 'UI CHROME', refresh: 'chrome', type: 'color' },
+
       chromeTextDim:      { val: '#cd8218', label: 'TEXT DIM',     section: 'UI CHROME', refresh: 'chrome', type: 'color' },
+
       chromeTextBright:   { val: '#ffeab8', label: 'TEXT BRIGHT',  section: 'UI CHROME', refresh: 'chrome', type: 'color' },
+
       chromeAccent:       { val: '#d07b1b', label: 'ACCENT',       section: 'UI CHROME', refresh: 'chrome', type: 'color' },
+
       chromeCyan:         { val: '#d4a843', label: 'CYAN',          section: 'UI CHROME', refresh: 'chrome', type: 'color' },
+
       chromeLightCyan:    { val: '#e8c46a', label: 'LIGHT CYAN',  section: 'UI CHROME', refresh: 'chrome', type: 'color' },
+
       chromeIndigo:       { val: '#c47a43', label: 'INDIGO',       section: 'UI CHROME', refresh: 'chrome', type: 'color' },
+
       chromeAmber:        { val: '#d4a843', label: 'AMBER',        section: 'UI CHROME', refresh: 'chrome', type: 'color' },
+
     };
 
+
+
     // ═══════════════════════════════════════════════
+
     // Color Themes
+
     // ═══════════════════════════════════════════════
+
+
 
     const COLOR_THEMES = {
+
       warm: {
+
         bgColor: '#f2efe9', bgAlpha: 1.0,
+
         labelColor: '#3a3a4a', labelAlpha: 1.0,
+
         linkColor: '#4dabf7', linkAlpha: 0.5,
+
         particleColor: '#ff6b6b', particleAlpha: 1.0,
+
         cluster0: '#ff6b6b', cluster1: '#4ecdc4', cluster2: '#a78bfa',
+
         cluster3: '#ffd93d', cluster4: '#51cf66', clusterAlpha: 1.0,
+
         chromeBg: '#f2efe9', chromeBgPanel: '#ffffff', chromeBgPanelA: 0.82,
+
         chromeBorder: '#3a3a4a', chromeText: '#3a3a4a', chromeTextDim: '#8a8a9a',
+
         chromeTextBright: '#1a1a2a', chromeAccent: '#4dabf7',
+
         chromeCyan: '#4ecdc4', chromeLightCyan: '#7ee8e0',
+
         chromeIndigo: '#a78bfa', chromeAmber: '#ffd93d',
+
       },
+
       grey: {
+
         bgColor: '#0a0a12', bgAlpha: 1.0,
+
         labelColor: '#b0b8d0', labelAlpha: 1.0,
+
         linkColor: '#5060a0', linkAlpha: 0.4,
+
         particleColor: '#7080c0', particleAlpha: 1.0,
+
         cluster0: '#ff6b6b', cluster1: '#4ecdc4', cluster2: '#a78bfa',
+
         cluster3: '#ffd93d', cluster4: '#51cf66', clusterAlpha: 1.0,
+
         chromeBg: '#0a0a12', chromeBgPanel: '#0e0e1a', chromeBgPanelA: 0.92,
+
         chromeBorder: '#3a3a5a', chromeText: '#b0b8d0', chromeTextDim: '#606080',
+
         chromeTextBright: '#e0e8ff', chromeAccent: '#5060a0',
+
         chromeCyan: '#4ecdc4', chromeLightCyan: '#7ee8e0',
+
         chromeIndigo: '#a78bfa', chromeAmber: '#ffd93d',
+
       },
+
     };
+
+
 
     let currentTheme = 'warm';
 
+
+
     function applyTheme(name) {
+
       const theme = COLOR_THEMES[name];
+
       if (!theme) return;
+
       currentTheme = name;
 
+
+
       // Apply VFX color values
+
       for (const [key, val] of Object.entries(theme)) {
+
         if (VFX[key]) VFX[key].val = val;
+
       }
+
       syncClusterColors();
 
+
+
       // Update config panel inputs if open
+
       const panel = document.getElementById('config-panel');
+
       if (panel && panel.children.length) {
+
         for (const [key, val] of Object.entries(theme)) {
+
           const input = panel.querySelector(`[data-key="${key}"]`);
+
           const display = panel.querySelector(`[data-vfx="${key}"]`);
+
           if (input) input.value = val;
+
           if (display) display.textContent = typeof val === 'number' ? val.toFixed(2) : val;
+
         }
+
       }
+
+
 
       // Refresh visuals
+
       refreshColors();
+
       refreshClusters();
+
       refreshChrome();
 
+
+
       // Update button label
+
       document.getElementById('theme-toggle').textContent = name === 'warm' ? 'LIGHT' : 'DARK';
+
     }
 
+
+
     // ═══════════════════════════════════════════════
+
     // Custom Node Rendering — CSS2D text labels
+
     // ═══════════════════════════════════════════════
+
+
 
     function wrapNodeLabel(name) {
+
       const words = (name || '').split(/\s+/).slice(0, 4);
+
       if (!words.length) return [];
+
       const maxChars = 12;
+
       const lines = [];
+
       let current = '';
+
       for (const word of words) {
+
         if (current && (current.length + 1 + word.length) > maxChars) {
+
           lines.push(current);
+
           current = word;
+
         } else {
+
           current = current ? current + ' ' + word : word;
+
         }
+
       }
+
       if (current) lines.push(current);
+
       return lines;
+
     }
+
+
 
     function createNodeObject(node) {
+
       const color = CLUSTER_COLORS[node.cluster_id % CLUSTER_COLORS.length];
+
       const isSpecial = node.is_medoid || node.is_llm_center;
+
       const baseScale = isSpecial ? VFX.nodeScaleSpecial.val : VFX.nodeScale.val;
 
+
+
       // Invisible hit-target sprite for raycasting
+
       const hitMat = new THREE.SpriteMaterial({
+
         transparent: true,
+
         opacity: 0,
+
         depthWrite: false,
+
       });
+
       const hitSprite = new THREE.Sprite(hitMat);
+
       hitSprite.scale.set(baseScale, baseScale, 1);
 
+
+
       const group = new THREE.Group();
+
       group.add(hitSprite);
 
+
+
       // CSS2D label — constant screen-space size regardless of zoom
+
       const lines = wrapNodeLabel(node.name);
+
       if (lines.length) {
+
         const div = document.createElement('div');
-        div.className = 'node-label' + (isSpecial ? ' node-label--special' : '');
+
+        div.className = 'node-label' + (isSpecial ? ' node-label--special node-label--pinned' : '');
+
         div.style.color = VFX.labelColor.val;
+
         div.style.opacity = String(VFX.labelAlpha.val);
+
         let html = `<span class="nl-bullet" style="color:${color};opacity:${VFX.clusterAlpha.val}">\u25A0</span><span class="nl-text"> ${lines[0]}`;
+
         for (let i = 1; i < lines.length; i++) html += `<br>${lines[i]}`;
+
         html += '</span>';
+
         div.innerHTML = html;
+
         const labelObj = new CSS2DObject(div);
+
         group.add(labelObj);
+
         node.__labelDiv = div;
+
       }
+
+
 
       node.__baseScale = baseScale;
+
       return group;
+
     }
+
+
 
     function updateNodeAppearance(node, state) {
+
       const lbl = node.__labelDiv;
+
       if (!lbl) return;
+
       switch (state) {
+
         case 'hover':
+
           lbl.style.opacity = '1';
+
           break;
+
         case 'neighbor':
+
           lbl.style.opacity = String(Math.min(1, VFX.labelAlpha.val + 0.15));
+
           break;
+
         case 'dim':
+
           lbl.style.opacity = String(VFX.dimOpacity.val * 0.3);
+
           break;
+
         default:
+
           lbl.style.opacity = String(VFX.labelAlpha.val);
+
       }
+
     }
 
+
+
     // ═══════════════════════════════════════════════
+
     // VFX Refresh Helpers
+
     // ═══════════════════════════════════════════════
+
+
 
     let nodeRefreshTimer = null;
 
+
+
     function scheduleNodeRefresh() {
+
       clearTimeout(nodeRefreshTimer);
+
       nodeRefreshTimer = setTimeout(() => {
+
         if (!Graph) return;
+
         Graph.nodeThreeObject(node => createNodeObject(node));
+
       }, 80);
+
     }
+
+
 
     function refreshNodeScales() {
+
       // Group-based nodes have baseScale baked into children — full rebuild needed
+
       scheduleNodeRefresh();
+
     }
+
+
 
     function refreshLinks() {
+
       if (!Graph) return;
+
       Graph
+
         .linkColor(link => getLinkColor(link))
+
         .linkWidth(link => getLinkWidth(link))
+
         .linkOpacity(1.0)
+
         .linkDirectionalParticles(VFX.particleCount.val)
+
         .linkDirectionalParticleSpeed(VFX.particleSpeed.val)
+
         .linkDirectionalParticleWidth(VFX.particleWidth.val)
+
         .linkDirectionalParticleColor(() => `rgba(${hexToRgb(VFX.particleColor.val)},${VFX.particleAlpha.val})`)
+
         .linkCurvature(VFX.linkCurvatureVal.val)
+
         .linkHoverPrecision(VFX.linkHoverPrec.val);
+
     }
+
+
 
     function refreshPostFx() {
+
       if (!bloomPass) return;
+
       bloomPass.strength = VFX.bloomStrength.val;
+
       bloomPass.radius = VFX.bloomRadius.val;
+
       bloomPass.threshold = VFX.bloomThreshold.val;
+
     }
+
+
 
     function refreshColors() {
+
       if (!Graph) return;
+
       // Background (with alpha)
+
       const bgRgb = hexToRgb(VFX.bgColor.val);
+
       Graph.backgroundColor(`rgba(${bgRgb},${VFX.bgAlpha.val})`);
+
       // Label text color + alpha (reset non-hovered labels to current alpha)
+
       document.querySelectorAll('.node-label').forEach(el => {
+
         el.style.color = VFX.labelColor.val;
+
         el.style.opacity = String(VFX.labelAlpha.val);
+
       });
+
       // Links + particles
+
       refreshLinks();
+
     }
+
+
 
     function refreshClusters() {
+
       syncClusterColors();
+
       // Update legend dot colors
+
       document.querySelectorAll('[data-cluster-dot]').forEach(el => {
+
         const idx = parseInt(el.dataset.clusterDot);
+
         el.style.background = CLUSTER_COLORS[idx % CLUSTER_COLORS.length];
+
       });
+
       // Update floating cluster label colors
+
       Object.entries(clusterLabelEls).forEach(([id, el]) => {
+
         el.style.color = CLUSTER_COLORS[id % CLUSTER_COLORS.length];
+
       });
+
       // Rebuild node labels with new bullet colors
+
       scheduleNodeRefresh();
+
     }
+
+
 
     function refreshChrome() {
+
       const root = document.documentElement;
+
       root.style.setProperty('--bg', VFX.chromeBg.val);
+
       root.style.setProperty('--bg-panel', `rgba(${hexToRgb(VFX.chromeBgPanel.val)},${VFX.chromeBgPanelA.val})`);
+
       root.style.setProperty('--border', VFX.chromeBorder.val);
+
       root.style.setProperty('--text', VFX.chromeText.val);
+
       root.style.setProperty('--text-dim', VFX.chromeTextDim.val);
+
       root.style.setProperty('--text-bright', VFX.chromeTextBright.val);
+
       root.style.setProperty('--blue', VFX.chromeAccent.val);
+
       root.style.setProperty('--cyan', VFX.chromeCyan.val);
+
       root.style.setProperty('--light-cyan', VFX.chromeLightCyan.val);
+
       root.style.setProperty('--indigo', VFX.chromeIndigo.val);
+
       root.style.setProperty('--amber', VFX.chromeAmber.val);
+
     }
 
+
+
     // ═══════════════════════════════════════════════
+
     // Pipeline Orchestrator
+
     // ═══════════════════════════════════════════════
+
+
 
     async function runPipeline(notes, config, fingerprint) {
+
       try {
+
         // ── STAGE 1: SCANNING ──
+
         setBootStage('SCANNING...', `${notes.length} NOTES LOADED`);
+
         await sleep(300); // brief pause so user sees it
 
+
+
         // ── STAGE 2: EMBEDDING ──
+
         const texts = notes.map(n => n.text.slice(0, 2000));
+
         const embeddings = await embedTexts(texts, config, (done, total) => {
+
           setBootStage('EMBEDDING...', `${done}/${total}`);
+
         });
 
+
+
         // ── STAGE 3: COMPUTING TOPOLOGY ──
+
         setBootStage('COMPUTING TOPOLOGY...', 'CLUSTERING');
+
         await sleep(50);
+
         const k = Math.min(N_CLUSTERS, notes.length);
+
         const { labels: clusterLabels } = kmeans(embeddings, k);
 
+
+
         setBootStage('COMPUTING TOPOLOGY...', 'PCA');
+
         await sleep(50);
+
         const pcaCoords = pca3d(embeddings);
 
+
+
         setBootStage('COMPUTING TOPOLOGY...', 'CENTRALIZED LAYOUT');
+
         await sleep(50);
+
         const central = computeCentralizedLayout(embeddings, pcaCoords);
 
+
+
         setBootStage('COMPUTING TOPOLOGY...', 'DECENTRALIZED LAYOUT');
+
         await sleep(50);
+
         const decentral = computeDecentralizedLayout(embeddings, clusterLabels, k);
 
+
+
         setBootStage('COMPUTING TOPOLOGY...', 'UMAP');
+
         await sleep(50);
+
         const distrib = computeDistributedLayout(embeddings, K_NEIGHBORS);
 
+
+
         setBootStage('COMPUTING TOPOLOGY...', 'K-NN EDGES');
+
         await sleep(50);
+
         const distMatrix = cosineDistanceMatrix(embeddings);
+
         const edges = knnEdges(distMatrix, K_NEIGHBORS);
+
+
 
         // ── Compute topology-specific edge sets ──
 
+
+
         // Centralized: star from medoid to every other node
+
         const centralEdges = [];
+
         for (let i = 0; i < notes.length; i++) {
+
           if (i === central.medoidIdx) continue;
+
           centralEdges.push({
+
             source: central.medoidIdx,
+
             target: i,
+
             label_forward: 'radiates to',
+
             label_backward: 'orbits center',
+
             topology: 'central',
+
           });
+
         }
+
+
 
         // Decentralized: find cluster medoids, connect hub→members + hub↔hub
+
         const clusterMedoids = {};
+
         for (let c = 0; c < k; c++) {
+
           const members = [];
+
           for (let i = 0; i < notes.length; i++) {
+
             if (clusterLabels[i] === c) members.push(i);
+
           }
+
           if (members.length === 0) continue;
+
           // Find cluster medoid (closest to cluster centroid)
+
           const clusterEmbs = members.map(i => embeddings[i]);
+
           const centroid = meanVec(clusterEmbs);
+
           let bestIdx = members[0], bestDist = Infinity;
+
           for (const i of members) {
+
             const d = cosineDistance(embeddings[i], centroid);
+
             if (d < bestDist) { bestDist = d; bestIdx = i; }
+
           }
+
           clusterMedoids[c] = bestIdx;
+
         }
+
+
 
         const decentralEdges = [];
+
         // Hub → members
+
         for (let c = 0; c < k; c++) {
+
           const hub = clusterMedoids[c];
+
           if (hub === undefined) continue;
+
           for (let i = 0; i < notes.length; i++) {
+
             if (clusterLabels[i] === c && i !== hub) {
+
               decentralEdges.push({
+
                 source: hub,
+
                 target: i,
+
                 label_forward: 'governs',
+
                 label_backward: 'belongs to hub',
+
                 topology: 'decentral',
+
               });
+
             }
+
           }
+
         }
+
         // Hub ↔ hub
+
         const hubs = Object.values(clusterMedoids);
+
         for (let a = 0; a < hubs.length; a++) {
+
           for (let b = a + 1; b < hubs.length; b++) {
+
             decentralEdges.push({
+
               source: hubs[a],
+
               target: hubs[b],
+
               label_forward: 'bridges to',
+
               label_backward: 'bridges to',
+
               topology: 'decentral',
+
             });
+
           }
+
         }
+
+
 
         // ── Build node data ──
+
         const graphNodes = notes.map((note, i) => ({
+
           id: note.id,
+
           filename: note.filename,
+
           name: note.filename.replace(/\.(md|txt)$/i, ''),
+
           text_preview: note.text.slice(0, 600),
+
           cluster_id: clusterLabels[i],
+
           x_central: central.x[i],
+
           y_central: central.y[i],
+
           z_central: central.z[i],
+
           x_decentral: decentral.x[i],
+
           y_decentral: decentral.y[i],
+
           z_decentral: decentral.z[i],
+
           x_distrib: distrib.x[i],
+
           y_distrib: distrib.y[i],
+
           z_distrib: distrib.z[i],
+
           is_medoid: i === central.medoidIdx ? 1 : 0,
+
           is_llm_center: 0,
+
           cluster_name: '',
+
         }));
+
+
 
         // Initialize graph with white/uncolored nodes (no annotations yet)
+
         setBootStage('COMPUTING TOPOLOGY...', 'INITIALIZING GRAPH');
+
         await sleep(50);
+
         initGraph(graphNodes, []);
 
+
+
         // ── STAGE 4: ANNOTATING ──
+
         setBootStage('ANNOTATING...', 'CENTER NOMINATION');
+
         const llmCenterIdx = await nominateCenter(notes, config);
+
         graphNodes.forEach(n => {
+
           n.is_llm_center = n.id === llmCenterIdx ? 1 : 0;
+
         });
+
+
 
         setBootStage('ANNOTATING...', 'CLUSTER NAMES');
+
         const clusterNames = await nameClusters(notes, clusterLabels, k, config);
+
         graphNodes.forEach(n => {
+
           n.cluster_name = clusterNames[n.cluster_id] || `Cluster ${n.cluster_id}`;
+
         });
+
+
 
         // Update graph with cluster colors and names (refresh node objects for LLM center decoration)
+
         updateGraphData(graphNodes, [], true);
 
+
+
         // Progressive edge labeling — batch in the pipeline for incremental reveal
+
         const labeledEdges = [];
+
         for (let i = 0; i < edges.length; i += EDGE_LABEL_BATCH) {
+
           const batchEdges = edges.slice(i, i + EDGE_LABEL_BATCH);
+
           const batchResult = await labelEdges(notes, batchEdges, config);
+
           labeledEdges.push(...batchResult);
+
           setBootStage('ANNOTATING...', `EDGE LABELS ${Math.min(i + EDGE_LABEL_BATCH, edges.length)}/${edges.length}`);
+
           // Show progressive edges during labeling
+
           updateGraphData(graphNodes, [...centralEdges, ...decentralEdges, ...labeledEdges]);
+
         }
+
+
 
         // Store edge sets for readout counts; combine all for the graph
+
         edgeSets = { central: centralEdges, decentral: decentralEdges, distrib: labeledEdges };
+
         allNodes = graphNodes;
+
         const combined = [...centralEdges, ...decentralEdges, ...labeledEdges];
+
         updateGraphData(graphNodes, combined);
+
         // Show only edges for the active topology
+
         Graph.linkVisibility(link => link.topology === currentLayout);
 
+
+
         // ── STAGE 5: ONLINE ──
+
         buildLegend(clusterNames);
+
         buildClusterLabels(clusterNames);
+
         const activeEdges = edgeSets[currentLayout] || [];
+
         buildReadouts(notes.length, activeEdges.length);
 
+
+
         // Cache session to IndexedDB — whitelist serialization to avoid Three.js/d3 objects
+
         const NODE_SAVE_KEYS = [
+
           'id', 'filename', 'name', 'text_preview', 'cluster_id', 'cluster_name',
+
           'x_central', 'y_central', 'z_central',
+
           'x_decentral', 'y_decentral', 'z_decentral',
+
           'x_distrib', 'y_distrib', 'z_distrib',
+
           'is_medoid', 'is_llm_center',
+
         ];
+
         const serializableNodes = graphNodes.map(n => {
+
           const clean = {};
+
           for (const k of NODE_SAVE_KEYS) if (n[k] !== undefined) clean[k] = n[k];
+
           return clean;
+
         });
+
         const serializeEdges = arr => arr.map(e => ({
+
           source: typeof e.source === 'object' ? e.source.id : e.source,
+
           target: typeof e.target === 'object' ? e.target.id : e.target,
+
           label_forward: e.label_forward || '',
+
           label_backward: e.label_backward || '',
+
         }));
+
         try {
+
           await saveSession({
+
             graphNodes: serializableNodes,
+
             labeledEdges: serializeEdges(labeledEdges),
+
             centralEdges: serializeEdges(centralEdges),
+
             decentralEdges: serializeEdges(decentralEdges),
+
             clusterNames,
+
             nodeCount: notes.length,
+
             fingerprint: fingerprint || '',
+
           });
+
           console.log('Cache saved:', serializableNodes.length, 'nodes');
+
         } catch (cacheErr) {
+
           console.error('Cache save failed:', cacheErr);
+
           setBootStage(`SCOPE ONLINE // ${notes.length} NODES // CACHE SAVE FAILED`, cacheErr.message);
+
         }
 
+
+
         setBootStage(`SCOPE ONLINE // ${notes.length} NODES // ${labeledEdges.length} EDGES`, '');
+
         setTimeout(hideBootStatus, 2000);
 
+
+
       } catch (err) {
+
         setBootStage('ERROR', err.message);
+
         console.error('Pipeline error:', err);
+
       }
+
     }
 
-    // ═══════════════════════════════════════════════
-    // 3D Graph Rendering + Scope Overlays
+
+
     // ═══════════════════════════════════════════════
 
+    // 3D Graph Rendering + Scope Overlays
+
+    // ═══════════════════════════════════════════════
+
+
+
     let Graph;
+
     let bloomPass;
+
     let currentLayout = 'central';
+
     let hoverNode = null;
+
     let selectedNode = null;
+
     let adjacency = {};
+
     let neighborSets = {};
+
     let nodeById = {};
+
     let allNodes = [];
+
     let edgeSets = { central: [], decentral: [], distrib: [] };
+
+
 
     // ── Lookup builders ──
 
+
+
     function rebuildLookups(nodes, edges) {
+
       adjacency = {};
+
       neighborSets = {};
+
       nodeById = {};
+
       nodes.forEach(n => { nodeById[n.id] = n; });
+
       edges.forEach(e => {
+
         if (!adjacency[e.source]) adjacency[e.source] = [];
+
         if (!adjacency[e.target]) adjacency[e.target] = [];
+
         adjacency[e.source].push({ id: e.target, label: e.label_forward });
+
         adjacency[e.target].push({ id: e.source, label: e.label_backward });
+
         if (!neighborSets[e.source]) neighborSets[e.source] = new Set();
+
         if (!neighborSets[e.target]) neighborSets[e.target] = new Set();
+
         neighborSets[e.source].add(e.target);
+
         neighborSets[e.target].add(e.source);
+
       });
+
     }
+
+
 
     // ── Custom position force ──
 
+
+
     function createPositionForce(strength) {
+
       let forceNodes;
+
       function force(alpha) {
+
         forceNodes.forEach(node => {
+
           const lk = 'x_' + currentLayout;
+
           const tx = (node[lk] || 0) * SCALE;
+
           const ty = (node['y_' + currentLayout] || 0) * SCALE;
+
           const tz = (node['z_' + currentLayout] || 0) * SCALE;
+
           node.vx += (tx - node.x) * strength * alpha;
+
           node.vy += (ty - node.y) * strength * alpha;
+
           node.vz += (tz - node.z) * strength * alpha;
+
         });
+
       }
+
       force.initialize = function(n) { forceNodes = n; };
+
       force.strength = function(s) {
+
         if (s === undefined) return strength;
+
         strength = s;
+
         return force;
+
       };
+
       return force;
+
     }
+
+
 
     // ── Color / style helpers ──
 
+
+
     function darken(hex, amount) {
+
       const r = Math.max(0, Math.round(parseInt(hex.slice(1, 3), 16) * (1 - amount)));
+
       const g = Math.max(0, Math.round(parseInt(hex.slice(3, 5), 16) * (1 - amount)));
+
       const b = Math.max(0, Math.round(parseInt(hex.slice(5, 7), 16) * (1 - amount)));
+
       return '#' + [r, g, b].map(v => v.toString(16).padStart(2, '0')).join('');
+
     }
+
+
 
     function escapeHtml(str) {
+
       const div = document.createElement('div');
+
       div.textContent = str;
+
       return div.innerHTML;
+
     }
+
+
 
     function getNodeColor(node) {
+
       const color = CLUSTER_COLORS[node.cluster_id % CLUSTER_COLORS.length];
+
       if (hoverNode) {
+
         if (node === hoverNode) return '#ffffff';
+
         if (neighborSets[hoverNode.id]?.has(node.id)) return color;
+
         return darken(color, 0.3);
+
       }
+
       if (selectedNode) {
+
         if (node === selectedNode) return '#ffffff';
+
         return darken(color, 0.3);
+
       }
+
       return color;
+
     }
+
+
 
     function hexToRgb(hex) {
+
       const n = parseInt(hex.slice(1), 16);
+
       return `${(n >> 16) & 255},${(n >> 8) & 255},${n & 255}`;
+
     }
+
+
 
     function getLinkColor(link) {
+
       const rgb = hexToRgb(VFX.linkColor.val);
+
       const focus = hoverNode || selectedNode;
+
       if (focus) {
+
         const s = typeof link.source === 'object' ? link.source : nodeById[link.source];
+
         const t = typeof link.target === 'object' ? link.target : nodeById[link.target];
+
         if (s === focus || t === focus) return `rgba(${rgb},${VFX.linkOpacityHover.val})`;
+
         return `rgba(${rgb},0.02)`;
+
       }
+
       return `rgba(${rgb},${VFX.linkAlpha.val})`;
+
     }
 
+
+
     function getLinkWidth(link) {
+
       const focus = hoverNode || selectedNode;
+
       if (focus) {
+
         const s = typeof link.source === 'object' ? link.source : nodeById[link.source];
+
         const t = typeof link.target === 'object' ? link.target : nodeById[link.target];
+
         if (s === focus || t === focus) return VFX.linkWidthHover.val;
+
       }
+
       return VFX.linkWidthVal.val;
+
     }
+
+
 
     // ── Tooltip builders ──
 
+
+
     function buildNodeTooltip(node) {
+
       const markers = [];
+
       if (node.is_medoid) markers.push('<span style="color:#ef4444;font-size:10px;">MEDOID</span>');
+
       if (node.is_llm_center) markers.push('<span style="color:#fb923c;font-size:10px;">LLM.CENTER</span>');
+
       return `<div style="text-align:center;font-family:monospace;">`
+
         + `<div style="font-weight:600;">${escapeHtml(node.name)}</div>`
+
         + `<div style="color:#4a6a8a;font-size:11px;">${escapeHtml(node.cluster_name || '')}</div>`
+
         + (markers.length ? `<div style="margin-top:3px;">${markers.join(' ')}</div>` : '')
+
         + '</div>';
+
     }
 
+
+
     function buildLinkTooltip(link) {
+
       const s = typeof link.source === 'object' ? link.source : nodeById[link.source];
+
       const t = typeof link.target === 'object' ? link.target : nodeById[link.target];
+
       if (!s || !t) return '';
+
       return `<div style="max-width:300px;font-family:monospace;">`
+
         + `<div>${escapeHtml(s.name)} → ${escapeHtml(t.name)}</div>`
+
         + `<div style="color:#4a6a8a;font-style:italic;">${escapeHtml(link.label_forward || '')}</div>`
+
         + `<div style="margin-top:6px;">${escapeHtml(t.name)} → ${escapeHtml(s.name)}</div>`
+
         + `<div style="color:#4a6a8a;font-style:italic;">${escapeHtml(link.label_backward || '')}</div>`
+
         + '</div>';
+
     }
+
+
 
     // ── Interaction handlers ──
 
+
+
     function handleNodeHover(node) {
+
       hoverNode = node || null;
+
       document.getElementById('graph').style.cursor = node ? 'pointer' : '';
+
       if (Graph) {
+
         Graph.graphData().nodes.forEach(n => {
+
           if (hoverNode) {
+
             // Hover: highlight node + neighbors
+
             if (n === hoverNode) updateNodeAppearance(n, 'hover');
+
             else if (neighborSets[hoverNode.id]?.has(n.id)) updateNodeAppearance(n, 'neighbor');
+
             else updateNodeAppearance(n, 'dim');
+
           } else if (selectedNode) {
+
             // Selection: only the selected node glows
+
             if (n === selectedNode) updateNodeAppearance(n, 'hover');
+
             else updateNodeAppearance(n, 'dim');
+
           } else {
+
             updateNodeAppearance(n, 'normal');
+
           }
+
         });
+
         Graph.linkColor(Graph.linkColor())
+
              .linkWidth(Graph.linkWidth());
+
       }
+
     }
+
+
 
     function handleNodeClick(node) {
+
       selectedNode = node;
+
       showDetailCard(node);
 
+
+
       // Apply selection highlighting — only selected node glows, rest dim
+
       Graph.graphData().nodes.forEach(n => {
+
         if (n === node) updateNodeAppearance(n, 'hover');
+
         else updateNodeAppearance(n, 'dim');
+
       });
+
       Graph.linkColor(Graph.linkColor())
+
            .linkWidth(Graph.linkWidth())
+
            .linkDirectionalParticles(0);
 
+
+
       // Focus camera
+
       const distance = 400;
+
       const mag = Math.hypot(node.x, node.y, node.z) || 1;
+
       const distRatio = 1 + distance / mag;
+
       Graph.cameraPosition(
+
         { x: node.x * distRatio, y: node.y * distRatio, z: node.z * distRatio },
+
         node,
+
         1200
+
       );
+
     }
 
+
+
     function handleBackgroundClick() {
+
       hideDetailCard();
+
     }
+
+
 
     // ── Side panel functions ──
 
+
+
     function parseFrontmatter(text) {
+
       const match = text.match(/^---\n([\s\S]*?)\n---\s*([\s\S]*)$/);
+
       if (!match) return { meta: null, body: text };
 
+
+
       const meta = {};
+
       let currentKey = null;
+
       for (const line of match[1].split('\n')) {
+
         const kvMatch = line.match(/^(\w[\w\s-]*):\s*(.*)$/);
+
         if (kvMatch) {
+
           currentKey = kvMatch[1].trim();
+
           const val = kvMatch[2].trim();
+
           if (val.startsWith('[') || val === '') {
+
             meta[currentKey] = val === '' ? '' : val;
+
           } else {
+
             meta[currentKey] = val;
+
           }
+
         } else if (currentKey && line.match(/^\s*-\s+/)) {
+
           // YAML list continuation
+
           const item = line.replace(/^\s*-\s+/, '').trim().replace(/^["']|["']$/g, '');
+
           const prev = meta[currentKey];
+
           meta[currentKey] = prev ? prev + ', ' + item : item;
+
         }
+
       }
+
       return { meta, body: match[2].trim() };
+
     }
+
+
 
     function renderMeta(meta) {
+
       if (!meta) return '';
+
       const skip = new Set(['cssclasses', 'tags']);
+
       let html = '';
+
       for (const [key, val] of Object.entries(meta)) {
+
         if (skip.has(key.toLowerCase()) || !val) continue;
+
         let rendered = escapeHtml(String(val)).replace(/\[\[([^\]]+)\]\]/g, '$1');
+
         // Auto-link URLs
+
         rendered = rendered.replace(/(https?:\/\/[^\s<]+)/g, '<a href="$1" target="_blank" rel="noopener">link</a>');
+
         html += `<div class="meta-row"><span class="meta-key">${escapeHtml(key)}:</span><span class="meta-val">${rendered}</span></div>`;
+
       }
+
       return html;
+
     }
+
+
 
     function showDetailCard(node) {
+
       const card = document.getElementById('detail-card');
+
       const resize = document.getElementById('panel-resize');
 
+
+
       // Title
+
       let title = escapeHtml(node.name);
+
       if (node.is_medoid) title += ' <span class="marker medoid">MEDOID</span>';
+
       if (node.is_llm_center) title += ' <span class="marker llm-center">LLM.CENTER</span>';
+
       document.getElementById('card-title').innerHTML = title;
 
+
+
       // Cluster
+
       const color = CLUSTER_COLORS[node.cluster_id % CLUSTER_COLORS.length];
+
       document.getElementById('card-cluster').innerHTML =
+
         `<span class="cluster-badge" style="border-color:${color};color:${color};">${escapeHtml(node.cluster_name)}</span>`;
 
+
+
       // Parse frontmatter and body
+
       const { meta, body } = parseFrontmatter(node.text_preview || '');
 
+
+
       // Metadata
+
       document.getElementById('card-meta').innerHTML = renderMeta(meta);
 
+
+
       // Body preview
+
       document.getElementById('card-preview').textContent = body || '(no content)';
 
+
+
       // Connections
+
       const edges = adjacency[node.id] || [];
+
       let html = `<div class="conn-header">CONNECTIONS (${edges.length})</div>`;
+
       edges.forEach(e => {
+
         const target = nodeById[e.id];
+
         if (!target) return;
+
         html += `<div class="conn-item"><div class="conn-edge"><span class="arrow">── </span><span class="label">${escapeHtml(e.label)}</span><span class="arrow"> ──▸</span></div><div class="conn-name" data-node-id="${target.id}">${escapeHtml(target.name)}</div></div>`;
+
       });
+
       document.getElementById('card-connections').innerHTML = html;
 
+
+
       card.classList.add('visible');
+
       resize.style.display = 'block';
+
       updateResizePosition();
+
     }
 
+
+
     function hideDetailCard() {
+
       document.getElementById('detail-card').classList.remove('visible');
+
       document.getElementById('panel-resize').style.display = 'none';
+
       selectedNode = null;
+
       // Clear selection highlighting
+
       if (Graph) {
+
         Graph.graphData().nodes.forEach(n => updateNodeAppearance(n, 'normal'));
+
         Graph.linkColor(Graph.linkColor())
+
              .linkWidth(Graph.linkWidth())
+
              .linkDirectionalParticles(VFX.particleCount.val);
+
       }
+
     }
+
+
 
     // ── Panel resize ──
 
+
+
     function updateResizePosition() {
+
       const card = document.getElementById('detail-card');
+
       const resize = document.getElementById('panel-resize');
+
       const width = card.getBoundingClientRect().width;
+
       resize.style.right = (width - 2) + 'px';
+
     }
 
+
+
     (function initPanelResize() {
+
       const resize = document.getElementById('panel-resize');
+
       const card = document.getElementById('detail-card');
+
       let startX, startWidth;
 
+
+
       resize.addEventListener('mousedown', e => {
+
         e.preventDefault();
+
         startX = e.clientX;
+
         startWidth = card.getBoundingClientRect().width;
+
         resize.classList.add('dragging');
+
         card.style.transition = 'none';
 
+
+
         function onMove(e) {
+
           const delta = startX - e.clientX;
+
           const newWidth = Math.max(280, Math.min(startWidth + delta, window.innerWidth * 0.6));
+
           document.documentElement.style.setProperty('--panel-width', newWidth + 'px');
+
           resize.style.right = (newWidth - 2) + 'px';
+
         }
+
+
 
         function onUp() {
+
           resize.classList.remove('dragging');
+
           card.style.transition = '';
+
           document.removeEventListener('mousemove', onMove);
+
           document.removeEventListener('mouseup', onUp);
+
         }
 
+
+
         document.addEventListener('mousemove', onMove);
+
         document.addEventListener('mouseup', onUp);
+
       });
+
     })();
 
+
+
     // Close button and Escape key listeners
+
     document.getElementById('card-close').addEventListener('click', hideDetailCard);
 
+
+
     // Connection name click — navigate to that node
+
     document.getElementById('card-connections').addEventListener('click', e => {
+
       const nameEl = e.target.closest('.conn-name');
+
       if (!nameEl) return;
+
       const id = parseInt(nameEl.dataset.nodeId);
+
       const node = nodeById[id];
+
       if (!node) return;
+
       handleNodeClick(node);
+
     });
+
     document.addEventListener('keydown', e => {
+
       if (e.key === 'Escape') hideDetailCard();
+
       if (e.key === 'h' && Graph) {
+
         Graph.cameraPosition({ x: 0, y: 0, z: SCALE * 2.5 }, { x: 0, y: 0, z: 0 }, 1000);
+
       }
+
     });
+
+
 
     // ── initGraph ──
 
+
+
     function initGraph(nodes, edges) {
+
       const links = edges.map(e => ({
+
         source: e.source,
+
         target: e.target,
+
         label_forward: e.label_forward,
+
         label_backward: e.label_backward,
+
         topology: e.topology,
+
       }));
 
+
+
       // Build neighbor lookups for only the active topology's edges
+
       const activeEdges = edges.filter(e => e.topology === currentLayout);
+
       rebuildLookups(nodes, activeEdges);
 
+
+
       Graph = ForceGraph3D()
+
         (document.getElementById('graph'))
+
         .graphData({ nodes, links })
+
         .backgroundColor(`rgba(${hexToRgb(VFX.bgColor.val)},${VFX.bgAlpha.val})`)
+
         .showNavInfo(false)
+
         .warmupTicks(60)
+
         .cooldownTicks(Infinity)
+
         .nodeThreeObject(node => createNodeObject(node))
+
         .nodeThreeObjectExtend(false)
+
         .nodeLabel(node => buildNodeTooltip(node))
+
         .linkColor(link => getLinkColor(link))
+
         .linkWidth(link => getLinkWidth(link))
+
         .linkOpacity(1.0)
+
         .linkHoverPrecision(VFX.linkHoverPrec.val)
+
         .linkLabel(link => buildLinkTooltip(link))
+
         .linkDirectionalParticles(VFX.particleCount.val)
+
         .linkDirectionalParticleWidth(VFX.particleWidth.val)
+
         .linkDirectionalParticleSpeed(VFX.particleSpeed.val)
+
         .linkDirectionalParticleColor(() => `rgba(${hexToRgb(VFX.particleColor.val)},${VFX.particleAlpha.val})`)
+
         .linkCurvature(VFX.linkCurvatureVal.val)
+
         .linkVisibility(link => link.topology === currentLayout)
+
         .onNodeClick(handleNodeClick)
+
         .onNodeHover(handleNodeHover)
+
         .onBackgroundClick(handleBackgroundClick);
 
+
+
       // Custom position force
+
       Graph
+
         .d3Force('position', createPositionForce(0.18))
+
         .d3Force('center', null);
+
       Graph.d3Force('link').strength(0.008).distance(100);
+
       Graph.d3Force('charge').strength(-25);
 
+
+
       // CSS2D overlay for constant-size node labels
+
       const graphEl = document.getElementById('graph');
+
       const css2d = new CSS2DRenderer();
+
       css2d.setSize(graphEl.clientWidth, graphEl.clientHeight);
+
       css2d.domElement.style.position = 'absolute';
+
       css2d.domElement.style.top = '0';
+
       css2d.domElement.style.left = '0';
+
       css2d.domElement.style.pointerEvents = 'none';
+
       graphEl.appendChild(css2d.domElement);
 
+
+
       // Render CSS2D labels on every frame
+
       (function renderLabels() {
+
         if (Graph) css2d.render(Graph.scene(), Graph.camera());
+
         requestAnimationFrame(renderLabels);
+
       })();
 
+
+
       // Resize graph + CSS2D overlay when window changes
+
       window.addEventListener('resize', () => {
+
         const w = window.innerWidth, h = window.innerHeight;
+
         Graph.width(w).height(h);
+
         css2d.setSize(w, h);
+
       });
 
+
+
       // Post-processing bloom
+
       const renderer = Graph.renderer();
+
       const composer = new EffectComposer(renderer);
+
       composer.addPass(new RenderPass(Graph.scene(), Graph.camera()));
+
       bloomPass = new UnrealBloomPass(
+
         new THREE.Vector2(graphEl.clientWidth, graphEl.clientHeight),
+
         VFX.bloomStrength.val,
+
         VFX.bloomRadius.val,
+
         VFX.bloomThreshold.val
+
       );
+
       composer.addPass(bloomPass);
+
       Graph.postProcessingComposer(composer);
 
+
+
       // Set initial camera to the "H" recenter position
+
       Graph.cameraPosition({ x: 0, y: 0, z: SCALE * 2.5 }, { x: 0, y: 0, z: 0 });
+
     }
+
+
 
     // ── updateGraphData ──
 
+
+
     function updateGraphData(nodes, edges, refreshNodeObjects = false) {
+
       if (!Graph) return;
+
       const activeEdges = edges.filter(e => e.topology === currentLayout);
+
       rebuildLookups(nodes, activeEdges);
+
       const links = edges.map(e => ({
+
         source: e.source,
+
         target: e.target,
+
         label_forward: e.label_forward,
+
         label_backward: e.label_backward,
+
         topology: e.topology,
+
       }));
+
       Graph.graphData({ nodes, links });
+
       if (refreshNodeObjects) {
+
         Graph.nodeThreeObject(node => createNodeObject(node));
+
       }
+
     }
+
+
 
     // ── Topology switching ──
 
+
+
     const LAYOUT_DESCRIPTIONS = {
+
       central: 'CORE \u2014 MEDOID AT ORIGIN, NOTES RADIATE OUTWARD',
+
       decentral: 'CLUSTERS \u2014 THEMATIC HUBS WITH ORBITING NOTES',
+
       distrib: 'NEURAL \u2014 UMAP PROJECTION, SEMANTIC PROXIMITY',
+
     };
 
+
+
     document.querySelectorAll('#controls button').forEach(btn => {
+
       btn.addEventListener('click', () => {
+
         document.querySelectorAll('#controls button').forEach(b => b.classList.remove('active'));
+
         btn.classList.add('active');
+
         currentLayout = btn.dataset.layout;
+
         document.getElementById('layout-desc').textContent = LAYOUT_DESCRIPTIONS[currentLayout] || '';
+
         if (Graph && allNodes.length) {
+
           const activeEdges = edgeSets[currentLayout] || [];
+
           // Swap visible edges without calling graphData (which resets simulation)
+
           Graph.linkVisibility(link => link.topology === currentLayout);
+
           rebuildLookups(allNodes, activeEdges);
+
           buildReadouts(allNodes.length, activeEdges.length);
+
           // Soften position force, reheat, then restore — smooth ~2s drift
+
           const posForce = Graph.d3Force('position');
+
           posForce.strength(0.03);
+
           Graph.d3ReheatSimulation();
+
           setTimeout(() => posForce.strength(0.18), 3000);
+
         }
+
       });
+
     });
 
+
+
     // Set initial layout description
+
     document.getElementById('layout-desc').textContent = LAYOUT_DESCRIPTIONS.central;
+
+
 
     // ── Legend, Cluster Labels ──
 
+
+
     function buildLegend(clusterNames) {
+
       const legend = document.getElementById('legend');
+
       legend.innerHTML = '';
 
+
+
       Object.entries(clusterNames).forEach(([id, name]) => {
+
         const color = CLUSTER_COLORS[id % CLUSTER_COLORS.length];
+
         const item = document.createElement('div');
+
         item.className = 'legend-item';
+
         item.innerHTML = `<div class="legend-dot" data-cluster-dot="${id}" style="background:${color};"></div>`
+
           + `<span class="legend-label">${escapeHtml(name)}</span>`;
+
         legend.appendChild(item);
+
       });
+
+
 
       // Special markers
+
       const special = document.createElement('div');
+
       special.className = 'legend-special';
+
       special.innerHTML =
+
         '<div class="legend-item"><div class="legend-dot" style="border:2px solid #ef4444;background:transparent;"></div><span class="legend-label">EMBEDDING MEDOID</span></div>'
+
         + '<div class="legend-item"><div class="legend-dot" style="border:2px solid #fb923c;background:transparent;"></div><span class="legend-label">LLM-NOMINATED CENTER</span></div>';
+
       legend.appendChild(special);
+
     }
+
+
 
     let clusterLabelEls = {};
+
     let clusterLabelRAF = null;
 
+
+
     function buildClusterLabels(clusterNames) {
+
       const container = document.getElementById('cluster-labels');
+
       container.innerHTML = '';
+
       clusterLabelEls = {};
 
+
+
       // Cancel existing loop before starting a new one
+
       if (clusterLabelRAF) {
+
         cancelAnimationFrame(clusterLabelRAF);
+
         clusterLabelRAF = null;
+
       }
+
+
 
       Object.entries(clusterNames).forEach(([id, name]) => {
+
         const el = document.createElement('div');
+
         el.className = 'cluster-label';
+
         el.textContent = name;
+
         el.style.color = CLUSTER_COLORS[id % CLUSTER_COLORS.length];
+
         el.style.opacity = '0';
+
         container.appendChild(el);
+
         clusterLabelEls[id] = el;
+
       });
 
+
+
       clusterLabelRAF = requestAnimationFrame(updateClusterLabelPositions);
+
     }
+
+
 
     function updateClusterLabelPositions() {
+
       clusterLabelRAF = requestAnimationFrame(updateClusterLabelPositions);
+
       if (!Graph) return;
+
       const show = currentLayout === 'decentral';
+
       const nodes = Graph.graphData().nodes;
 
+
+
       const centers = {};
+
       const counts = {};
+
       nodes.forEach(node => {
+
         const c = node.cluster_id;
+
         if (!centers[c]) { centers[c] = { x: 0, y: 0, z: 0 }; counts[c] = 0; }
+
         centers[c].x += node.x;
+
         centers[c].y += node.y;
+
         centers[c].z += node.z;
+
         counts[c]++;
+
       });
+
+
 
       Object.entries(clusterLabelEls).forEach(([id, el]) => {
+
         if (!show) { el.style.opacity = '0'; return; }
+
         const c = centers[id];
+
         const n = counts[id];
+
         if (!c || !n) return;
+
         const screen = Graph.graph2ScreenCoords(c.x / n, c.y / n, c.z / n);
+
         el.style.left = screen.x + 'px';
+
         el.style.top = screen.y + 'px';
+
         el.style.opacity = '1';
+
       });
+
     }
+
+
 
     function buildReadouts(nodeCount, edgeCount) {
+
       document.getElementById('readout-nodes').textContent = nodeCount;
+
       document.getElementById('readout-edges').textContent = edgeCount;
+
     }
 
+
+
     // ═══════════════════════════════════════════════
+
     // Config Panel Builder
+
     // ═══════════════════════════════════════════════
+
+
 
     function buildConfigPanel() {
+
       const panel = document.getElementById('config-panel');
+
       const sections = {};
 
+
+
       for (const [key, cfg] of Object.entries(VFX)) {
+
         if (!sections[cfg.section]) sections[cfg.section] = [];
+
         sections[cfg.section].push({ key, ...cfg });
+
       }
 
+
+
       let html = '';
+
       for (const [section, items] of Object.entries(sections)) {
+
         html += `<div class="config-section">`;
+
         html += `<div class="config-section-title">${section}</div>`;
+
         for (const item of items) {
+
           html += `<div class="config-row">`;
+
           html += `<span class="config-label">${item.label}</span>`;
+
           if (item.type === 'color') {
+
             html += `<input type="color" class="config-color" data-key="${item.key}" value="${item.val}">`;
+
             html += `<span class="config-hex" data-vfx="${item.key}">${item.val}</span>`;
+
           } else {
+
             const dec = item.step < 0.01 ? 3 : item.step < 1 ? 2 : 0;
+
             html += `<input type="range" class="config-slider" data-key="${item.key}" `;
+
             html += `min="${item.min}" max="${item.max}" step="${item.step}" value="${item.val}">`;
+
             html += `<span class="config-value" data-vfx="${item.key}">${Number(item.val).toFixed(dec)}</span>`;
+
           }
+
           html += `</div>`;
+
         }
+
         html += `</div>`;
+
       }
+
+
 
       panel.innerHTML = html;
 
+
+
       function doRefresh(refresh) {
+
         if (refresh === 'nodes') scheduleNodeRefresh();
+
         else if (refresh === 'scale') refreshNodeScales();
+
         else if (refresh === 'links') refreshLinks();
+
         else if (refresh === 'colors') refreshColors();
+
         else if (refresh === 'clusters') refreshClusters();
+
         else if (refresh === 'postfx') refreshPostFx();
+
         else if (refresh === 'chrome') refreshChrome();
+
       }
+
+
 
       // Wire slider events
+
       panel.querySelectorAll('.config-slider').forEach(slider => {
+
         slider.addEventListener('input', e => {
+
           const key = e.target.dataset.key;
+
           const val = parseFloat(e.target.value);
+
           VFX[key].val = val;
+
           const dec = VFX[key].step < 0.01 ? 3 : VFX[key].step < 1 ? 2 : 0;
+
           panel.querySelector(`[data-vfx="${key}"]`).textContent = val.toFixed(dec);
+
           doRefresh(VFX[key].refresh);
+
         });
+
       });
+
+
 
       // Wire color picker events
+
       panel.querySelectorAll('.config-color').forEach(picker => {
+
         picker.addEventListener('input', e => {
+
           const key = e.target.dataset.key;
+
           VFX[key].val = e.target.value;
+
           panel.querySelector(`[data-vfx="${key}"]`).textContent = e.target.value;
+
           doRefresh(VFX[key].refresh);
+
         });
+
       });
+
     }
 
+
+
     // Toggle color theme
+
     document.getElementById('theme-toggle').addEventListener('click', () => {
+
       const names = Object.keys(COLOR_THEMES);
+
       const next = names[(names.indexOf(currentTheme) + 1) % names.length];
+
       applyTheme(next);
+
     });
 
+
+
     // (label-toggle and config panel removed from release build)
+
   
+
     // ═══════════════════════════════════════════════
-    // Export Snapshot as HTML
+
+    // Export Snapshot + Copy Graph Link
+
     // ═══════════════════════════════════════════════
-    document.getElementById('export-snapshot-btn').addEventListener('click', () => {
-      if (!allNodes.length || !edgeSets) {
-        alert('No graph data to export. Load a vault first.');
-        return;
-      }
-      const snapshot = {
-        exportedAt: new Date().toISOString(),
-        nodes: allNodes.map(n => ({
-          id: n.id, name: n.name, filename: n.filename,
-          cluster_id: n.cluster_id, cluster_name: n.cluster_name,
-          is_medoid: n.is_medoid, is_llm_center: n.is_llm_center,
-          text_preview: n.text_preview,
-          x_central: n.x_central, y_central: n.y_central, z_central: n.z_central,
-          x_decentral: n.x_decentral, y_decentral: n.y_decentral, z_decentral: n.z_decentral,
-          x_distrib: n.x_distrib, y_distrib: n.y_distrib, z_distrib: n.z_distrib,
-        })),
-        edges: {
-          central: edgeSets.central || [],
-          decentral: edgeSets.decentral || [],
-          distrib: edgeSets.distrib || [],
-        },
-      };
-      const json = JSON.stringify(snapshot);
-      const styles = document.querySelector('style').textContent;
-      const html = '<!DOCTYPE html>\n<html lang="en" style="color-scheme: dark;">\n<head><meta charset="UTF-8"><title>Obsidian Universe Snapshot</title><style>' + styles + '</style></head>\n<body>\n<div id="graph"></div>\n<script>\nconst SNAPSHOT = ' + JSON.stringify(json) + ';\nconst data = JSON.parse(SNAPSHOT);\nconsole.log("Snapshot loaded", data);\n<\/script>\n</body></html>';
-      const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+
+    let latestSessionSnapshot = null;
+
+
+
+    function sanitizeExportNamePart(value = '') {
+
+      return String(value).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 48) || 'graph';
+
+    }
+
+
+
+    function downloadTextFile(filename, content) {
+
+      const blob = new Blob([content], { type: 'text/html;charset=utf-8' });
+
       const url = URL.createObjectURL(blob);
+
       const a = document.createElement('a');
+
       a.href = url;
-      a.download = 'obsidian-universe-snapshot-' + Date.now() + '.html';
+
+      a.download = filename;
+
       document.body.appendChild(a);
+
       a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    });
+
+      a.remove();
+
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+    }
+
+
+
+    function buildStandaloneSnapshotHtml(sourceHtml, session) {
+
+      const payload = JSON.stringify(session).replace(/</g, '\u003c');
+
+      const injection = '<script>window.__TOPOLOGIES_EMBEDDED_SESSION__ = ' + payload + ';<\/script>\n<script>window.__TOPOLOGIES_SNAPSHOT_MODE__ = true;<\/script>\n';
+
+      const marker = '<script type="module">';
+
+      const idx = sourceHtml.indexOf(marker);
+
+      if (idx === -1) throw new Error('EXPORT FAILED: MODULE SCRIPT NOT FOUND');
+
+      return sourceHtml.slice(0, idx) + injection + sourceHtml.slice(idx);
+
+    }
+
+
+
+    async function exportStandaloneSnapshot() {
+
+      // Build session from current graph data
+
+      const session = latestSessionSnapshot || await loadSession().catch(() => null);
+
+      if (!session && !allNodes.length) {
+
+        setBootStage('EXPORT FAILED', 'NO GRAPH DATA AVAILABLE');
+
+        showBootStatus();
+
+        setTimeout(hideBootStatus, 1800);
+
+        return;
+
+      }
+
+      // Use current graph data if no cached session
+
+      const sessionData = session || {
+
+        graphNodes: allNodes.map(n => {
+
+          const clean = {};
+
+          for (const k of ['id','filename','name','text_preview','cluster_id','cluster_name','x_central','y_central','z_central','x_decentral','y_decentral','z_decentral','x_distrib','y_distrib','z_distrib','is_medoid','is_llm_center']) {
+
+            if (n[k] !== undefined) clean[k] = n[k];
+
+          }
+
+          return clean;
+
+        }),
+
+        centralEdges: (edgeSets.central || []).map(e => ({ source: e.source, target: e.target, label_forward: e.label_forward, label_backward: e.label_backward })),
+
+        decentralEdges: (edgeSets.decentral || []).map(e => ({ source: e.source, target: e.target, label_forward: e.label_forward, label_backward: e.label_backward })),
+
+        labeledEdges: (edgeSets.distrib || []).map(e => ({ source: e.source, target: e.target, label_forward: e.label_forward, label_backward: e.label_backward })),
+
+        clusterNames: {},
+
+        nodeCount: allNodes.length,
+
+      };
+
+
+
+      try {
+
+        const exportUrl = new URL(window.location.href);
+
+        exportUrl.search = '';
+
+        exportUrl.hash = '';
+
+        const response = await fetch(exportUrl.toString(), { cache: 'no-store' });
+
+        if (!response.ok) throw new Error('SOURCE HTML ' + response.status);
+
+        const sourceHtml = await response.text();
+
+        const standaloneHtml = buildStandaloneSnapshotHtml(sourceHtml, sessionData);
+
+        const nameBits = [sessionData.nodeCount ? sessionData.nodeCount + '-notes' : '', sanitizeExportNamePart(Object.values(sessionData.clusterNames || {})[0] || '')].filter(Boolean).join('-');
+
+        downloadTextFile('obsidian-universe-' + (nameBits || 'snapshot') + '.html', standaloneHtml);
+
+        setBootStage('SNAPSHOT EXPORTED', 'STANDALONE HTML READY');
+
+        showBootStatus();
+
+        setTimeout(hideBootStatus, 1800);
+
+      } catch (err) {
+
+        // Fallback: simple JSON export
+
+        const json = JSON.stringify(sessionData);
+
+        downloadTextFile('obsidian-universe-snapshot-' + Date.now() + '.json', json);
+
+        setBootStage('SNAPSHOT EXPORTED', 'JSON FALLBACK (COULD NOT FETCH SOURCE)');
+
+        showBootStatus();
+
+        setTimeout(hideBootStatus, 2000);
+
+      }
+
+    }
+
+
+
+    function buildCachedGraphLink() {
+
+      const url = new URL(window.location.href);
+
+      url.searchParams.set('resume', 'latest');
+
+      return url.toString();
+
+    }
+
+
+
+    async function copyCachedGraphLink() {
+
+      const link = buildCachedGraphLink();
+
+      try {
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+
+          await navigator.clipboard.writeText(link);
+
+        } else {
+
+          const temp = document.createElement('textarea');
+
+          temp.value = link;
+
+          temp.setAttribute('readonly', '');
+
+          temp.style.position = 'absolute';
+
+          temp.style.left = '-9999px';
+
+          document.body.appendChild(temp);
+
+          temp.select();
+
+          document.execCommand('copy');
+
+          document.body.removeChild(temp);
+
+        }
+
+        setBootStage('LINK COPIED', 'RESTORES THE LAST GRAPH FROM CACHE');
+
+        showBootStatus();
+
+        setTimeout(hideBootStatus, 1800);
+
+      } catch (err) {
+
+        setBootStage('COPY FAILED', link);
+
+        showBootStatus();
+
+        setTimeout(hideBootStatus, 3000);
+
+      }
+
+    }
+
+
+
+    document.getElementById('export-snapshot-btn').addEventListener('click', exportStandaloneSnapshot);
+
+    document.getElementById('copy-graph-link-btn').addEventListener('click', copyCachedGraphLink);
+
+
+
+    // Auto-resume from URL param
+
+    if (new URLSearchParams(window.location.search).get('resume') === 'latest') {
+
+      loadSession().then(session => {
+
+        if (session) {
+
+          document.getElementById('setup').classList.add('hidden');
+
+          document.getElementById('main').classList.remove('hidden');
+
+          document.getElementById('reanalyze-btn').classList.remove('hidden');
+
+          document.getElementById('copy-graph-link-btn').classList.remove('hidden');
+
+          restoreFromCache(session);
+
+        }
+
+      }).catch(() => {});
+
+    }
+
+
 
   </script>
 
+
+
 </body>
+
 </html>
+
