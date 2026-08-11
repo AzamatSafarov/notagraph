@@ -2083,7 +2083,7 @@ CLUSTER 1: <name>
       return names;
     }
 
-    const EDGE_LABEL_BATCH = 20;
+    const EDGE_LABEL_BATCH = 50;
 
     async function labelEdges(notes, edges, config, onProgress) {
       const labeled = [];
@@ -2627,11 +2627,18 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
         // Progressive edge labeling — batch in the pipeline for incremental reveal
         const labeledEdges = [];
-        for (let i = 0; i < edges.length; i += EDGE_LABEL_BATCH) {
-          const batchEdges = edges.slice(i, i + EDGE_LABEL_BATCH);
-          const batchResult = await labelEdges(notes, batchEdges, config);
-          labeledEdges.push(...batchResult);
-          setBootStage('ANNOTATING...', `EDGE LABELS ${Math.min(i + EDGE_LABEL_BATCH, edges.length)}/${edges.length}`);
+        const PARALLEL = 3;
+        for (let i = 0; i < edges.length; i += EDGE_LABEL_BATCH * PARALLEL) {
+          const promises = [];
+          for (let p = 0; p < PARALLEL; p++) {
+            const start = i + p * EDGE_LABEL_BATCH;
+            if (start >= edges.length) break;
+            const batchEdges = edges.slice(start, start + EDGE_LABEL_BATCH);
+            promises.push(labelEdges(notes, batchEdges, config));
+          }
+          const results = await Promise.all(promises);
+          results.forEach(r => labeledEdges.push(...r));
+          setBootStage('ANNOTATING...', `EDGE LABELS ${Math.min(i + EDGE_LABEL_BATCH * PARALLEL, edges.length)}/${edges.length}`);
           // Show progressive edges during labeling
           updateGraphData(graphNodes, [...centralEdges, ...decentralEdges, ...labeledEdges]);
         }
