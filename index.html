@@ -980,12 +980,20 @@
       <button data-layout="distrib">NEURAL</button>
     </div>
 
+        <!-- Search bar: top-right area -->
+    <div id="search-bar" style="position:fixed;top:48px;left:50%;transform:translateX(-50%);z-index:10;">
+      <input type="text" id="node-search" placeholder="Search notes..." style="background:var(--bg-panel);backdrop-filter:blur(8px);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:12px;padding:6px 14px;width:240px;outline:none;transition:border-color 200ms ease;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
+    </div>
+
     <!-- Info Panel: left side (unified readouts + legend + key hint) -->
     <div id="info-panel">
       <div class="info-section">
         <div class="info-row"><span class="info-key">NODES</span><span class="info-val" id="readout-nodes">0</span></div>
         <div class="info-row"><span class="info-key">EDGES</span><span class="info-val" id="readout-edges">0</span></div>
         <div class="info-row"><span class="info-key">K-NN</span><span class="info-val" id="readout-knn">5</span></div>
+      </div>
+      <div class="info-section">
+        <div class="info-row"><span class="info-key">CLUSTERS</span><span class="info-val" id="readout-clusters">-</span></div>
       </div>
       <div class="info-section">
         <div class="info-row"><span class="info-key">FILES SCANNED</span><span class="info-val" id="readout-files-total">-</span></div>
@@ -1030,6 +1038,7 @@
     <div id="cluster-labels"></div>
 
     <!-- Config Panel: bottom-right -->
+        <button id="random-node-btn" title="Jump to a random note" style="position:fixed;bottom:60px;right:200px;z-index:10;background:var(--bg-panel);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border:1px solid var(--border);border-radius:8px;color:var(--text-dim);font-family:var(--mono);font-size:11px;letter-spacing:0.10em;text-transform:uppercase;padding:8px 14px;cursor:pointer;transition:color 200ms ease,border-color 200ms ease;">RANDOM</button>
     <button id="copy-graph-link-btn" title="Copy link to restore graph">COPY LINK</button>
     <button id="export-snapshot-btn" title="Export graph as HTML">EXPORT</button>
     <button id="theme-toggle" title="Switch color theme">LIGHT</button>
@@ -2588,7 +2597,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
           id: note.id,
           filename: note.filename,
           name: note.filename.replace(/\.(md|txt)$/i, ''),
-          text_preview: note.text.slice(0, 600),
+          text_preview: note.text.slice(0, 2000),
           cluster_id: clusterLabels[i],
           x_central: central.x[i],
           y_central: central.y[i],
@@ -2953,8 +2962,16 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
       // Parse frontmatter and body
       const { meta, body } = parseFrontmatter(node.text_preview || '');
 
+      // Add computed metadata
+      const computedMeta = { ...meta };
+      computedMeta['File'] = node.filename || '-';
+      computedMeta['Words'] = (node.text_preview || '').split(/\s+/).filter(Boolean).length;
+      computedMeta['Cluster'] = node.cluster_name || ('Cluster ' + node.cluster_id);
+      if (node.is_medoid) computedMeta['Role'] = 'Embedding Medoid';
+      if (node.is_llm_center) computedMeta['LLM'] = 'Nominated Center';
+
       // Metadata
-      document.getElementById('card-meta').innerHTML = renderMeta(meta);
+      document.getElementById('card-meta').innerHTML = renderMeta(computedMeta);
 
       // Body preview
       document.getElementById('card-preview').textContent = body || '(no content)';
@@ -3267,6 +3284,10 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
     function buildReadouts(nodeCount, edgeCount) {
       document.getElementById('readout-nodes').textContent = nodeCount;
       document.getElementById('readout-edges').textContent = edgeCount;
+      // Add cluster count
+      const clusterCount = new Set(allNodes.map(n => n.cluster_id)).size;
+      const clusterEl = document.getElementById('readout-clusters');
+      if (clusterEl) clusterEl.textContent = clusterCount;
     }
 
     // ═══════════════════════════════════════════════
@@ -3321,7 +3342,26 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
           const key = e.target.dataset.key;
           const val = parseFloat(e.target.value);
           VFX[key].val = val;
-          const dec = VFX[key].step < 0.01 ? 3 : VFX[key].step < 1 ? 2 : 0;
+          const dec = VFX[key].step < 0.01 ? 3 : VFX[key].step 
+    // Random node button
+    const randomBtn = document.getElementById('random-node-btn');
+    if (randomBtn) {
+      randomBtn.addEventListener('click', () => {
+        if (!allNodes.length) return;
+        const random = allNodes[Math.floor(Math.random() * allNodes.length)];
+        handleNodeClick(random);
+      });
+      randomBtn.addEventListener('mouseenter', () => {
+        randomBtn.style.color = 'var(--text-bright)';
+        randomBtn.style.borderColor = 'var(--accent)';
+      });
+      randomBtn.addEventListener('mouseleave', () => {
+        randomBtn.style.color = 'var(--text-dim)';
+        randomBtn.style.borderColor = 'var(--border)';
+      });
+    }
+
+< 1 ? 2 : 0;
           panel.querySelector(`[data-vfx="${key}"]`).textContent = val.toFixed(dec);
           doRefresh(VFX[key].refresh);
         });
@@ -3347,6 +3387,30 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
     // (label-toggle and config panel removed from release build)
   
+
+    // ═══════════════════════════════════════════════
+    // Node Search
+    // ═══════════════════════════════════════════════
+    const searchInput = document.getElementById('node-search');
+    if (searchInput) {
+      searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        if (!query || !Graph) {
+          // Reset all nodes
+          Graph.graphData().nodes.forEach(n => updateNodeAppearance(n, 'normal'));
+          return;
+        }
+        // Highlight matching nodes, dim others
+        Graph.graphData().nodes.forEach(n => {
+          if (n.name && n.name.toLowerCase().includes(query)) {
+            updateNodeAppearance(n, 'hover');
+          } else {
+            updateNodeAppearance(n, 'dim');
+          }
+        });
+      });
+    }
+
     // ═══════════════════════════════════════════════
     // Export Snapshot + Copy Graph Link
     // ═══════════════════════════════════════════════
