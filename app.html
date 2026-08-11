@@ -4872,7 +4872,18 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
         .linkDirectionalParticleColor(() => `rgba(${hexToRgb(VFX.particleColor.val)},${VFX.particleAlpha.val})`)
 
-        .linkCurvature(VFX.linkCurvatureVal.val)
+        .linkCurvature(link => {
+          if (currentLayout === 'planet') {
+            const s = typeof link.source === 'object' ? link.source : (nodeById[link.source] || {});
+            const t = typeof link.target === 'object' ? link.target : (nodeById[link.target] || {});
+            const sMag = Math.sqrt(s.x*s.x + s.y*s.y + s.z*s.z) + 1e-9;
+            const tMag = Math.sqrt(t.x*t.x + t.y*t.y + t.z*t.z) + 1e-9;
+            const dot = (s.x*t.x + s.y*t.y + s.z*t.z) / (sMag * tMag);
+            const angle = Math.acos(Math.max(-1, Math.min(1, dot)));
+            return Math.min(0.85, angle * 0.45);
+          }
+          return VFX.linkCurvatureVal.val;
+        })
 
         .linkHoverPrecision(VFX.linkHoverPrec.val);
 
@@ -5250,6 +5261,34 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
               label_backward: 'bridges continents',
               topology: 'planet',
             });
+          }
+        }
+
+        // PLANET: global surface k-NN - connect nearest notes on sphere surface
+        // This creates the planet shape through links going along the surface
+        const planetSurfaceK = Math.min(4, notes.length - 1);
+        for (let i = 0; i < notes.length; i++) {
+          const dists = [];
+          for (let j = 0; j < notes.length; j++) {
+            if (i === j) continue;
+            const dx = planet.x[i] - planet.x[j];
+            const dy = planet.y[i] - planet.y[j];
+            const dz = planet.z[i] - planet.z[j];
+            dists.push({ j, d: Math.sqrt(dx*dx + dy*dy + dz*dz) });
+          }
+          dists.sort((p, q) => p.d - q.d);
+          for (let n = 0; n < planetSurfaceK && n < dists.length; n++) {
+            const a = Math.min(i, dists[n].j);
+            const b = Math.max(i, dists[n].j);
+            if (!planetEdges.some(e => e.source === a && e.target === b)) {
+              planetEdges.push({
+                source: a,
+                target: b,
+                label_forward: 'visible from',
+                label_backward: 'visible from',
+                topology: 'planet',
+              });
+            }
           }
         }
 
@@ -6238,7 +6277,18 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
         .linkDirectionalParticleColor(() => `rgba(${hexToRgb(VFX.particleColor.val)},${VFX.particleAlpha.val})`)
 
-        .linkCurvature(VFX.linkCurvatureVal.val)
+        .linkCurvature(link => {
+          if (currentLayout === 'planet') {
+            const s = typeof link.source === 'object' ? link.source : (nodeById[link.source] || {});
+            const t = typeof link.target === 'object' ? link.target : (nodeById[link.target] || {});
+            const sMag = Math.sqrt(s.x*s.x + s.y*s.y + s.z*s.z) + 1e-9;
+            const tMag = Math.sqrt(t.x*t.x + t.y*t.y + t.z*t.z) + 1e-9;
+            const dot = (s.x*t.x + s.y*t.y + s.z*t.z) / (sMag * tMag);
+            const angle = Math.acos(Math.max(-1, Math.min(1, dot)));
+            return Math.min(0.85, angle * 0.45);
+          }
+          return VFX.linkCurvatureVal.val;
+        })
 
         .linkVisibility(link => link.topology === currentLayout)
 
