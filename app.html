@@ -2623,48 +2623,6 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
         // ── Compute topology-specific edge sets ──
 
-        // PLANET: connect notes within same cluster on the sphere surface
-        // Use k-NN within each cluster to create "continent" connections
-        const planetEdges = [];
-        for (let c = 0; c < k; c++) {
-          const indices = [];
-          for (let i = 0; i < notes.length; i++) {
-            if (clusterLabels[i] === c) indices.push(i);
-          }
-          if (indices.length < 2) continue;
-          // Connect each note to its 2 nearest neighbors within the cluster
-          for (const i of indices) {
-            const dists = indices
-              .filter(j => j !== i)
-              .map(j => ({ j, d: cosineDistance(embeddings[i], embeddings[j]) }))
-              .sort((a, b) => a.d - b.d)
-              .slice(0, 2);
-            for (const { j } of dists) {
-              if (i < j) {
-                planetEdges.push({
-                  source: i,
-                  target: j,
-                  label_forward: 'borders',
-                  label_backward: 'borders',
-                  topology: 'planet',
-                });
-              }
-            }
-          }
-        }
-        // Connect cluster medoids (continent bridges)
-        for (let a = 0; a < hubs.length; a++) {
-          for (let b = a + 1; b < hubs.length; b++) {
-            planetEdges.push({
-              source: hubs[a],
-              target: hubs[b],
-              label_forward: 'ocean route',
-              label_backward: 'ocean route',
-              topology: 'planet',
-            });
-          }
-        }
-
         // Centralized: star from medoid to every other node
         const centralEdges = [];
         for (let i = 0; i < notes.length; i++) {
@@ -2717,10 +2675,54 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
         // Hub ↔ hub
         const hubs = Object.values(clusterMedoids);
         for (let a = 0; a < hubs.length; a++) {
-          for (let b = a + 1; b < hubs.length; b++) {
+// PLANET: connect notes within same cluster on the sphere surface
+        // Use k-NN within each cluster to create "continent" connections
+        const planetEdges = [];
+        for (let c = 0; c < k; c++) {
+          const indices = [];
+          for (let i = 0; i < notes.length; i++) {
+            if (clusterLabels[i] === c) indices.push(i);
+          }
+          if (indices.length < 2) continue;
+          // Connect each note to its 2 nearest neighbors within the cluster
+          for (const i of indices) {
+            const dists = indices
+              .filter(j => j !== i)
+              .map(j => ({ j, d: cosineDistance(embeddings[i], embeddings[j]) }))
+              .sort((a, b) => a.d - b.d)
+              .slice(0, 2);
+            for (const { j } of dists) {
+              if (i < j) {
+                planetEdges.push({
+                  source: i,
+                  target: j,
+                  label_forward: 'borders',
+                  label_backward: 'borders',
+                  topology: 'planet',
+                });
+              }
+            }
+          }
+        }
+        // Connect cluster medoids (continent bridges)
+        const planetHubs = Object.values(clusterMedoids);
+        for (let a = 0; a < planetHubs.length; a++) {
+          for (let b = a + 1; b < planetHubs.length; b++) {
+            planetEdges.push({
+              source: planetHubs[a],
+              target: planetHubs[b],
+              label_forward: 'ocean route',
+              label_backward: 'ocean route',
+              topology: 'planet',
+            });
+          }
+        }
+
+        
+          for (let b = a + 1; b < planetHubs.length; b++) {
             decentralEdges.push({
-              source: hubs[a],
-              target: hubs[b],
+              source: planetHubs[a],
+              target: planetHubs[b],
               label_forward: 'bridges to',
               label_backward: 'bridges to',
               topology: 'decentral',
