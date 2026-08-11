@@ -163,6 +163,23 @@
       overflow: hidden;
 
     }
+#setup-card, .setup-card {
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid rgba(60, 60, 80, 0.12);
+      border-radius: 16px;
+      padding: 28px 32px;
+      box-shadow: 0 8px 32px rgba(60, 60, 80, 0.08), 0 2px 8px rgba(60, 60, 80, 0.04);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      max-width: 420px;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      position: relative;
+      z-index: 2;
+    }
+
 
 
 
@@ -1894,6 +1911,7 @@
 
     <div id="setup-subtitle">Neural Cartography of Ideas</div>
 
+    <div class="setup-card">
     <select id="provider-select">
 
       <option value="azure">AZURE OPENAI</option>
@@ -1931,7 +1949,7 @@
     <div id="setup-status"></div>
 
     <input id="folder-input" class="hidden" type="file" webkitdirectory directory multiple>
-
+    </div>
   </div>
 
 
