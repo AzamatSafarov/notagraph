@@ -1922,6 +1922,10 @@
 
       <option value="openrouter">OPENROUTER</option>
 
+      <option value="mistral">MISTRAL</option>
+
+      <option value="groq">GROQ</option>
+
       <option value="ollama">OLLAMA LOCAL</option>
 
     </select>
@@ -2464,6 +2468,40 @@
 
       },
 
+      mistral: {
+
+        label: 'Mistral',
+
+        apiKey: '',
+
+        baseUrl: 'https://api.mistral.ai/v1',
+
+        apiVersion: '',
+
+        chatModel: 'mistral-small-latest',
+
+        embeddingModel: 'mistral-embed',
+
+      },
+
+      groq: {
+
+        label: 'Groq',
+
+        apiKey: '',
+
+        baseUrl: 'https://api.groq.com/openai/v1',
+
+        apiVersion: '',
+
+        chatModel: 'llama-3.3-70b-versatile',
+
+        embeddingModel: '',
+
+        groqEmbedFallback: 'ollama',
+
+      },
+
     };
 
 
@@ -2505,23 +2543,25 @@
 
 
     function applyProviderPreset(provider) {
-
       const preset = PROVIDER_PRESETS[provider] || PROVIDER_PRESETS.azure;
-
-      apiKeyInput.value = preset.apiKey;
-
-      baseUrlInput.value = preset.baseUrl;
-
-      chatModelInput.value = preset.chatModel;
-
-      embeddingModelInput.value = preset.embeddingModel;
-
-      // Show/hide base URL field
-
-      baseUrlInput.style.display = (provider === 'azure') ? 'block' : (provider === 'ollama' ? 'block' : 'none');
-
-      baseUrlInput.previousElementSibling.style.display = baseUrlInput.style.display;
-
+      apiKeyInput.value = preset.apiKey || '';
+      baseUrlInput.value = preset.baseUrl || '';
+      chatModelInput.value = preset.chatModel || '';
+      embeddingModelInput.value = preset.embeddingModel || '';
+      // Show/hide API Key (Ollama doesn't need it)
+      const showApiKey = provider !== 'ollama';
+      apiKeyInput.style.display = showApiKey ? 'block' : 'none';
+      const apiKeyLabel = document.getElementById('api-key-label');
+      if (apiKeyLabel) apiKeyLabel.style.display = showApiKey ? 'block' : 'none';
+      // Show/hide Base URL (Azure, Ollama, Mistral, Groq show it)
+      const showBaseUrl = ['azure', 'ollama', 'mistral', 'groq'].includes(provider);
+      baseUrlInput.style.display = showBaseUrl ? 'block' : 'none';
+      if (baseUrlInput.previousElementSibling) baseUrlInput.previousElementSibling.style.display = baseUrlInput.style.display;
+      // Show/hide Embedding Model (Groq has no embeddings API)
+      const showEmbed = provider !== 'groq';
+      embeddingModelInput.style.display = showEmbed ? 'block' : 'none';
+      const embedLabel = document.querySelector('label[for="embedding-model-input"]');
+      if (embedLabel) embedLabel.style.display = showEmbed ? 'block' : 'none';
     }
 
 
@@ -3297,9 +3337,37 @@
 
           allEmbeddings.push(...vectors);
 
+        } else if (provider === 'groq') {
+
+          // Groq has no embeddings API - use Ollama fallback
+
+          const ollamaUrl = 'http://localhost:11434/v1';
+
+          response = await fetch(`${ollamaUrl}/embeddings`, {
+
+            method: 'POST',
+
+            headers: { 'Content-Type': 'application/json' },
+
+            body: JSON.stringify({ model: 'nomic-embed-text', input: batch }),
+
+          });
+
+          if (!response.ok) {
+
+            throw new Error('Groq has no embeddings API. Start Ollama locally with nomic-embed-text model for embeddings.');
+
+          }
+
+          const data = await response.json();
+
+          const vectors = data.data.map(e => e.embedding);
+
+          allEmbeddings.push(...vectors);
+
         } else {
 
-          // OpenAI-compatible (OpenAI, OpenRouter, Ollama)
+          // OpenAI-compatible (OpenAI, OpenRouter, Ollama, Mistral)
 
           response = await fetch(
 
