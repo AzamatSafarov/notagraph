@@ -51,20 +51,7 @@
       width: 100vw;
     }
 
-    /* Animated pointillism dot background */
-    @keyframes dotDrift {
-      0%, 100% { transform: translate(0, 0); opacity: 0.3; }
-      50% { transform: translate(10px, -8px); opacity: 0.5; }
-    }
-    @keyframes dotPulse {
-      0%, 100% { opacity: 0.15; }
-      50% { opacity: 0.35; }
-    }
-    @keyframes dotFloat {
-      0% { transform: translateY(0) scale(1); }
-      50% { transform: translateY(-12px) scale(1.1); }
-      100% { transform: translateY(0) scale(1); }
-    }
+
 
     :focus-visible {
       outline: 2px solid var(--blue);
@@ -90,36 +77,19 @@
       align-items: center;
       justify-content: center;
       gap: 14px;
-      background:
-        radial-gradient(circle at 15% 20%, var(--coral) 1.2px, transparent 1.8px),
-        radial-gradient(circle at 85% 30%, var(--teal) 1.2px, transparent 1.8px),
-        radial-gradient(circle at 45% 80%, var(--purple) 1.2px, transparent 1.8px),
-        radial-gradient(circle at 70% 60%, var(--yellow) 1px, transparent 1.5px),
-        radial-gradient(circle at 30% 50%, var(--green) 1px, transparent 1.5px),
-        radial-gradient(circle at 90% 90%, var(--blue) 1px, transparent 1.5px),
-        radial-gradient(circle at 10% 70%, var(--pink) 1px, transparent 1.5px),
-        radial-gradient(circle at 60% 15%, var(--coral) 0.8px, transparent 1.2px),
-        radial-gradient(circle at 50% 45%, rgba(100,100,140,0.12) 0.8px, transparent 1.2px),
-        linear-gradient(180deg, #f5f2ec 0%, #ede9e2 100%);
-      background-size: 80px 80px, 120px 120px, 100px 100px, 60px 60px, 90px 90px, 70px 70px, 110px 110px, 50px 50px, 40px 40px, 100% 100%;
-      animation: dotPulse 8s ease-in-out infinite;
+      background: linear-gradient(180deg, #f5f2ec 0%, #ede9e2 100%);
       position: relative;
       overflow: hidden;
     }
 
-    /* Floating dot layer overlay */
-    #setup::before {
-      content: '';
+    #bg-canvas {
       position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background:
-        radial-gradient(circle at 25% 35%, var(--teal) 2px, transparent 3px),
-        radial-gradient(circle at 75% 65%, var(--purple) 2px, transparent 3px),
-        radial-gradient(circle at 50% 50%, var(--coral) 1.5px, transparent 2.5px);
-      background-size: 200px 200px, 250px 250px, 180px 180px;
-      animation: dotFloat 12s ease-in-out infinite;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       pointer-events: none;
-      opacity: 0.4;
+      z-index: 0;
     }
 
     #setup-title {
@@ -156,9 +126,9 @@
     }
 
     #api-key-input {
-      background: rgba(255, 255, 255, 0.7);
-      border: 1px solid var(--border);
-      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(60, 60, 80, 0.15);
+      border-radius: 10px;
       color: var(--text-bright);
       font-family: var(--mono);
       font-size: 13px;
@@ -182,9 +152,9 @@
     }
 
     .setup-model-input {
-      background: rgba(255, 255, 255, 0.7);
-      border: 1px solid var(--border);
-      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(60, 60, 80, 0.15);
+      border-radius: 10px;
       color: var(--text-bright);
       font-family: var(--mono);
       font-size: 12px;
@@ -204,9 +174,9 @@
     }
 
     #provider-select {
-      background: rgba(255, 255, 255, 0.7);
-      border: 1px solid var(--border);
-      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(60, 60, 80, 0.15);
+      border-radius: 10px;
       color: var(--text-bright);
       font-family: var(--mono);
       font-size: 12px;
@@ -227,16 +197,16 @@
     #provider-select:focus { border-color: var(--blue); }
 
     #pick-folder-btn {
-      background: linear-gradient(135deg, var(--blue), var(--purple));
+      background: linear-gradient(135deg, #4dabf7, #a78bfa);
       border: none;
-      border-radius: 8px;
-      color: #fff;
+      border-radius: 10px;
+      color: #ffffff;
       font-family: var(--mono);
-      font-size: 12px;
-      font-weight: 600;
+      font-size: 13px;
+      font-weight: 700;
       letter-spacing: 0.12em;
       text-transform: uppercase;
-      padding: 14px 24px;
+      padding: 16px 24px;
       width: 340px;
       box-sizing: border-box;
       cursor: pointer;
@@ -244,35 +214,39 @@
       margin-top: 8px;
       z-index: 1;
       position: relative;
-      box-shadow: 0 4px 14px rgba(77, 171, 247, 0.25);
+      box-shadow: 0 4px 16px rgba(77, 171, 247, 0.3);
     }
 
     #pick-folder-btn:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 22px rgba(77, 171, 247, 0.35);
+      box-shadow: 0 8px 26px rgba(77, 171, 247, 0.45);
+      filter: brightness(1.08);
     }
 
     #load-cache-btn {
-      background: rgba(255, 255, 255, 0.6);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      color: var(--text-dim);
+      background: rgba(255, 255, 255, 0.85);
+      border: 1px solid rgba(60, 60, 80, 0.15);
+      border-radius: 10px;
+      color: #4dabf7;
       font-family: var(--mono);
       font-size: 11px;
+      font-weight: 600;
       letter-spacing: 0.10em;
       text-transform: uppercase;
-      padding: 10px 24px;
+      padding: 12px 24px;
       width: 340px;
       box-sizing: border-box;
       cursor: pointer;
       transition: all 200ms ease;
       z-index: 1;
       position: relative;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
     }
 
     #load-cache-btn:hover {
-      border-color: var(--blue);
-      color: var(--blue);
+      border-color: #4dabf7;
+      color: #3a8de0;
+      box-shadow: 0 4px 14px rgba(77, 171, 247, 0.15);
     }
 
     #setup-status {
@@ -926,6 +900,7 @@
        Setup Screen
        ═══════════════════════════════════════════════ -->
   <div id="setup">
+    <canvas id="bg-canvas"></canvas>
     <div id="setup-title">Obsidian Universe</div>
     <div id="setup-subtitle">Neural Cartography of Ideas</div>
     <select id="provider-select">
@@ -1024,6 +999,135 @@
     import { EffectComposer } from 'https://esm.sh/three@0.170.0/addons/postprocessing/EffectComposer.js';
     import { RenderPass } from 'https://esm.sh/three@0.170.0/addons/postprocessing/RenderPass.js';
     import { UnrealBloomPass } from 'https://esm.sh/three@0.170.0/addons/postprocessing/UnrealBloomPass.js';
+
+
+    // ═══════════════════════════════════════════════
+    // Animated Pointillism Network Background
+    // ═══════════════════════════════════════════════
+    (function() {
+      const canvas = document.getElementById('bg-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let W, H, particles = [];
+      const COLORS = ['#ff6b6b', '#4ecdc4', '#a78bfa', '#ffd93d', '#51cf66', '#4dabf7', '#ff9ff3'];
+      const MAX_DIST = 140;
+      const PARTICLE_COUNT = 80;
+
+      function resize() {
+        W = canvas.width = window.innerWidth;
+        H = canvas.height = window.innerHeight;
+      }
+      resize();
+      window.addEventListener('resize', resize);
+
+      function initParticles() {
+        particles = [];
+        for (let i = 0; i < PARTICLE_COUNT; i++) {
+          particles.push({
+            x: Math.random() * W,
+            y: Math.random() * H,
+            vx: (Math.random() - 0.5) * 0.4,
+            vy: (Math.random() - 0.5) * 0.4,
+            r: 1.5 + Math.random() * 2.5,
+            color: COLORS[Math.floor(Math.random() * COLORS.length)],
+            phase: Math.random() * Math.PI * 2,
+          });
+        }
+      }
+      initParticles();
+
+      let mouseX = -1000, mouseY = -1000;
+      window.addEventListener('mousemove', e => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+      });
+      window.addEventListener('mouseleave', () => {
+        mouseX = -1000; mouseY = -1000;
+      });
+
+      let t = 0;
+      function animate() {
+        t += 0.01;
+        ctx.clearRect(0, 0, W, H);
+
+        // Update + draw particles
+        for (let i = 0; i < particles.length; i++) {
+          const p = particles[i];
+          p.x += p.vx;
+          p.y += p.vy;
+
+          // Bounce edges
+          if (p.x < 0 || p.x > W) p.vx *= -1;
+          if (p.y < 0 || p.y > H) p.vy *= -1;
+
+          // Mouse repel
+          const dx = p.x - mouseX;
+          const dy = p.y - mouseY;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 100) {
+            const force = (100 - dist) / 100;
+            p.x += (dx / dist) * force * 1.5;
+            p.y += (dy / dist) * force * 1.5;
+          }
+
+          // Pulse size
+          const pulseR = p.r + Math.sin(t + p.phase) * 0.5;
+
+          // Draw dot
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, pulseR, 0, Math.PI * 2);
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = 0.5 + Math.sin(t + p.phase) * 0.15;
+          ctx.fill();
+        }
+
+        // Draw connections
+        ctx.globalAlpha = 1;
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const p1 = particles[i];
+            const p2 = particles[j];
+            const dx = p1.x - p2.x;
+            const dy = p1.y - p2.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < MAX_DIST) {
+              const alpha = (1 - dist / MAX_DIST) * 0.25;
+              ctx.beginPath();
+              ctx.moveTo(p1.x, p1.y);
+              ctx.lineTo(p2.x, p2.y);
+              ctx.strokeStyle = p1.color;
+              ctx.globalAlpha = alpha;
+              ctx.lineWidth = 0.8;
+              ctx.stroke();
+            }
+          }
+        }
+
+        // Draw mouse connections
+        if (mouseX > 0) {
+          for (let i = 0; i < particles.length; i++) {
+            const p = particles[i];
+            const dx = p.x - mouseX;
+            const dy = p.y - mouseY;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 160) {
+              const alpha = (1 - dist / 160) * 0.4;
+              ctx.beginPath();
+              ctx.moveTo(p.x, p.y);
+              ctx.lineTo(mouseX, mouseY);
+              ctx.strokeStyle = p.color;
+              ctx.globalAlpha = alpha;
+              ctx.lineWidth = 1;
+              ctx.stroke();
+            }
+          }
+        }
+
+        ctx.globalAlpha = 1;
+        requestAnimationFrame(animate);
+      }
+      animate();
+    })();
 
     // ═══════════════════════════════════════════════
     // Provider Config Persistence
