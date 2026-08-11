@@ -983,7 +983,7 @@
 
         <!-- Search bar: top-right area -->
     <div id="search-bar" style="position:fixed;top:48px;left:50%;transform:translateX(-50%);z-index:10;">
-      <input type="text" id="node-search" placeholder="Search notes..." style="background:var(--bg-panel);backdrop-filter:blur(8px);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:12px;padding:6px 14px;width:240px;outline:none;transition:border-color 200ms ease;" onfocus="this.style.borderColor='var(--accent)'" onblur="this.style.borderColor='var(--border)'">
+      <input type="text" id="node-search" placeholder="Search notes..." style="background:var(--bg-panel);backdrop-filter:blur(8px);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:12px;padding:6px 14px;width:240px;outline:none;transition:border-color 200ms ease;">
     </div>
 
     <!-- Info Panel: left side (unified readouts + legend + key hint) -->
@@ -1405,7 +1405,7 @@
       return { notes, emptySkipped };
     }
 
-    async function pickFolder() {
+    async async function pickFolder() {
       if (!supportsDirectoryPicker()) {
         return pickFolderWithInput();
       }
@@ -3537,6 +3537,8 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
     // ═══════════════════════════════════════════════
     const searchInput = document.getElementById('node-search');
     if (searchInput) {
+      searchInput.addEventListener('focus', () => { searchInput.style.borderColor = 'var(--accent)'; });
+      searchInput.addEventListener('blur', () => { searchInput.style.borderColor = 'var(--border)'; });
       searchInput.addEventListener('input', (e) => {
         const query = e.target.value.toLowerCase().trim();
         if (!query || !Graph) {
