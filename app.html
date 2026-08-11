@@ -5419,25 +5419,33 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
 
 
-        // Progressive edge labeling — batch in the pipeline for incremental reveal
+        // Edge labeling — labelEdges handles batching internally (3x parallel, 50 per batch = 150/round)
 
-        const labeledEdges = [];
+        const labeledEdges = await labelEdges(notes, edges, config, (done, total) => {
 
-        for (let i = 0; i < edges.length; i += EDGE_LABEL_BATCH) {
+          setBootStage('ANNOTATING...', `EDGE LABELS ${done}/${total}`);
 
-          const batchEdges = edges.slice(i, i + EDGE_LABEL_BATCH);
+          // Show progressive edges during labeling (without rebuilding nodes)
 
-          const batchResult = await labelEdges(notes, batchEdges, config);
+          const activeEdges = [...centralEdges, ...decentralEdges, ...labeledEdges.slice(0, done), ...planetEdges];
 
-          labeledEdges.push(...batchResult);
+          const links = activeEdges.map(e => ({
 
-          setBootStage('ANNOTATING...', `EDGE LABELS ${Math.min(i + EDGE_LABEL_BATCH, edges.length)}/${edges.length}`);
+            source: e.source,
 
-          // Show progressive edges during labeling
+            target: e.target,
 
-          updateGraphData(graphNodes, [...centralEdges, ...decentralEdges, ...labeledEdges, ...planetEdges]);
+            label_forward: e.label_forward,
 
-        }
+            label_backward: e.label_backward,
+
+            topology: e.topology,
+
+          }));
+
+          Graph.graphData({ nodes: graphNodes, links });
+
+        });
 
 
 
@@ -6462,9 +6470,9 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
       Graph.graphData({ nodes, links });
 
-      // Always rebuild node objects to clear stale CSS2D labels
-      Graph.nodeThreeObject(node => createNodeObject(node));
-
+      if (refreshNodeObjects) {
+        Graph.nodeThreeObject(node => createNodeObject(node));
+      }
     }
 
 
