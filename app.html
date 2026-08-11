@@ -6462,11 +6462,8 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
       Graph.graphData({ nodes, links });
 
-      if (refreshNodeObjects) {
-
-        Graph.nodeThreeObject(node => createNodeObject(node));
-
-      }
+      // Always rebuild node objects to clear stale CSS2D labels
+      Graph.nodeThreeObject(node => createNodeObject(node));
 
     }
 
