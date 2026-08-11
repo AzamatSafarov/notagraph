@@ -3208,7 +3208,7 @@
 
         let retries = 0;
 
-        const maxRetries = 5;
+        const maxRetries = 10;
 
 
 
@@ -3238,7 +3238,7 @@
 
             if (response.status === 429 || response.status === 503) {
 
-              const retryAfter = Math.min(parseInt(response.headers.get('Retry-After') || '5'), 5);
+              const retryAfter = Math.min(parseInt(response.headers.get('Retry-After') || '10'), 20);
 
               retries++;
 
@@ -3358,6 +3358,8 @@
 
         if (onProgress) onProgress(Math.min(i + EMBED_BATCH_SIZE, texts.length), texts.length);
 
+      
+        if (provider === 'azure') await sleep(1000);
       }
 
 
