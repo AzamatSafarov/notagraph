@@ -1842,51 +1842,9 @@
 
 
 
-    #theme-toggle {
+    
 
-      position: fixed;
-
-      bottom: 20px;
-
-      right: 20px;
-
-      z-index: 10;
-
-      background: var(--bg-panel);
-
-      backdrop-filter: blur(8px);
-
-      -webkit-backdrop-filter: blur(8px);
-
-      border: 1px solid var(--border);
-
-      border-radius: 8px;
-
-      color: var(--text-dim);
-
-      font-family: var(--mono);
-
-      font-size: 11px;
-
-      letter-spacing: 0.10em;
-
-      text-transform: uppercase;
-
-      padding: 8px 14px;
-
-      cursor: pointer;
-
-      transition: color 200ms ease, border-color 200ms ease;
-
-    }
-
-    #theme-toggle:hover {
-
-      color: var(--text);
-
-      border-color: var(--blue);
-
-    }
+    
 
 
 
@@ -2087,7 +2045,7 @@
 
     <button id="export-snapshot-btn" title="Export graph as HTML">EXPORT SNAPSHOT HTML</button>
 
-    <button id="theme-toggle" title="Switch color theme">LIGHT</button>
+    
 
 
 
@@ -4579,31 +4537,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
       },
 
-      grey: {
-
-        bgColor: '#0a0a12', bgAlpha: 1.0,
-
-        labelColor: '#b0b8d0', labelAlpha: 1.0,
-
-        linkColor: '#5060a0', linkAlpha: 0.4,
-
-        particleColor: '#7080c0', particleAlpha: 1.0,
-
-        cluster0: '#ff6b6b', cluster1: '#4ecdc4', cluster2: '#a78bfa',
-
-        cluster3: '#ffd93d', cluster4: '#51cf66', clusterAlpha: 1.0,
-
-        chromeBg: '#0a0a12', chromeBgPanel: '#0e0e1a', chromeBgPanelA: 0.92,
-
-        chromeBorder: '#3a3a5a', chromeText: '#b0b8d0', chromeTextDim: '#606080',
-
-        chromeTextBright: '#e0e8ff', chromeAccent: '#5060a0',
-
-        chromeCyan: '#4ecdc4', chromeLightCyan: '#7ee8e0',
-
-        chromeIndigo: '#a78bfa', chromeAmber: '#ffd93d',
-
-      },
+      
 
     };
 
@@ -4669,9 +4603,11 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
       // Update button label
 
-      document.getElementById('theme-toggle').textContent = name === 'warm' ? 'LIGHT' : 'DARK';
+      
 
     }
+
+    applyTheme('warm');
 
 
 
@@ -5394,25 +5330,11 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
 
 
-        // Progressive edge labeling — batch in the pipeline for incremental reveal
-
-        const labeledEdges = [];
-
-        for (let i = 0; i < edges.length; i += EDGE_LABEL_BATCH) {
-
-          const batchEdges = edges.slice(i, i + EDGE_LABEL_BATCH);
-
-          const batchResult = await labelEdges(notes, batchEdges, config);
-
-          labeledEdges.push(...batchResult);
-
-          setBootStage('ANNOTATING...', `EDGE LABELS ${Math.min(i + EDGE_LABEL_BATCH, edges.length)}/${edges.length}`);
-
-          // Show progressive edges during labeling
-
-          updateGraphData(graphNodes, [...centralEdges, ...decentralEdges, ...labeledEdges, ...planetEdges]);
-
-        }
+        // // Edge labeling - wait for full completion (no progressive update = no CSS zalipanie)
+        setBootStage('ANNOTATING...', `EDGE LABELS 0/${edges.length}`);
+        const labeledEdges = await labelEdges(notes, edges, config, (done, total) => {
+          setBootStage('ANNOTATING...', `EDGE LABELS ${done}/${total}`);
+        });
 
 
 
@@ -6821,16 +6743,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
 
     // Toggle color theme
-
-    document.getElementById('theme-toggle').addEventListener('click', () => {
-
-      const names = Object.keys(COLOR_THEMES);
-
-      const next = names[(names.indexOf(currentTheme) + 1) % names.length];
-
-      applyTheme(next);
-
-    });
+);
 
 
 
