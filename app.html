@@ -5421,13 +5421,14 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
         // Edge labeling — labelEdges handles batching internally (3x parallel, 50 per batch = 150/round)
 
+        const progressiveLabeled = [];
         const labeledEdges = await labelEdges(notes, edges, config, (done, total) => {
 
           setBootStage('ANNOTATING...', `EDGE LABELS ${done}/${total}`);
 
           // Show progressive edges during labeling (without rebuilding nodes)
 
-          const activeEdges = [...centralEdges, ...decentralEdges, ...labeledEdges.slice(0, done), ...planetEdges];
+          const activeEdges = [...centralEdges, ...decentralEdges, ...progressiveLabeled, ...planetEdges];
 
           const links = activeEdges.map(e => ({
 
@@ -5444,6 +5445,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
           }));
 
           Graph.graphData({ nodes: graphNodes, links });
+        progressiveLabeled.push(...labeledEdges);
 
         });
 
