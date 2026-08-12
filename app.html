@@ -1,15 +1,14 @@
 <!DOCTYPE html>
 
-<html lang="en" style="color-scheme: light;">
+<html lang="en" style="color-scheme: dark;">
 
 <head>
 
   <meta charset="UTF-8">
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="%234d8eff" stroke-width="4"/><circle cx="50" cy="50" r="8" fill="%234d8eff"/><circle cx="30" cy="35" r="5" fill="%23a78bfa"/><circle cx="70" cy="65" r="5" fill="%23a78bfa"/><line x1="50" y1="50" x2="30" y2="35" stroke="%234d8eff" stroke-width="1.5"/><line x1="50" y1="50" x2="70" y2="65" stroke="%234d8eff" stroke-width="1.5"/></svg>'>
 
-  <meta name="theme-color" content="#f2efe9">
+  <meta name="theme-color" content="#0a0a0f">
 
   <title>Obsidian Universe</title>
 
@@ -1842,9 +1841,51 @@
 
 
 
-    
+    #theme-toggle {
 
-    
+      position: fixed;
+
+      bottom: 20px;
+
+      right: 20px;
+
+      z-index: 10;
+
+      background: var(--bg-panel);
+
+      backdrop-filter: blur(8px);
+
+      -webkit-backdrop-filter: blur(8px);
+
+      border: 1px solid var(--border);
+
+      border-radius: 8px;
+
+      color: var(--text-dim);
+
+      font-family: var(--mono);
+
+      font-size: 11px;
+
+      letter-spacing: 0.10em;
+
+      text-transform: uppercase;
+
+      padding: 8px 14px;
+
+      cursor: pointer;
+
+      transition: color 200ms ease, border-color 200ms ease;
+
+    }
+
+    #theme-toggle:hover {
+
+      color: var(--text);
+
+      border-color: var(--blue);
+
+    }
 
 
 
@@ -2045,7 +2086,7 @@
 
     <button id="export-snapshot-btn" title="Export graph as HTML">EXPORT SNAPSHOT HTML</button>
 
-    
+    <button id="theme-toggle" title="Switch color theme">LIGHT</button>
 
 
 
@@ -4375,7 +4416,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
     const SCALE = 280;
 
-    let CLUSTER_COLORS = ['#ff9ff3', '#4ecdc4', '#a78bfa', '#ffd93d', '#51cf66'];
+    let CLUSTER_COLORS = ['#c45c3e', '#d4a843', '#a8523a', '#c47a43', '#8b3a2a'];
 
 
 
@@ -4473,29 +4514,29 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
       // UI Chrome (CSS variable colors)
 
-      chromeBg:           { val: '#f2efe9', label: 'UI BG',        section: 'UI CHROME', refresh: 'chrome', type: 'color' },
+      chromeBg:           { val: '#0a0a0f', label: 'UI BG',        section: 'UI CHROME', refresh: 'chrome', type: 'color' },
 
-      chromeBgPanel:      { val: '#ffffff', label: 'PANEL BG',     section: 'UI CHROME', refresh: 'chrome', type: 'color' },
+      chromeBgPanel:      { val: '#080807', label: 'PANEL BG',     section: 'UI CHROME', refresh: 'chrome', type: 'color' },
 
-      chromeBgPanelA:     { val: 0.82, min: 0, max: 1, step: 0.05, label: 'PANEL ALPHA', section: 'UI CHROME', refresh: 'chrome' },
+      chromeBgPanelA:     { val: 0.88, min: 0, max: 1, step: 0.05, label: 'PANEL ALPHA', section: 'UI CHROME', refresh: 'chrome' },
 
-      chromeBorder:       { val: '#cccfd4', label: 'BORDER',       section: 'UI CHROME', refresh: 'chrome', type: 'color' },
+      chromeBorder:       { val: '#cd6d13', label: 'BORDER',       section: 'UI CHROME', refresh: 'chrome', type: 'color' },
 
-      chromeText:         { val: '#3a3a4a', label: 'TEXT',          section: 'UI CHROME', refresh: 'chrome', type: 'color' },
+      chromeText:         { val: '#e8cea6', label: 'TEXT',          section: 'UI CHROME', refresh: 'chrome', type: 'color' },
 
-      chromeTextDim:      { val: '#8a8a9a', label: 'TEXT DIM',     section: 'UI CHROME', refresh: 'chrome', type: 'color' },
+      chromeTextDim:      { val: '#cd8218', label: 'TEXT DIM',     section: 'UI CHROME', refresh: 'chrome', type: 'color' },
 
-      chromeTextBright:   { val: '#1a1a2a', label: 'TEXT BRIGHT',  section: 'UI CHROME', refresh: 'chrome', type: 'color' },
+      chromeTextBright:   { val: '#ffeab8', label: 'TEXT BRIGHT',  section: 'UI CHROME', refresh: 'chrome', type: 'color' },
 
-      chromeAccent:       { val: '#4dabf7', label: 'ACCENT',       section: 'UI CHROME', refresh: 'chrome', type: 'color' },
+      chromeAccent:       { val: '#d07b1b', label: 'ACCENT',       section: 'UI CHROME', refresh: 'chrome', type: 'color' },
 
-      chromeCyan:         { val: '#4ecdc4', label: 'CYAN',          section: 'UI CHROME', refresh: 'chrome', type: 'color' },
+      chromeCyan:         { val: '#d4a843', label: 'CYAN',          section: 'UI CHROME', refresh: 'chrome', type: 'color' },
 
-      chromeLightCyan:    { val: '#7ee8e0', label: 'LIGHT CYAN',  section: 'UI CHROME', refresh: 'chrome', type: 'color' },
+      chromeLightCyan:    { val: '#e8c46a', label: 'LIGHT CYAN',  section: 'UI CHROME', refresh: 'chrome', type: 'color' },
 
-      chromeIndigo:       { val: '#a78bfa', label: 'INDIGO',       section: 'UI CHROME', refresh: 'chrome', type: 'color' },
+      chromeIndigo:       { val: '#c47a43', label: 'INDIGO',       section: 'UI CHROME', refresh: 'chrome', type: 'color' },
 
-      chromeAmber:        { val: '#ffd93d', label: 'AMBER',        section: 'UI CHROME', refresh: 'chrome', type: 'color' },
+      chromeAmber:        { val: '#d4a843', label: 'AMBER',        section: 'UI CHROME', refresh: 'chrome', type: 'color' },
 
     };
 
@@ -4537,7 +4578,31 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
       },
 
-      
+      grey: {
+
+        bgColor: '#0a0a12', bgAlpha: 1.0,
+
+        labelColor: '#b0b8d0', labelAlpha: 1.0,
+
+        linkColor: '#5060a0', linkAlpha: 0.4,
+
+        particleColor: '#7080c0', particleAlpha: 1.0,
+
+        cluster0: '#ff6b6b', cluster1: '#4ecdc4', cluster2: '#a78bfa',
+
+        cluster3: '#ffd93d', cluster4: '#51cf66', clusterAlpha: 1.0,
+
+        chromeBg: '#0a0a12', chromeBgPanel: '#0e0e1a', chromeBgPanelA: 0.92,
+
+        chromeBorder: '#3a3a5a', chromeText: '#b0b8d0', chromeTextDim: '#606080',
+
+        chromeTextBright: '#e0e8ff', chromeAccent: '#5060a0',
+
+        chromeCyan: '#4ecdc4', chromeLightCyan: '#7ee8e0',
+
+        chromeIndigo: '#a78bfa', chromeAmber: '#ffd93d',
+
+      },
 
     };
 
@@ -4603,11 +4668,9 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
       // Update button label
 
-      
+      document.getElementById('theme-toggle').textContent = name === 'warm' ? 'LIGHT' : 'DARK';
 
     }
-
-    applyTheme('warm');
 
 
 
@@ -6757,7 +6820,16 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
 
     // Toggle color theme
-);
+
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+
+      const names = Object.keys(COLOR_THEMES);
+
+      const next = names[(names.indexOf(currentTheme) + 1) % names.length];
+
+      applyTheme(next);
+
+    });
 
 
 
