@@ -1580,7 +1580,7 @@
 
 
 
-    .marker.llm-center {
+    .marker.ai-selected {
 
       color: #fb923c;
 
@@ -1955,12 +1955,12 @@
 
     <div id="controls">
 
-      <button class="active" data-layout="central">CORE</button>
+      <button class="active" data-layout="central">NEXUS</button>
 
-      <button data-layout="decentral">CLUSTERS</button>
+      <button data-layout="decentral">GALAXIES</button>
 
-      <button data-layout="distrib">NEURAL</button>
-      <button data-layout="planet">PLANET</button>
+      <button data-layout="distrib">SYNAPSE</button>
+      <button data-layout="planet">ORBIT</button>
 
     </div>
 
@@ -1976,7 +1976,7 @@
 
         <div class="info-row"><span class="info-key">EDGES</span><span class="info-val" id="readout-edges">0</span></div>
 
-        <div class="info-row"><span class="info-key">K-NN</span><span class="info-val" id="readout-knn">5</span></div>
+        <div class="info-row"><span class="info-key">LINKS</span><span class="info-val" id="readout-knn">5</span></div>
 
       </div>
 
@@ -1991,7 +1991,7 @@
 
 
 
-    <div id="key-hint">H — RECENTER</div>
+    <div id="key-hint">H — RESET</div>
 
 
 
@@ -2944,7 +2944,7 @@
 
 
 
-      setBootStage(`SCOPE ONLINE // ${session.nodeCount} NODES // ${activeEdges.length} EDGES`, 'RESTORED FROM CACHE');
+      setBootStage(`UNIVERSE ONLINE // ${session.nodeCount} NODES // ${activeEdges.length} EDGES`, 'LOADED FROM MEMORY');
 
       setTimeout(hideBootStatus, 2000);
 
@@ -5012,9 +5012,9 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
 
 
-        // ── STAGE 3: COMPUTING TOPOLOGY ──
+        // ── STAGE 3: MAPPING IDEAS ──
 
-        setBootStage('COMPUTING TOPOLOGY...', 'CLUSTERING');
+        setBootStage('MAPPING IDEAS...', 'CLUSTERING');
 
         await sleep(50);
 
@@ -5024,7 +5024,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
 
 
-        setBootStage('COMPUTING TOPOLOGY...', 'PCA');
+        setBootStage('MAPPING IDEAS...', 'PCA');
 
         await sleep(50);
 
@@ -5032,7 +5032,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
 
 
-        setBootStage('COMPUTING TOPOLOGY...', 'CENTRALIZED LAYOUT');
+        setBootStage('MAPPING IDEAS...', 'CENTRALIZED LAYOUT');
 
         await sleep(50);
 
@@ -5040,7 +5040,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
 
 
-        setBootStage('COMPUTING TOPOLOGY...', 'DECENTRALIZED LAYOUT');
+        setBootStage('MAPPING IDEAS...', 'DECENTRALIZED LAYOUT');
 
         await sleep(50);
 
@@ -5048,18 +5048,18 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
 
 
-        setBootStage('COMPUTING TOPOLOGY...', 'UMAP');
+        setBootStage('MAPPING IDEAS...', 'UMAP');
 
         await sleep(50);
 
         const distrib = computeDistributedLayout(embeddings, K_NEIGHBORS);
 
-        setBootStage('COMPUTING TOPOLOGY...', 'PLANET LAYOUT');
+        setBootStage('MAPPING IDEAS...', 'PLANET LAYOUT');
         await sleep(50);
         const planet = computePlanetLayout(embeddings, clusterLabels, k);
 
 
-        setBootStage('COMPUTING TOPOLOGY...', 'K-NN EDGES');
+        setBootStage('MAPPING IDEAS...', 'K-NN EDGES');
 
         await sleep(50);
 
@@ -5326,7 +5326,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
         // Initialize graph with white/uncolored nodes (no annotations yet)
 
-        setBootStage('COMPUTING TOPOLOGY...', 'INITIALIZING GRAPH');
+        setBootStage('MAPPING IDEAS...', 'BUILDING UNIVERSE');
 
         await sleep(50);
 
@@ -5334,9 +5334,9 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
 
 
-        // ── STAGE 4: ANNOTATING ──
+        // ── STAGE 4: LABELING ──
 
-        setBootStage('ANNOTATING...', 'CENTER NOMINATION');
+        setBootStage('LABELING...', 'NAMING ANCHOR');
 
         const llmCenterIdx = await nominateCenter(notes, config);
 
@@ -5348,7 +5348,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
 
 
-        setBootStage('ANNOTATING...', 'CLUSTER NAMES');
+        setBootStage('LABELING...', 'GALAXY NAMES');
 
         const clusterNames = await nameClusters(notes, clusterLabels, k, config);
 
@@ -5369,7 +5369,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
         // Progressive edge labeling — batch in the pipeline for incremental reveal
 
         const labeledEdges = await labelEdges(notes, edges, config, (done, total) => {
-          setBootStage('ANNOTATING...', `EDGE LABELS ${done}/${total}`);
+          setBootStage('LABELING...', `CONNECTIONS ${done}/${total}`);
         });
 
 
@@ -5468,13 +5468,13 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
           console.error('Cache save failed:', cacheErr);
 
-          setBootStage(`SCOPE ONLINE // ${notes.length} NODES // CACHE SAVE FAILED`, cacheErr.message);
+          setBootStage(`UNIVERSE ONLINE // ${notes.length} NODES // CACHE SAVE FAILED`, cacheErr.message);
 
         }
 
 
 
-        setBootStage(`SCOPE ONLINE // ${notes.length} NODES // ${labeledEdges.length} EDGES`, '');
+        setBootStage(`UNIVERSE ONLINE // ${notes.length} NODES // ${labeledEdges.length} EDGES`, '');
 
         setTimeout(hideBootStatus, 2000);
 
@@ -5728,7 +5728,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
       const markers = [];
 
-      if (node.is_medoid) markers.push('<span style="color:#ef4444;font-size:10px;">MEDOID</span>');
+      if (node.is_medoid) markers.push('<span style="color:#ef4444;font-size:10px;">ANCHOR</span>');
 
       if (node.is_llm_center) markers.push('<span style="color:#fb923c;font-size:10px;">LLM.CENTER</span>');
 
@@ -5972,9 +5972,9 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
       let title = escapeHtml(node.name);
 
-      if (node.is_medoid) title += ' <span class="marker medoid">MEDOID</span>';
+      if (node.is_medoid) title += ' <span class="marker medoid">ANCHOR</span>';
 
-      if (node.is_llm_center) title += ' <span class="marker llm-center">LLM.CENTER</span>';
+      if (node.is_llm_center) title += ' <span class="marker ai-selected">LLM.CENTER</span>';
 
       document.getElementById('card-title').innerHTML = title;
 
@@ -6410,14 +6410,14 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
     const LAYOUT_DESCRIPTIONS = {
 
-      central: 'CORE \u2014 MEDOID AT ORIGIN, NOTES RADIATE OUTWARD',
+      central: 'NEXUS \u2014 ANCHOR AT ORIGIN, NOTES RADIATE OUTWARD',
 
-      decentral: 'CLUSTERS \u2014 THEMATIC HUBS WITH ORBITING NOTES',
+      decentral: 'GALAXIES \u2014 THEMATIC HUBS WITH ORBITING NOTES',
 
-      distrib: 'NEURAL \u2014 UMAP PROJECTION, SEMANTIC PROXIMITY',
+      distrib: 'SYNAPSE \u2014 UMAP PROJECTION, SEMANTIC PROXIMITY',
 
     
-      planet: 'PLANET \u2014 CLUSTERS AS CONTINENTS ON A SPHERE',};
+      planet: 'ORBIT \u2014 CLUSTERS AS CONTINENTS ON A SPHERE',};
 
 
 
@@ -6507,9 +6507,9 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
       special.innerHTML =
 
-        '<div class="legend-item"><div class="legend-dot" style="border:2px solid #ef4444;background:transparent;"></div><span class="legend-label">EMBEDDING MEDOID</span></div>'
+        '<div class="legend-item"><div class="legend-dot" style="border:2px solid #ef4444;background:transparent;"></div><span class="legend-label">EMBEDDING ANCHOR</span></div>'
 
-        + '<div class="legend-item"><div class="legend-dot" style="border:2px solid #fb923c;background:transparent;"></div><span class="legend-label">LLM-NOMINATED CENTER</span></div>';
+        + '<div class="legend-item"><div class="legend-dot" style="border:2px solid #fb923c;background:transparent;"></div><span class="legend-label">AI-SELECTED CENTER</span></div>';
 
       legend.appendChild(special);
 
