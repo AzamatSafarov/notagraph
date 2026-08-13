@@ -1,77 +1,125 @@
-<div align="center">
-
-<img src="assets/logo-mark.svg" alt="Obsidian Universe mark" width="92">
-
 # Obsidian Universe
 
-![Status](https://img.shields.io/badge/status-active-22c55e?style=for-the-badge)
-![Type](https://img.shields.io/badge/type-Visualization-2563eb?style=for-the-badge)
-![License](https://img.shields.io/badge/license-MIT-lightgrey?style=for-the-badge)
+<div align="center">
 
-![HTML](https://img.shields.io/badge/HTML-E34F26?style=for-the-badge&logo=html5&logoColor=white)
-![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
-![Three.js](https://img.shields.io/badge/Three.js-000000?style=for-the-badge&logo=three.js&logoColor=white)
+```
+Notes -> Embeddings -> Clusters -> LLM Labels -> 3D Graph -> Export
+  md/txt     PCA/UMAP    KMeans+     naming,      Force      HTML
+             k-NN        k-means++   labels       directed
+```
 
-**Neural Cartography of Ideas - visualize your notes as a 3D knowledge graph with AI embeddings and LLM annotations.**
+[![Live](https://img.shields.io/badge/LIVE-topologies--of--ideas--universal.vercel.app-4dabf7?style=flat-square&logo=vercel)](https://topologies-of-ideas-universal.vercel.app)
+[![Status](https://img.shields.io/badge/status-active-success?style=flat-square)](#)
+[![License](https://img.shields.io/badge/license-MIT-lightgrey?style=flat-square)](#)
 
-[Live Demo](https://topologies-of-ideas-universal.vercel.app) - [Quick Start](#quick-start) - [Features](#features) - [Architecture](#architecture) - [Roadmap](#roadmap)
-
-<img src="assets/hero-banner.svg" alt="Hero banner" width="100%">
+> Load your `.md` and `.txt` notes and watch AI build an explorable 3D universe of your knowledge. All local, no tracking.
 
 </div>
 
----
+## What it does
 
-> **Obsidian Universe** loads your `.md` and `.txt` notes and turns them into an explorable 3D knowledge constellation. All processing happens in your browser - nothing leaves your machine.
-
-## Quick Start
-
-1. Open [topologies-of-ideas-universal.vercel.app](https://topologies-of-ideas-universal.vercel.app)
-2. Choose an AI provider (Azure, Gemini, OpenAI, OpenRouter, Mistral, Groq, or local Ollama)
-3. Paste your API key and enter model names
-4. Click **SELECT NOTES FOLDER** and choose your note folder
-5. Wait for the pipeline (embeddings, clustering, LLM annotations)
-6. Explore your knowledge graph in 4 topology modes
-
-Done. No build, no install, no tracking.
-
-## Features
-
-| Feature | What it does |
-|---------|-------------|
-| **7 AI Providers** | Azure OpenAI, Gemini, OpenAI, OpenRouter, Mistral, Groq, local Ollama with smart field visibility |
-| **4 Topologies** | Core, Clusters, Neural (UMAP), and Planet (clusters as continents on a sphere) |
-| **3D Graph** | Force-directed with CSS2D labels, bloom post-processing, particle FX |
-| **LLM Annotations** | Cluster naming, edge labeling, center nomination by AI |
-| **Dim Reduction** | PCA + UMAP + k-NN for layout |
-| **Parallel Labeling** | 150 edge pairs per round, 3x concurrency |
-| **Rate Limit Retry** | Exponential backoff for Azure 429/503 |
-| **Session Cache** | IndexedDB persistence + resume previous |
-| **Export Snapshot** | Standalone HTML with embedded graph data |
-| **Share Graph** | Copy link with resume parameter |
-| **Privacy First** | All local. No tracking, no telemetry, no cookies |
+Picks up your note folder, sends text through an embedding model, clusters by semantic similarity, names clusters with LLM, labels connections, then drops everything into an interactive 3D graph with 4 topology modes. Export as standalone HTML, share with a link.
 
 ## Architecture
 
-```mermaid
-flowchart LR
-    A[Folder of .md/.txt] --> B[Text Embeddings]
-    B --> C[PCA/UMAP]
-    C --> D[KMeans Clustering]
-    D --> E[k-NN Edges]
-    E --> F[LLM Labels]
-    F --> G[3D Force Graph]
-    G --> H[Export HTML]
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│  Notes Folder   │───→│  Embeddings     │───→│  PCA / UMAP     │
+│  .md / .txt     │    │  7 providers    │    │  Dim reduction  │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+                           ↑
+                           │    ┌─────────────────┐
+                           └───→│  LLM Assistant  │
+                                │  Cluster names  │
+                                │  Edge labels    │
+                                └─────────────────┘
+                                                       │
+                                                       ↓
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│  Export HTML    │←───│  3D Force Graph │←───│  KMeans + k-NN  │
+│  Embedded data  │    │  Three.js       │    │  Clusters       │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
 ```
 
-## Topologies
+## Structure
 
-| Mode | Layout |
-|------|--------|
-| **CORE** | Medoid at center, notes radiate outward by distance |
-| **CLUSTERS** | Thematic hubs with orbital notes around each center |
-| **NEURAL** | UMAP projection, semantic proximity in vector space |
-| **PLANET** | Clusters as continents on a sphere with surface arcs |
+```
+topologies-of-ideas-universal/
+├── 📖 README.md              ← you are here
+├── 📜 CHANGELOG.md           ← history of changes
+│
+├── 🌐 app.html               ← single-file application (143K)
+│   ├── 7 AI providers        ← Azure, Gemini, OpenAI, OR, Mistral, Groq, Ollama
+│   ├── 4 topology modes      ← Core, Clusters, Neural, Planet
+│   ├── VFX panel             ← bloom, particles, node size, link opacity
+│   └── Export snapshot       ← standalone HTML with embedded graph data
+│
+├── 🎨 assets/
+│   ├── logo-mark.svg         ← cosmic node cluster mark
+│   └── hero-banner.svg       ← 3D knowledge constellation banner
+│
+├── 🔧 index.html             ← sync of app.html for Vercel root
+├── 🔑 api/                   ← optional FastAPI RAG backend
+│   ├── main.py               ← chat endpoint
+│   └── requirements.txt      ← dependencies
+│
+└── 📦 .github/               ← topics set via GitHub API
+```
+
+## Providers
+
+| Provider | Chat | Embeddings | Status |
+|----------|------|-----------|--------|
+| Azure OpenAI | GPT | text-embedding | ✅ Active |
+| Gemini | Flash | embedding-001 | ✅ Active |
+| OpenAI | GPT-4o-mini | text-embedding | ✅ Active |
+| OpenRouter | Various | text-embedding | ✅ Active |
+| Mistral | Small-latest | mistral-embed | ✅ Active |
+| Groq | Llama-70B | Via Ollama fallback | ✅ Active |
+| Ollama | Local models | nomic-embed-text | ✅ Local only |
+
+## Status
+
+| Feature | State |
+|---------|-------|
+| Multi-provider AI | ✅ Done |
+| 3D force graph with bloom | ✅ Done |
+| 4 topology modes | ✅ Done |
+| LLM cluster naming | ✅ Done |
+| LLM edge labeling | ✅ Done |
+| Planet surface arcs | ✅ Done |
+| Parallel labeling (150/round) | ✅ Done |
+| Rate limit retry | ✅ Done |
+| IndexedDB cache | ✅ Done |
+| Export HTML snapshot | ✅ Done |
+| Share link | ✅ Done |
+| Search/filter | 🟡 Next |
+| WebVR | 🟡 Next |
+| Multi-folder colors | 🟡 Next |
+
+## Where everything lives
+
+| Layer | What | Where |
+|-------|------|-------|
+| Frontend | Single HTML app | `app.html` |
+| 3D Engine | Three.js + force-graph | CDN (esm.sh) |
+| AI | Your chosen provider | Browser -> API |
+| Cache | IndexedDB | Browser local |
+| Deploy | Static hosting | Vercel |
+| Optional RAG | FastAPI + ChromaDB | `api/` |
+| Optional backup | Git | This repo |
+
+## Tech
+
+| Component | Library |
+|-----------|---------|
+| 3D Graph | Three.js + 3d-force-graph + CSS2DRenderer |
+| Dim Reduction | UMAP.js + power iteration PCA |
+| Clustering | KMeans++ |
+| Layout | Force-directed 3D + k-NN |
+| Bloom | Three.js postprocessing |
+| Cache | IndexedDB |
+| Deploy | Vercel (single static file) |
 
 ## Browser Support
 
@@ -81,37 +129,13 @@ flowchart LR
 | Firefox | webkitdirectory fallback |
 | Safari | webkitdirectory fallback |
 
-## Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
-| 3D Engine | Three.js + 3d-force-graph + CSS2DRenderer |
-| Dim Reduction | UMAP.js + power iteration PCA |
-| Clustering | KMeans++ |
-| Layout | Force-directed 3D + k-NN |
-| Cache | IndexedDB |
-| Deploy | Vercel (single static HTML file) |
-
-## Roadmap
-
-- [x] Multi-provider AI support (7 providers)
-- [x] Planet topology with surface arcs
-- [x] Parallel edge labeling
-- [x] Export standalone HTML
-- [ ] Search/filter notes in graph
-- [ ] WebVR mode
-- [ ] Multi-folder support with color coding
-
 ## License
 
 MIT
 
 ---
 
-<div align="center">
-
 **Built by [Azamat Safarov](https://github.com/AzamatSafarov)**
 
-[Telegram](https://t.me/kelebrimbor) - [GitHub](https://github.com/AzamatSafarov)
-
-</div>
+Also see:
+- [github-repo-beautifier](https://github.com/AzamatSafarov/github-repo-beautifier.git) - premium GitHub README templates
