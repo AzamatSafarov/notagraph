@@ -3211,7 +3211,7 @@
 
         let retries = 0;
 
-        const maxRetries = 5;
+        const maxRetries = 10;
 
 
 
@@ -3237,11 +3237,13 @@
 
             );
 
-            if (response.ok) break;
-
+            if (response.ok) {
+              await sleep(6000); // 6s base delay between Azure requests (match rate limit)
+              break;
+            }
             if (response.status === 429 || response.status === 503) {
 
-              const retryAfter = Math.min(parseInt(response.headers.get('Retry-After') || '5'), 5);
+              const retryAfter = Math.min(parseInt(response.headers.get('Retry-After') || '6'), 60);
 
               retries++;
 
@@ -3399,7 +3401,7 @@
 
           if (response.status === 429 || response.status === 503) {
 
-            const retryAfter = Math.min(parseInt(response.headers.get('Retry-After') || '5'), 5);
+            const retryAfter = Math.min(parseInt(response.headers.get('Retry-After') || '6'), 60);
 
             retries++;
 
