@@ -87,7 +87,7 @@ flowchart LR
 ## 📁 Structure
 
 ```
-topologies-of-ideas-universal/
+obsidian-universe/
 ├── 📖 README.md              ← you are here
 ├── 📜 CHANGELOG.md           ← history of changes
 │
