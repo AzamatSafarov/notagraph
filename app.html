@@ -7,6 +7,7 @@
   <meta charset="UTF-8">
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="none" stroke="%234d8eff" stroke-width="4"/><circle cx="50" cy="50" r="8" fill="%234d8eff"/><circle cx="30" cy="35" r="5" fill="%23a78bfa"/><circle cx="70" cy="65" r="5" fill="%23a78bfa"/><line x1="50" y1="50" x2="30" y2="35" stroke="%234d8eff" stroke-width="1.5"/><line x1="50" y1="50" x2="70" y2="65" stroke="%234d8eff" stroke-width="1.5"/></svg>'>
 
   <meta name="theme-color" content="#0a0a0f">
 
@@ -5367,23 +5368,9 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
         // Progressive edge labeling — batch in the pipeline for incremental reveal
 
-        const labeledEdges = [];
-
-        for (let i = 0; i < edges.length; i += EDGE_LABEL_BATCH) {
-
-          const batchEdges = edges.slice(i, i + EDGE_LABEL_BATCH);
-
-          const batchResult = await labelEdges(notes, batchEdges, config);
-
-          labeledEdges.push(...batchResult);
-
-          setBootStage('ANNOTATING...', `EDGE LABELS ${Math.min(i + EDGE_LABEL_BATCH, edges.length)}/${edges.length}`);
-
-          // Show progressive edges during labeling
-
-          updateGraphData(graphNodes, [...centralEdges, ...decentralEdges, ...labeledEdges, ...planetEdges]);
-
-        }
+        const labeledEdges = await labelEdges(notes, edges, config, (done, total) => {
+          setBootStage('ANNOTATING...', `EDGE LABELS ${done}/${total}`);
+        });
 
 
 
@@ -6225,6 +6212,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
 
 
+      document.getElementById('graph').innerHTML = '';
       Graph = ForceGraph3D()
 
         (document.getElementById('graph'))
