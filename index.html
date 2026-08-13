@@ -12,13 +12,13 @@
   <meta name="theme-color" content="#0a0a0f">
 
   
-    <meta property="og:title" content="Obsidian Universe - Neural Cartography of Ideas">
+    <meta property="og:title" content="Notagraph - Neural Cartography of Ideas">
     <meta property="og:description" content="Visualize your notes as a 3D knowledge graph. Multi-provider AI embeddings + LLM annotations.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://obsidian-universe.vercel.app">
+    <meta property="og:url" content="https://notagraph.vercel.app">
     <meta name="description" content="Visualize your notes as a 3D knowledge graph with AI embeddings and LLM annotations.">
 
-    <title>Obsidian Universe</title>
+    <title>Notagraph</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
 
@@ -1887,7 +1887,7 @@
 
     <canvas id="bg-canvas"></canvas>
 
-    <div id="setup-title">Obsidian Universe</div>
+    <div id="setup-title">Notagraph</div>
 
     <div id="setup-subtitle">Neural Cartography of Ideas</div>
 
@@ -1946,7 +1946,7 @@
        ═══════════════════════════════════════════════ -->
 
     <div id="contact-footer" style="position:fixed;bottom:16px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:10px;color:var(--text-dim);letter-spacing:0.08em;text-transform:uppercase;text-align:center;opacity:0.6;z-index:5;pointer-events:none;">
-    Built by <a href="https://github.com/AzamatSafarov" target="_blank" rel="noopener" style="color:var(--text);text-decoration:none;pointer-events:auto;">Azamat Safarov</a> - <a href="https://github.com/AzamatSafarov/obsidian-universe" target="_blank" rel="noopener" style="color:var(--text);text-decoration:none;pointer-events:auto;">GitHub</a>
+    Built by <a href="https://github.com/AzamatSafarov" target="_blank" rel="noopener" style="color:var(--text);text-decoration:none;pointer-events:auto;">Azamat Safarov</a> - <a href="https://github.com/AzamatSafarov/notagraph" target="_blank" rel="noopener" style="color:var(--text);text-decoration:none;pointer-events:auto;">GitHub</a>
   </div>
 
 <div id="main" class="hidden">
@@ -1961,7 +1961,7 @@
 
     <!-- Title: top-left -->
 
-    <div id="title">OBSIDIAN UNIVERSE</div>
+    <div id="title">NOTAGRAPH</div>
 
     <button id="reanalyze-btn" class="hidden">RE-ANALYZE</button>
 
@@ -2365,7 +2365,7 @@
 
     // ═══════════════════════════════════════════════
 
-    const CONFIG_STORAGE = 'obsidian-universe-config-v2';
+    const CONFIG_STORAGE = 'notagraph-config-v2';
 
     const AZURE_API_VERSION = '2024-02-01';
 
@@ -6975,7 +6975,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
         const nameBits = [sessionData.nodeCount ? sessionData.nodeCount + '-notes' : '', sanitizeExportNamePart(Object.values(sessionData.clusterNames || {})[0] || '')].filter(Boolean).join('-');
 
-        downloadTextFile('obsidian-universe-' + (nameBits || 'snapshot') + '.html', standaloneHtml);
+        downloadTextFile('notagraph-' + (nameBits || 'snapshot') + '.html', standaloneHtml);
 
         setBootStage('SNAPSHOT EXPORTED', 'STANDALONE HTML READY');
 
@@ -6989,7 +6989,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
         const json = JSON.stringify(sessionData);
 
-        downloadTextFile('obsidian-universe-snapshot-' + Date.now() + '.json', json);
+        downloadTextFile('notagraph-snapshot-' + Date.now() + '.json', json);
 
         setBootStage('SNAPSHOT EXPORTED', 'JSON FALLBACK (COULD NOT FETCH SOURCE)');
 

@@ -1,8 +1,8 @@
 <div align="center">
 
-<img src="assets/logo-mark.svg" alt="Obsidian Universe mark" width="92">
+<img src="assets/logo-mark.svg" alt="Notagraph mark" width="92">
 
-# 🌌 Obsidian Universe
+# 🌌 Notagraph
 
 ![Status](https://img.shields.io/badge/status-active-22c55e?style=for-the-badge)
 ![Type](https://img.shields.io/badge/type-Visualization-7c3aed?style=for-the-badge)
@@ -14,13 +14,13 @@
 
 **Neural Cartography of Ideas — visualize your notes as a 3D knowledge graph with AI embeddings and LLM annotations.**
 
-[Live Demo](https://https://obsidian-universe-n8kmqmlnp-kirin-jindoshs-projects.vercel.app) - [Quick Start](#-quick-start) - [Features](#-features) - [Architecture](#-architecture) - [Roadmap](#-roadmap)
+[Live Demo](https://https://notagraph-n8kmqmlnp-kirin-jindoshs-projects.vercel.app) - [Quick Start](#-quick-start) - [Features](#-features) - [Architecture](#-architecture) - [Roadmap](#-roadmap)
 
-<img src="assets/hero-banner.svg" alt="Obsidian Universe hero banner" width="100%">
+<img src="assets/hero-banner.svg" alt="Notagraph hero banner" width="100%">
 
 </div>
 
-> Obsidian Universe does **not** upload your notes anywhere. All processing happens in your browser — embeddings, clustering, graph layout, everything.
+> Notagraph does **not** upload your notes anywhere. All processing happens in your browser — embeddings, clustering, graph layout, everything.
 
 > [!NOTE]
 > Public examples are intentionally generic. Load your own `.md` or `.txt` folder to explore your personal knowledge constellation.
@@ -31,7 +31,7 @@
 
 Most note-taking apps trap your ideas in folders.
 
-**Obsidian Universe** builds a 3D gravitational field from your notes and lets you explore them as constellations, continents, and neural networks. Every word you wrote becomes a node. Every semantic connection becomes an edge. The AI names clusters, labels relationships, and finds the center of each idea cluster.
+**Notagraph** builds a 3D gravitational field from your notes and lets you explore them as constellations, continents, and neural networks. Every word you wrote becomes a node. Every semantic connection becomes an edge. The AI names clusters, labels relationships, and finds the center of each idea cluster.
 
 That makes it useful for:
 - researchers mapping domains of knowledge
@@ -61,7 +61,7 @@ That makes it useful for:
 
 ## 🚀 Quick Start
 
-1. Open [https://obsidian-universe-n8kmqmlnp-kirin-jindoshs-projects.vercel.app](https://https://obsidian-universe-n8kmqmlnp-kirin-jindoshs-projects.vercel.app)
+1. Open [https://notagraph-n8kmqmlnp-kirin-jindoshs-projects.vercel.app](https://https://notagraph-n8kmqmlnp-kirin-jindoshs-projects.vercel.app)
 2. Choose an AI provider and enter API key
 3. Click **SELECT NOTES FOLDER** and choose your `.md` / `.txt` files
 4. Wait for the pipeline (embeddings -> clustering -> LLM annotations)
@@ -87,7 +87,7 @@ flowchart LR
 ## 📁 Structure
 
 ```
-obsidian-universe/
+notagraph/
 ├── 📖 README.md              ← you are here
 ├── 📜 CHANGELOG.md           ← history of changes
 │
