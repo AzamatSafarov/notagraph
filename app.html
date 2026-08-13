@@ -2427,7 +2427,7 @@
       openrouter: {
 
         label: 'OpenRouter',
-        getKeyUrl: 'https://openrouter.ai/settings/keys',
+        getKeyUrl: 'https://openrouter.ai/',
 
         apiKey: '',
 
@@ -7082,7 +7082,19 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
 
 
-    // Auto-resume from URL param
+    // Initialize theme
+    applyTheme('warm');
+
+    // Check for embedded session (exported snapshot)
+    if (window.__TOPOLOGIES_EMBEDDED_SESSION__) {
+      const session = window.__TOPOLOGIES_EMBEDDED_SESSION__;
+      document.getElementById('setup').classList.add('hidden');
+      document.getElementById('main').classList.remove('hidden');
+      document.getElementById('reanalyze-btn').classList.remove('hidden');
+      document.getElementById('copy-graph-link-btn').classList.remove('hidden');
+      document.getElementById('export-snapshot-btn').classList.remove('hidden');
+      restoreFromCache(session);
+    } else // Auto-resume from URL param
 
     if (new URLSearchParams(window.location.search).get('resume') === 'latest') {
 
