@@ -1945,7 +1945,11 @@
 
        ═══════════════════════════════════════════════ -->
 
-  <div id="main" class="hidden">
+    <div id="contact-footer" style="position:fixed;bottom:16px;left:50%;transform:translateX(-50%);font-family:var(--mono);font-size:10px;color:var(--text-dim);letter-spacing:0.08em;text-transform:uppercase;text-align:center;opacity:0.6;z-index:5;pointer-events:none;">
+    Built by <a href="https://github.com/AzamatSafarov" target="_blank" rel="noopener" style="color:var(--text);text-decoration:none;pointer-events:auto;">Azamat Safarov</a> - <a href="https://github.com/AzamatSafarov/topologies-of-ideas-universal" target="_blank" rel="noopener" style="color:var(--text);text-decoration:none;pointer-events:auto;">GitHub</a>
+  </div>
+
+<div id="main" class="hidden">
 
 
 
@@ -2423,7 +2427,7 @@
       openrouter: {
 
         label: 'OpenRouter',
-        getKeyUrl: 'https://openrouter.ai/keys',
+        getKeyUrl: 'https://openrouter.ai/settings/keys',
 
         apiKey: '',
 
@@ -2953,7 +2957,7 @@
 
       document.getElementById('setup').classList.add('hidden');
 
-      document.getElementById('main').classList.remove('hidden');
+      document.getElementById('main').classList.remove('hidden'); document.getElementById('contact-footer').style.display = 'none';
 
       document.getElementById('reanalyze-btn').classList.remove('hidden');
 
@@ -3082,7 +3086,7 @@
 
         document.getElementById('setup').classList.add('hidden');
 
-        document.getElementById('main').classList.remove('hidden');
+        document.getElementById('main').classList.remove('hidden'); document.getElementById('contact-footer').style.display = 'none';
 
         document.getElementById('reanalyze-btn').classList.remove('hidden');
 
@@ -3146,7 +3150,7 @@
 
         document.getElementById('main').classList.add('hidden');
 
-        document.getElementById('setup').classList.remove('hidden');
+        document.getElementById('setup').classList.remove('hidden'); document.getElementById('contact-footer').style.display = 'block';
 
         setupStatus.textContent = 'SELECT FOLDER AGAIN TO RE-ANALYZE';
 
@@ -7088,7 +7092,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
           document.getElementById('setup').classList.add('hidden');
 
-          document.getElementById('main').classList.remove('hidden');
+          document.getElementById('main').classList.remove('hidden'); document.getElementById('contact-footer').style.display = 'none';
 
           document.getElementById('reanalyze-btn').classList.remove('hidden');
 
