@@ -11,7 +11,14 @@
 
   <meta name="theme-color" content="#0a0a0f">
 
-  <title>Obsidian Universe</title>
+  
+    <meta property="og:title" content="Obsidian Universe - Neural Cartography of Ideas">
+    <meta property="og:description" content="Visualize your notes as a 3D knowledge graph. Multi-provider AI embeddings + LLM annotations.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://topologies-of-ideas-universal.vercel.app">
+    <meta name="description" content="Visualize your notes as a 3D knowledge graph with AI embeddings and LLM annotations.">
+
+    <title>Obsidian Universe</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
 
@@ -1895,6 +1902,10 @@
 
       <option value="openrouter">OPENROUTER</option>
 
+      <option value="mistral">MISTRAL</option>
+
+      <option value="groq">GROQ</option>
+
       <option value="ollama">OLLAMA LOCAL</option>
 
     </select>
@@ -1902,6 +1913,7 @@
     <label for="api-key-input" id="api-key-label">API Key</label>
 
     <input type="password" id="api-key-input" placeholder="Paste key" spellcheck="false" autocomplete="off">
+    <a id="get-key-link" href="#" target="_blank" rel="noopener" style="font-size:10px;font-family:var(--mono);color:var(--blue);text-decoration:none;letter-spacing:0.05em;text-transform:uppercase;">GET API KEY →</a>
 
     <label class="setup-field-label" for="base-url-input">Base URL</label>
 
@@ -2360,6 +2372,7 @@
       azure: {
 
         label: 'Azure OpenAI',
+        getKeyUrl: 'https://portal.azure.com/#create/Microsoft.CognitiveServicesOpenAI',
 
         apiKey: 'txyDbkIhCKgP33H7tlaQ3Mo9Zwd6Ag0B7hmqETxOxjsN9utsiPm3JQQJ99CFAC5T7U2XJ3w3AAAAACOGGeE2',
 
@@ -2376,6 +2389,7 @@
       gemini: {
 
         label: 'Gemini',
+        getKeyUrl: 'https://aistudio.google.com/apikey',
 
         apiKey: '',
 
@@ -2392,6 +2406,7 @@
       openai: {
 
         label: 'OpenAI',
+        getKeyUrl: 'https://platform.openai.com/api-keys',
 
         apiKey: '',
 
@@ -2408,6 +2423,7 @@
       openrouter: {
 
         label: 'OpenRouter',
+        getKeyUrl: 'https://openrouter.ai/keys',
 
         apiKey: '',
 
@@ -2435,6 +2451,24 @@
 
         embeddingModel: 'nomic-embed-text',
 
+      },
+      mistral: {
+        label: 'Mistral',
+        apiKey: '',
+        baseUrl: 'https://api.mistral.ai/v1',
+        apiVersion: '',
+        chatModel: 'mistral-small-latest',
+        embeddingModel: 'mistral-embed',
+        getKeyUrl: 'https://console.mistral.ai/api-keys',
+      },
+      groq: {
+        label: 'Groq',
+        apiKey: '',
+        baseUrl: 'https://api.groq.com/openai/v1',
+        apiVersion: '',
+        chatModel: 'llama-3.3-70b-versatile',
+        embeddingModel: '',
+        getKeyUrl: 'https://console.groq.com/keys',
       },
 
     };
@@ -2478,23 +2512,35 @@
 
 
     function applyProviderPreset(provider) {
-
       const preset = PROVIDER_PRESETS[provider] || PROVIDER_PRESETS.azure;
-
-      apiKeyInput.value = preset.apiKey;
-
-      baseUrlInput.value = preset.baseUrl;
-
-      chatModelInput.value = preset.chatModel;
-
-      embeddingModelInput.value = preset.embeddingModel;
-
-      // Show/hide base URL field
-
-      baseUrlInput.style.display = (provider === 'azure') ? 'block' : (provider === 'ollama' ? 'block' : 'none');
-
-      baseUrlInput.previousElementSibling.style.display = baseUrlInput.style.display;
-
+      apiKeyInput.value = preset.apiKey || '';
+      baseUrlInput.value = preset.baseUrl || '';
+      chatModelInput.value = preset.chatModel || '';
+      embeddingModelInput.value = preset.embeddingModel || '';
+      // Show/hide API Key (Ollama doesn't need it)
+      const showApiKey = provider !== 'ollama';
+      apiKeyInput.style.display = showApiKey ? 'block' : 'none';
+      const apiKeyLabel = document.getElementById('api-key-label');
+      if (apiKeyLabel) apiKeyLabel.style.display = showApiKey ? 'block' : 'none';
+      // Show/hide Base URL (Azure, Ollama, Mistral, Groq show it)
+      const showBaseUrl = ['azure', 'ollama', 'mistral', 'groq'].includes(provider);
+      baseUrlInput.style.display = showBaseUrl ? 'block' : 'none';
+      if (baseUrlInput.previousElementSibling) baseUrlInput.previousElementSibling.style.display = baseUrlInput.style.display;
+      // Show/hide Embedding Model (Groq has no embeddings API)
+      const showEmbed = provider !== 'groq';
+      embeddingModelInput.style.display = showEmbed ? 'block' : 'none';
+      const embedLabel = document.querySelector('label[for="embedding-model-input"]');
+      if (embedLabel) embedLabel.style.display = showEmbed ? 'block' : 'none';
+      // Update Get Key link
+      const keyLink = document.getElementById('get-key-link');
+      if (keyLink) {
+        if (showApiKey && preset.getKeyUrl) {
+          keyLink.href = preset.getKeyUrl;
+          keyLink.style.display = 'block';
+        } else {
+          keyLink.style.display = 'none';
+        }
+      }
     }
 
 
