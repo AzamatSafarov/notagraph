@@ -14,7 +14,7 @@
 
 **Neural Cartography of Ideas — visualize your notes as a 3D knowledge graph with AI embeddings and LLM annotations.**
 
-[Live Demo](https://topologies-of-ideas-universal.vercel.app) - [Quick Start](#-quick-start) - [Features](#-features) - [Architecture](#-architecture) - [Roadmap](#-roadmap)
+[Live Demo](https://obsidian-universe.vercel.app) - [Quick Start](#-quick-start) - [Features](#-features) - [Architecture](#-architecture) - [Roadmap](#-roadmap)
 
 <img src="assets/hero-banner.svg" alt="Obsidian Universe hero banner" width="100%">
 
@@ -61,7 +61,7 @@ That makes it useful for:
 
 ## 🚀 Quick Start
 
-1. Open [topologies-of-ideas-universal.vercel.app](https://topologies-of-ideas-universal.vercel.app)
+1. Open [obsidian-universe.vercel.app](https://obsidian-universe.vercel.app)
 2. Choose an AI provider and enter API key
 3. Click **SELECT NOTES FOLDER** and choose your `.md` / `.txt` files
 4. Wait for the pipeline (embeddings -> clustering -> LLM annotations)
