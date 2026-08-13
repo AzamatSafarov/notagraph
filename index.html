@@ -6409,11 +6409,9 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
       Graph.graphData({ nodes, links });
 
       if (refreshNodeObjects) {
-
         Graph.nodeThreeObject(node => createNodeObject(node));
-
+        Graph.d3ReheatSimulation();
       }
-
     }
 
 
