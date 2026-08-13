@@ -1795,32 +1795,6 @@
 
     }
 
-.node-label .nl-text {
-
-      display: none;
-
-    }
-
-    .node-label--pinned .nl-text,
-
-    .node-label--hover .nl-text {
-
-      display: inline;
-
-    }
-
-    .node-label--pinned {
-
-      opacity: 0.9;
-
-    }
-
-    .node-label--pinned .nl-bullet {
-
-      font-size: 11px;
-
-    }
-
 
 
     /* Square-only mode — hide text, show just the bullet */
@@ -1835,9 +1809,7 @@
 
     }
 
-    .squares-only .node-label .nl-text { display: none; }
-
-    .squares-only .node-label .nl-bullet { font-size: 12px; }
+    .squares-only .node-label .squares-only .node-label .nl-bullet { font-size: 12px; }
 
 
 
@@ -4760,7 +4732,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
         const div = document.createElement('div');
 
-        div.className = 'node-label' + (isSpecial ? ' node-label--special node-label--pinned' : '');
+        div.className = 'node-label' + (isSpecial ? ' node-label--special' : '');
 
         div.style.color = VFX.labelColor.val;
 
