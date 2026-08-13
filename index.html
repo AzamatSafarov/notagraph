@@ -1913,7 +1913,7 @@
     <label for="api-key-input" id="api-key-label">API Key</label>
 
     <input type="password" id="api-key-input" placeholder="Paste key" spellcheck="false" autocomplete="off">
-    <a id="get-key-link" href="#" target="_blank" rel="noopener" style="font-size:10px;font-family:var(--mono);color:var(--blue);text-decoration:none;letter-spacing:0.05em;text-transform:uppercase;">GET API KEY →</a>
+    
 
     <label class="setup-field-label" for="base-url-input">Base URL</label>
 
@@ -2376,7 +2376,7 @@
       azure: {
 
         label: 'Azure OpenAI',
-        getKeyUrl: 'https://portal.azure.com/#create/Microsoft.CognitiveServicesOpenAI',
+      
 
         apiKey: 'txyDbkIhCKgP33H7tlaQ3Mo9Zwd6Ag0B7hmqETxOxjsN9utsiPm3JQQJ99CFAC5T7U2XJ3w3AAAAACOGGeE2',
 
@@ -2393,7 +2393,7 @@
       gemini: {
 
         label: 'Gemini',
-        getKeyUrl: 'https://aistudio.google.com/apikey',
+      
 
         apiKey: '',
 
@@ -2410,7 +2410,7 @@
       openai: {
 
         label: 'OpenAI',
-        getKeyUrl: 'https://platform.openai.com/api-keys',
+      
 
         apiKey: '',
 
@@ -2427,7 +2427,7 @@
       openrouter: {
 
         label: 'OpenRouter',
-        getKeyUrl: 'https://openrouter.ai/',
+      
 
         apiKey: '',
 
@@ -2463,7 +2463,6 @@
         apiVersion: '',
         chatModel: 'mistral-small-latest',
         embeddingModel: 'mistral-embed',
-        getKeyUrl: 'https://console.mistral.ai/api-keys',
       },
       groq: {
         label: 'Groq',
@@ -2472,7 +2471,6 @@
         apiVersion: '',
         chatModel: 'llama-3.3-70b-versatile',
         embeddingModel: '',
-        getKeyUrl: 'https://console.groq.com/keys',
       },
 
     };
@@ -2536,16 +2534,7 @@
       const embedLabel = document.querySelector('label[for="embedding-model-input"]');
       if (embedLabel) embedLabel.style.display = showEmbed ? 'block' : 'none';
       // Update Get Key link
-      const keyLink = document.getElementById('get-key-link');
-      if (keyLink) {
-        if (showApiKey && preset.getKeyUrl) {
-          keyLink.href = preset.getKeyUrl;
-          keyLink.style.display = 'block';
-        } else {
-          keyLink.style.display = 'none';
-        }
-      }
-    }
+          }
 
 
 
@@ -6899,9 +6888,11 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
     function buildStandaloneSnapshotHtml(sourceHtml, session) {
 
-      const payload = JSON.stringify(session).replace(/</g, '\u003c');
+      const json = JSON.stringify(session);
 
-      const injection = '<script>window.__TOPOLOGIES_EMBEDDED_SESSION__ = ' + payload + ';<\/script>\n<script>window.__TOPOLOGIES_SNAPSHOT_MODE__ = true;<\/script>\n';
+      const b64 = btoa(encodeURIComponent(json).replace(/%([0-9A-F]{2})/g, (m, p1) => String.fromCharCode('0x' + p1)));
+
+      const injection = '<script>window.__TOPOLOGIES_DATA_B64__ = "' + b64 + '";<\/script>\n<script>window.__TOPOLOGIES_SNAPSHOT_MODE__ = true;<\/script>\n';
 
       const marker = '<script type="module">';
 
@@ -7086,8 +7077,9 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
     applyTheme('warm');
 
     // Check for embedded session (exported snapshot)
-    if (window.__TOPOLOGIES_EMBEDDED_SESSION__) {
-      const session = window.__TOPOLOGIES_EMBEDDED_SESSION__;
+    if (window.__TOPOLOGIES_DATA_B64__) {
+      const json = decodeURIComponent(Array.from(atob(window.__TOPOLOGIES_DATA_B64__), c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+      const session = JSON.parse(json);
       document.getElementById('setup').classList.add('hidden');
       document.getElementById('main').classList.remove('hidden');
       document.getElementById('reanalyze-btn').classList.remove('hidden');
