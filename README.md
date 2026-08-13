@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/logo-mark.svg" alt="Obsidian Universe" width="92">
+<img src="assets/logo-mark.svg" alt="Obsidian Universe mark" width="92">
 
 # Obsidian Universe
 
