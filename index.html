@@ -1786,6 +1786,7 @@
       transition: opacity 0.15s ease;
 
     }
+    .node-label.hidden-label { display: none !important; }
 
     .node-label .nl-bullet {
 
@@ -1869,7 +1870,55 @@
 
 
 
-  </style>
+    #toggle-labels-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 130px;
+      z-index: 1000;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(0, 0, 0, 0.15);
+      border-radius: 8px;
+      color: #3a3a4a;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      padding: 8px 14px;
+      cursor: pointer;
+      transition: color 200ms ease, border-color 200ms ease;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    #toggle-labels-btn:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+    #toggle-meta-btn {
+      margin: 12px 0 8px 0;
+      padding: 6px 12px;
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      border-radius: 6px;
+      background: #ffffff;
+      color: #4ecdc4;
+      font-family: var(--mono);
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 200ms ease;
+      align-self: flex-start;
+      flex-shrink: 0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    #toggle-meta-btn:hover {
+      color: #ff9ff3;
+      border-color: #ff9ff3;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.12);
+    }
+    #card-meta.hidden { display: none; }</style>
 
 </head>
 
@@ -2049,6 +2098,7 @@
 
       </div>
 
+      <button id="toggle-meta-btn" title="Toggle metadata">HIDE META</button>
       <div id="card-meta"></div>
 
       <div id="card-preview"></div>
@@ -2076,10 +2126,11 @@
     <button id="export-snapshot-btn" title="Export graph as HTML">EXPORT SNAPSHOT HTML</button>
 
     <button id="theme-toggle" title="Switch color theme">LIGHT</button>
+    <button id="toggle-labels-btn" title="Toggle note labels">LABELS</button>
 
 
 
-  </div><!-- /main -->
+      </div><!-- /main -->
 
 
 
@@ -3211,7 +3262,7 @@
 
         let retries = 0;
 
-        const maxRetries = 5;
+        const maxRetries = 10;
 
 
 
@@ -3237,11 +3288,13 @@
 
             );
 
-            if (response.ok) break;
-
+            if (response.ok) {
+              await sleep(6000); // 6s base delay between Azure requests (match rate limit)
+              break;
+            }
             if (response.status === 429 || response.status === 503) {
 
-              const retryAfter = Math.min(parseInt(response.headers.get('Retry-After') || '5'), 5);
+              const retryAfter = Math.min(parseInt(response.headers.get('Retry-After') || '6'), 60);
 
               retries++;
 
@@ -3399,7 +3452,7 @@
 
           if (response.status === 429 || response.status === 503) {
 
-            const retryAfter = Math.min(parseInt(response.headers.get('Retry-After') || '5'), 5);
+            const retryAfter = Math.min(parseInt(response.headers.get('Retry-After') || '6'), 60);
 
             retries++;
 
@@ -4621,6 +4674,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
 
     let currentTheme = 'warm';
+    let showNodeLabels = true;
 
 
 
@@ -4782,7 +4836,7 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
 
         const div = document.createElement('div');
 
-        div.className = 'node-label' + (isSpecial ? ' node-label--special' : '');
+        div.className = 'node-label' + (isSpecial ? ' node-label--special' : '') + (showNodeLabels ? '' : ' hidden-label');
 
         div.style.color = VFX.labelColor.val;
 
@@ -6198,6 +6252,22 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
     document.getElementById('card-close').addEventListener('click', hideDetailCard);
 
 
+    // Toggle metadata visibility in detail card
+    let showMeta = true;
+    document.getElementById('toggle-meta-btn').addEventListener('click', () => {
+      showMeta = !showMeta;
+      const metaEl = document.getElementById('card-meta');
+      const btn = document.getElementById('toggle-meta-btn');
+      if (showMeta) {
+        metaEl.classList.remove('hidden');
+        btn.textContent = 'HIDE META';
+      } else {
+        metaEl.classList.add('hidden');
+        btn.textContent = 'SHOW META';
+      }
+    });
+
+
 
     // Connection name click — navigate to that node
 
@@ -6835,6 +6905,25 @@ PAIR 1: A→B: <verb phrase> | B→A: <verb phrase>
       const next = names[(names.indexOf(currentTheme) + 1) % names.length];
 
       applyTheme(next);
+
+    });
+
+
+    // Toggle note labels visibility
+
+    document.getElementById('toggle-labels-btn').addEventListener('click', () => {
+
+      showNodeLabels = !showNodeLabels;
+
+      document.getElementById('toggle-labels-btn').textContent = showNodeLabels ? 'LABELS' : 'NO LABELS';
+
+      document.querySelectorAll('.node-label').forEach(el => {
+
+        if (showNodeLabels) el.classList.remove('hidden-label');
+
+        else el.classList.add('hidden-label');
+
+      });
 
     });
 
